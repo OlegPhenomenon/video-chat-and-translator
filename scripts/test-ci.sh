@@ -69,7 +69,6 @@ check_direct "mise installed" mise --version
 section "Core toolchain"
 check_mise "direnv installed" direnv version
 check_mise "gh installed" gh --version
-check_mise "himalaya installed" himalaya --version
 check_mise "gitleaks installed" gitleaks version
 check_mise "jq installed" jq --version
 check_mise "node installed" node --version
@@ -85,7 +84,6 @@ section "Agent CLIs"
 check_mise "claude installed" claude --version
 check_mise "codex installed" codex --version
 check_mise "playwright-cli installed" playwright-cli --version
-check_mise "tgcli installed" tgcli --help
-check_mise "gws installed" gws --help
+check_direct "ccbox installed" ccbox --version
 
 printf '\nCI smoke checks passed.\n'

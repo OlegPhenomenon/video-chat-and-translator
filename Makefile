@@ -21,7 +21,7 @@ GOOGLE_WORKSPACE_SKILLS := \
 	gws-drive \
 	gws-sheets
 
-.PHONY: ai bootstrap mise-package mise-install check check-context register
+.PHONY: ai bootstrap mise-package mise-install check check-context codex-context register
 .PHONY: agents-install agents agents-cli agents-skills extra-skills
 .PHONY: agents-skills-install agents-skills-list agents-skills-check-npx
 
@@ -38,6 +38,9 @@ check:
 
 check-context:
 	@./scripts/test-context.sh
+
+codex-context:
+	@./scripts/codex-context.sh
 
 mise-package:
 	@set -e; \
@@ -81,6 +84,17 @@ agents:
 
 agents-cli:
 	@$(NPM) install -g @playwright/cli@latest
+	@if command -v ccbox >/dev/null 2>&1; then \
+		echo "Install ccbox - already exists"; \
+	elif command -v brew >/dev/null 2>&1; then \
+		brew tap diskd-ai/ccbox && brew install ccbox; \
+		echo "Install ccbox - installed via brew"; \
+	elif command -v curl >/dev/null 2>&1; then \
+		curl -fsSL -H 'Cache-Control: no-cache' -o - https://raw.githubusercontent.com/diskd-ai/ccbox/main/scripts/install.sh | /bin/bash; \
+		echo "Install ccbox - installed via script"; \
+	else \
+		echo "⚠️  ccbox: need either brew or curl to install"; \
+	fi
 
 # --- Skills for agents ---
 
@@ -95,16 +109,23 @@ agents-skills-install: agents-skills-check-npx
 	@$(SKILLS) add microsoft/playwright-cli --skill playwright-cli -g $(AGENTS_SKILLS_AGENT_FLAGS) -y
 	@echo "  📥 Installing prompt-engeneering from CodeAlive-AI/prompt-engineering-skill"
 	@$(SKILLS) add CodeAlive-AI/prompt-engineering-skill@prompt-engeneering -g -y
+	@echo "  📥 Installing ccbox from diskd-ai/ccbox"
+	@$(SKILLS) add diskd-ai/ccbox --skill ccbox -g $(AGENTS_SKILLS_AGENT_FLAGS) -y
+	@echo "  📥 Installing ccbox-insights from diskd-ai/ccbox"
+	@$(SKILLS) add diskd-ai/ccbox --skill ccbox-insights -g $(AGENTS_SKILLS_AGENT_FLAGS) -y
 
 agents-skills-list:
 	@echo "$(BLUE)📋 Core skills:$(NC)"
 	@printf "  playwright-cli (microsoft/playwright-cli)\n"
 	@printf "  prompt-engeneering (CodeAlive-AI/prompt-engineering-skill)\n"
+	@printf "  ccbox (diskd-ai/ccbox)\n"
+	@printf "  ccbox-insights (diskd-ai/ccbox)\n"
 
 # --- Extra skills and plugins (not installed by default) ---
 
 extra-skills: agents-skills-check-npx
 	@echo "$(BLUE)📦 Installing extra CLIs, skills, and plugins...$(NC)"
+	@mise install "github:pimalaya/himalaya"
 	@$(NPM) install -g @dapi/tgcli
 	@$(NPM) install -g @googleworkspace/cli
 	@echo "  📥 Installing tgcli from dapi/tgcli"
@@ -128,7 +149,7 @@ CLAUDE_PLUGINS ?= \
 	himalaya@$(CLAUDE_PLUGIN_NAMESPACE) \
 	pr-review-fix-loop@$(CLAUDE_PLUGIN_NAMESPACE) \
 	spec-reviewer@$(CLAUDE_PLUGIN_NAMESPACE) \
-	zellij-workflow@$(CLAUDE_PLUGIN_NAMESPACE) \
+	zellij-workflow@$(CLAUDE_PLUGIN_NAMESPACE)
 
 # --- Registry ---
 

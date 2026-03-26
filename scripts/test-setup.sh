@@ -2,6 +2,8 @@
 
 set -u
 
+ORIG_PATH="$PATH"
+
 PATH="${HOME}/.local/bin:/usr/local/bin:/opt/homebrew/bin:${PATH}"
 export PATH
 
@@ -63,6 +65,14 @@ extract_json() {
 
 command_exists() {
 	command -v "$1" >/dev/null 2>&1
+}
+
+command_in_path() {
+	PATH="$ORIG_PATH" command -v "$1" >/dev/null 2>&1
+}
+
+path_contains() {
+	printf '%s' "$ORIG_PATH" | tr ':' '\n' | grep -q "$1"
 }
 
 check_command() {
@@ -266,11 +276,36 @@ check_claude_plugins() {
 	done
 }
 
+section "Shell integration (required)"
+if command_in_path mise; then
+	ok "mise in PATH"
+else
+	fail "mise in PATH"
+	note "mise is not in your shell PATH. Install via brew or add ~/.local/bin to PATH."
+fi
+if path_contains "mise/shims\|mise/installs"; then
+	ok "mise activate (tool paths in PATH)"
+else
+	fail "mise activate (tool paths in PATH)"
+	note "mise tool directories not in PATH. Add 'mise activate' to your shell rc — see: https://mise.jdx.dev/getting-started.html"
+fi
+if command_in_path direnv; then
+	ok "direnv in PATH"
+else
+	fail "direnv in PATH"
+	note "direnv is not in your shell PATH. Ensure mise activate is configured so mise-installed tools are available."
+fi
+if [ -n "${DIRENV_DIR:-}" ]; then
+	ok "direnv hook active (DIRENV_DIR is set)"
+else
+	fail "direnv hook active (DIRENV_DIR is set)"
+	note "direnv hook is not configured in your shell. Add it — see: https://direnv.net/docs/hook.html"
+fi
+
 section "Core toolchain (required)"
 check_command required "mise installed" mise --version
 check_command required "direnv installed" direnv version
 check_command required "gh installed" gh --version
-check_command required "himalaya installed" himalaya --version
 check_command required "gitleaks installed" gitleaks version
 check_command required "jq installed" jq --version
 check_command required "node installed" node --version
@@ -286,18 +321,19 @@ section "Agent CLIs (required)"
 check_command required "claude installed" claude --version
 check_command required "codex installed" codex --version
 check_command required "playwright-cli installed" playwright-cli --version
-check_command required "tgcli installed" tgcli --help
-check_command required "gws installed" gws --help
-
+check_command required "ccbox installed" ccbox --version
 section "Account-backed tools"
 check_json_command required "claude authenticated" '.loggedIn == true' claude auth status --json
 check_command required "codex authenticated" codex login status
 check_command required "gh authenticated" gh auth status
+
+section "Optional agent extras"
+check_command optional "tgcli installed" tgcli --help
+check_command optional "gws installed" gws --help
+check_command optional "himalaya installed" himalaya --version
 check_command optional "tgcli authenticated" tgcli auth status
 check_json_command optional "gws authenticated" '(.token_valid // false) == true' gws auth status
 check_himalaya_accounts
-
-section "Optional agent extras"
 check_skills
 check_claude_plugins
 
