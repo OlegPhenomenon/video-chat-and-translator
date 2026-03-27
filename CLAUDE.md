@@ -37,6 +37,9 @@ See PROJECT.md for project description.
   - **No custom actions** are allowed in standard controllers.
   - If a specific action is needed within a controller's context (e.g., search), create a namespaced controller with the name of that action inside the scope of the main controller.
   - *Example:* If `BlogsController` needs a `search` action, you must create `Blogs::SearchController` with an `index` or `show` action, placing the file in the appropriately scoped directory.
+- **Callbacks:**
+  - Use callbacks in models and controllers *only* when absolutely justified. 
+  - In most cases, you should seek alternative solutions (like explicit method calls or processing in separate objects) to ensure the system's execution flow remains clear and predictable.
 - **DRY & Documentation:**
   - Strictly adhere to the DRY principle.
   - Any added public methods, classes, modules, and files MUST be documented in a separate document located in the `/docs` path (e.g. `/docs/...`). This ensures any AI agent can read it and understand existing features to avoid duplication.
@@ -44,3 +47,4 @@ See PROJECT.md for project description.
 ## Constraints
 - **Database Changes:** You MUST ask for permission before modifying the database schema or creating migrations.
 - **Gems:** You MUST ask for permission before installing any new gems.
+- **Error Handling & Fallbacks:** Avoid excessive error handlers, global rescues, and silent fallbacks. Overusing them hides true errors during development and causes the system to deviate from intended business logic. You MUST consult the user (ask for permission/advice) before implementing complex fallbacks or broad error handling mechanisms.
