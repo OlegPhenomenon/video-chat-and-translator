@@ -1,0 +1,2 @@
+vite: bin/vite dev
+web: env PORT=3100 bin/rails s -p 3100 -b 0.0.0.0

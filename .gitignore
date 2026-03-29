@@ -1,1 +1,76 @@
+# === OS & Editor ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
 .obsidian/
+own
+*.swp
+*.swo
+*~
+
+# === IDE ===
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# === Ruby / Bundler ===
+/.bundle
+vendor/bundle
+*.gem
+
+# === Node / JS ===
+node_modules/
+*.local
+
+# === Rails (relative to video_chat_and_translator/) ===
+video_chat_and_translator/log/*
+!video_chat_and_translator/log/.keep
+video_chat_and_translator/tmp/*
+!video_chat_and_translator/tmp/.keep
+video_chat_and_translator/tmp/pids/*
+!video_chat_and_translator/tmp/pids/.keep
+video_chat_and_translator/storage/*
+!video_chat_and_translator/storage/.keep
+video_chat_and_translator/tmp/storage/*
+!video_chat_and_translator/tmp/storage/.keep
+video_chat_and_translator/public/assets
+video_chat_and_translator/public/vite*
+video_chat_and_translator/app/assets/builds/*
+!video_chat_and_translator/app/assets/builds/.keep
+video_chat_and_translator/vendor/bundle
+
+# === Secrets & Credentials ===
+video_chat_and_translator/config/master.key
+video_chat_and_translator/config/credentials/*.key
+.env*.local
+.env.production
+.env.staging
+
+# === Keep .env and .envrc (non-secret templates) ===
+!.env
+!.envrc
+
+# === Vite ===
+video_chat_and_translator/public/vite*
+
+# === Kamal ===
+video_chat_and_translator/.kamal/secrets
+
+# === Docker ===
+# Keep docker/ in repo, but ignore runtime artifacts
+docker/tmp/
+
+# === Playwright ===
+.playwright-cli/
+
+# === Screenshots (development artifacts) ===
+landing-screenshot.png
+video_chat_and_translator/landing-screenshot.png
+
+# === Misc ===
+*.bak
