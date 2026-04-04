@@ -5,7 +5,8 @@ class Users::SessionsController < Devise::SessionsController
 
   def new
     render inertia: "auth/Login", props: {
-      translations: I18n.t("auth.login")
+      translations: I18n.t("auth.login"),
+      forgot_password_url: new_user_password_path
     }
   end
 

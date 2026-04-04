@@ -9,11 +9,13 @@ interface LoginTranslations {
   submit: string
   no_account: string
   register_link: string
+  forgot_password: string
   resend_email: string
 }
 
 interface LoginProps {
   translations: LoginTranslations
+  forgot_password_url: string
 }
 
 interface SharedProps {
@@ -24,7 +26,7 @@ interface SharedProps {
   [key: string]: unknown
 }
 
-export default function Login({ translations }: LoginProps) {
+export default function Login({ translations, forgot_password_url }: LoginProps) {
   const { flash } = usePage<SharedProps>().props
   const [showResend, setShowResend] = useState(false)
   const [resendEmail, setResendEmail] = useState('')
@@ -117,6 +119,12 @@ export default function Login({ translations }: LoginProps) {
             {translations.no_account}{' '}
             <a href="/users/sign_up" className="text-indigo-600 hover:underline">
               {translations.register_link}
+            </a>
+          </div>
+
+          <div className="text-center">
+            <a href={forgot_password_url} className="text-sm text-gray-500 hover:text-indigo-600 hover:underline">
+              {translations.forgot_password}
             </a>
           </div>
 
