@@ -32,6 +32,18 @@ ru:
       email_taken: "Этот эмэйл уже зарегистрирован"
       password_too_short: "Пароль должен содержать минимум 8 символов"
       password_mismatch: "Пароли не совпадают"
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              invalid: "Некорректный формат эмэйла"
+              taken: "Этот эмэйл уже зарегистрирован"
+            password:
+              too_short: "Пароль должен содержать минимум 8 символов"
+            password_confirmation:
+              confirmation: "Пароли не совпадают"
   devise:
     sessions:
       signed_in: "Вы успешно авторизовались"
