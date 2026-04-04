@@ -1,8 +1,9 @@
 # Brief: Система сброса пароля
 
 **Related Issue:** [GitHub Issue #2](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/2)
-**Status:** active
+**Status:** completed
 **Date:** 03.04.2026
+**Completed:** 04.04.2026
 
 ### Цель
 Сейчас если пользователь забыл пароль, у него нет возможности восстановить доступ к аккаунту. Он полностью заблокирован.
