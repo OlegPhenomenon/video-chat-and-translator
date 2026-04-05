@@ -19,6 +19,7 @@ Registered users with a **confirmed email** can reset their password via email l
 ## Anti-enumeration Policy
 
 At the email submission step, **always** the same neutral message is shown regardless of:
+
 - Whether the email is registered
 - Whether the account is confirmed
 - Whether the email was actually sent
@@ -27,17 +28,17 @@ This prevents account enumeration attacks.
 
 ## Routes
 
-| Method | Path | Controller#Action |
-|--------|------|-------------------|
-| GET | `/users/password/new` | `users/passwords#new` |
-| POST | `/users/password` | `users/passwords#create` |
-| GET | `/users/password/edit` | `users/passwords#edit` |
-| PATCH | `/users/password` | `users/passwords#update` |
+| Method | Path                   | Controller#Action        |
+| ------ | ---------------------- | ------------------------ |
+| GET    | `/users/password/new`  | `users/passwords#new`    |
+| POST   | `/users/password`      | `users/passwords#create` |
+| GET    | `/users/password/edit` | `users/passwords#edit`   |
+| PATCH  | `/users/password`      | `users/passwords#update` |
 
 ## Files
 
 | Area | File |
-|------|------|
+| ---- | ---- |
 | Model | `app/models/user.rb` — added `:recoverable` |
 | Routes | `config/routes.rb` — added `passwords: "users/passwords"` |
 | Controller | `app/controllers/users/passwords_controller.rb` |
