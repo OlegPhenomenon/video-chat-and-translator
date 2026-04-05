@@ -192,9 +192,9 @@ export default function Show({ translations, errors = {} }: Props) {
           </div>
 
           <div className="text-right text-sm">
-            <a href="/users/password/new" className="text-indigo-600 hover:underline">
+            <Link href="/users/password/new" className="text-indigo-600 hover:underline">
               {translations.password.forgot_password}
-            </a>
+            </Link>
           </div>
 
           <button
