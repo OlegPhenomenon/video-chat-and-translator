@@ -1,7 +1,20 @@
 import { createInertiaApp } from '@inertiajs/react'
+import { createElement } from 'react'
+import AppLayout from '../layouts/AppLayout'
+
+const pages = import.meta.glob('../pages/**/*.tsx', { eager: true }) as Record<
+  string,
+  { default: React.ComponentType & { layout?: (page: React.ReactNode) => React.ReactNode } }
+>
 
 void createInertiaApp({
-  pages: "../pages",
+  resolve: (name) => {
+    const page = pages[`../pages/${name}.tsx`]
+    if (page && page.default && !page.default.layout) {
+      page.default.layout = (page: React.ReactNode) => createElement(AppLayout, null, page)
+    }
+    return page
+  },
 
   strictMode: true,
 

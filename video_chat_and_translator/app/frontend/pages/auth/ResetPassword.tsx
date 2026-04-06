@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import AuthLayout from './AuthLayout'
 
 interface ResetPasswordTranslations {
@@ -18,17 +18,7 @@ interface ResetPasswordProps {
   errors?: Record<string, string[]>
 }
 
-interface SharedProps {
-  flash?: {
-    notice?: string
-    alert?: string
-  }
-  [key: string]: unknown
-}
-
 export default function ResetPassword({ translations, token_state, reset_password_token, forgot_password_url, errors = {} }: ResetPasswordProps) {
-  const { flash } = usePage<SharedProps>().props
-
   const { data, setData, patch, processing } = useForm({
     user: {
       password: '',
@@ -53,18 +43,6 @@ export default function ResetPassword({ translations, token_state, reset_passwor
       <Head title={translations.title} />
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
-
-      {flash?.notice && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-green-500 text-white text-sm">
-          {flash.notice}
-        </div>
-      )}
-
-      {flash?.alert && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-red-500 text-white text-sm">
-          {flash.alert}
-        </div>
-      )}
 
       {token_state === 'invalid' ? (
         <div className="space-y-4">

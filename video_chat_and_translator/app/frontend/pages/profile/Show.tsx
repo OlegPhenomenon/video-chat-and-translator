@@ -38,7 +38,7 @@ interface SharedProps {
 }
 
 export default function Show({ translations, errors = {} }: Props) {
-  const { current_user, flash } = usePage<SharedProps>().props
+  const { current_user } = usePage<SharedProps>().props
 
   const emailForm = useForm({
     user: { email: '' }
@@ -73,18 +73,6 @@ export default function Show({ translations, errors = {} }: Props) {
       <Head title={translations.title} />
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
-
-      {flash?.notice && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-green-500 text-white text-sm">
-          {flash.notice}
-        </div>
-      )}
-
-      {flash?.alert && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-red-500 text-white text-sm">
-          {flash.alert}
-        </div>
-      )}
 
       {/* Email section */}
       <div className="mb-6">
@@ -207,13 +195,6 @@ export default function Show({ translations, errors = {} }: Props) {
         </form>
       </div>
 
-      <hr className="my-6 border-gray-200" />
-
-      <div className="text-center">
-        <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
-          {translations.back_to_home}
-        </Link>
-      </div>
     </AuthLayout>
   )
 }

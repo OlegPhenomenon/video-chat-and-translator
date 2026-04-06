@@ -6,4 +6,8 @@ class ApplicationController < ActionController::Base
 
   inertia_share flash: -> { flash.to_hash }
   inertia_share current_user: -> { current_user&.as_json(only: [ :id, :email, :unconfirmed_email ]) }
+
+  def after_sign_in_path_for(_resource)
+    dashboard_path
+  end
 end

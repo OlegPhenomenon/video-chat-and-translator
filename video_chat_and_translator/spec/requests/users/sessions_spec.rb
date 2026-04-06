@@ -5,11 +5,29 @@ RSpec.describe "Users::Sessions", type: :request do
   let!(:unconfirmed_user) { create(:user, :unconfirmed, email: "unconfirmed@example.com", password: "password123") }
   let!(:expired_user) { create(:user, :expired_confirmation, email: "expired@example.com", password: "password123") }
 
+  describe "GET /users/sign_in" do
+    context "when not authenticated" do
+      it "renders the login page" do
+        get "/users/sign_in"
+        expect(response).to be_successful
+      end
+    end
+
+    context "when authenticated" do
+      before { sign_in confirmed_user }
+
+      it "redirects to dashboard" do
+        get "/users/sign_in"
+        expect(response).to redirect_to(dashboard_path)
+      end
+    end
+  end
+
   describe "POST /users/sign_in" do
     context "with valid confirmed user" do
-      it "signs in and redirects to root" do
+      it "signs in and redirects to dashboard" do
         post "/users/sign_in", params: { user: { email: "confirmed@example.com", password: "password123" } }
-        expect(response).to redirect_to(authenticated_root_path)
+        expect(response).to redirect_to(dashboard_path)
       end
     end
 
@@ -49,10 +67,10 @@ RSpec.describe "Users::Sessions", type: :request do
   end
 
   describe "DELETE /users/sign_out" do
-    it "signs out and redirects to login" do
+    it "signs out and redirects to root" do
       sign_in confirmed_user
       delete "/users/sign_out"
-      expect(response).to redirect_to(new_user_session_path)
+      expect(response).to redirect_to(root_path)
     end
   end
 end
