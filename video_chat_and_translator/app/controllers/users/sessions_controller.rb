@@ -1,9 +1,13 @@
 class Users::SessionsController < Devise::SessionsController
   include ConfirmableLoginHandler
+  include RedirectAuthenticatedUser
 
   skip_before_action :authenticate_user!
 
   def new
+    redirect_if_authenticated
+    return if performed?
+
     render inertia: "auth/Login", props: {
       translations: I18n.t("auth.login"),
       forgot_password_url: new_user_password_path
@@ -18,7 +22,7 @@ class Users::SessionsController < Devise::SessionsController
 
     if resource
       sign_in(resource_name, resource)
-      redirect_to authenticated_root_path, notice: I18n.t("devise.sessions.signed_in")
+      redirect_to dashboard_path, notice: I18n.t("devise.sessions.signed_in")
     elsif caught && caught[:message] == :unconfirmed
       user = User.find_by(email: params.dig(:user, :email))
       handle_unconfirmed_user(user)
@@ -29,6 +33,6 @@ class Users::SessionsController < Devise::SessionsController
 
   def destroy
     Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
-    redirect_to new_user_session_path
+    redirect_to root_path
   end
 end

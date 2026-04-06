@@ -1,7 +1,12 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  include RedirectAuthenticatedUser
+
   skip_before_action :authenticate_user!
 
   def new
+    redirect_if_authenticated
+    return if performed?
+
     render inertia: "auth/Register", props: {
       translations: I18n.t("auth.register")
     }

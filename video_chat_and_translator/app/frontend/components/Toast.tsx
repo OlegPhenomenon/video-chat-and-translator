@@ -9,7 +9,11 @@ interface SharedProps {
   [key: string]: unknown
 }
 
-export default function Toast() {
+interface ToastProps {
+  error?: string | null
+}
+
+export default function Toast({ error }: ToastProps = {}) {
   const { flash } = usePage<SharedProps>().props
   const [visible, setVisible] = useState(false)
   const [message, setMessage] = useState('')
@@ -20,15 +24,27 @@ export default function Toast() {
       setMessage(flash.notice)
       setType('notice')
       setVisible(true)
+      const timer = setTimeout(() => setVisible(false), 5000)
+      return () => clearTimeout(timer)
     } else if (flash?.alert) {
       setMessage(flash.alert)
       setType('alert')
       setVisible(true)
+      const timer = setTimeout(() => setVisible(false), 5000)
+      return () => clearTimeout(timer)
     }
-
-    const timer = setTimeout(() => setVisible(false), 5000)
-    return () => clearTimeout(timer)
   }, [flash])
+
+  useEffect(() => {
+    if (error) {
+      setMessage(error)
+      setType('alert')
+      setVisible(true)
+
+      const timer = setTimeout(() => setVisible(false), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
 
   if (!visible || !message) return null
 

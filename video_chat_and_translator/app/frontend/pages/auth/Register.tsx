@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import AuthLayout from './AuthLayout'
 
 interface RegisterTranslations {
@@ -16,17 +16,7 @@ interface RegisterProps {
   errors?: Record<string, string[]>
 }
 
-interface SharedProps {
-  flash?: {
-    notice?: string
-    alert?: string
-  }
-  [key: string]: unknown
-}
-
 export default function Register({ translations, errors = {} }: RegisterProps) {
-  const { flash } = usePage<SharedProps>().props
-
   const { data, setData, post, processing } = useForm({
     user: {
       email: '',
@@ -51,18 +41,6 @@ export default function Register({ translations, errors = {} }: RegisterProps) {
       <Head title={translations.title} />
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
-
-      {flash?.notice && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-green-500 text-white text-sm">
-          {flash.notice}
-        </div>
-      )}
-
-      {flash?.alert && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-red-500 text-white text-sm">
-          {flash.alert}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

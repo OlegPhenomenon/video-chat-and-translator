@@ -1,7 +1,7 @@
 # Spec: Создание страницы дашборда
 
 **Brief:** [brief.md](./brief.md)
-**Status:** draft
+**Status:** active
 **Date:** 06.04.2026
 
 ---

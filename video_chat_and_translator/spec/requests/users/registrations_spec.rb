@@ -1,6 +1,26 @@
 require 'rails_helper'
 
 RSpec.describe "Users::Registrations", type: :request do
+  describe "GET /users/sign_up" do
+    context "when not authenticated" do
+      it "renders the registration page" do
+        get "/users/sign_up"
+        expect(response).to be_successful
+      end
+    end
+
+    context "when authenticated" do
+      let!(:user) { create(:user, :confirmed) }
+
+      before { sign_in user }
+
+      it "redirects to dashboard" do
+        get "/users/sign_up"
+        expect(response).to redirect_to(dashboard_path)
+      end
+    end
+  end
+
   describe "POST /users" do
     let(:valid_params) do
       { user: { email: "test@example.com", password: "password123", password_confirmation: "password123" } }

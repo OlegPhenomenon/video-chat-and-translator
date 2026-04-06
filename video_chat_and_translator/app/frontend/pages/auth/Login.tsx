@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react'
 import { useState } from 'react'
 import AuthLayout from './AuthLayout'
 
@@ -18,16 +18,7 @@ interface LoginProps {
   forgot_password_url: string
 }
 
-interface SharedProps {
-  flash?: {
-    notice?: string
-    alert?: string
-  }
-  [key: string]: unknown
-}
-
 export default function Login({ translations, forgot_password_url }: LoginProps) {
-  const { flash } = usePage<SharedProps>().props
   const [showResend, setShowResend] = useState(false)
   const [resendEmail, setResendEmail] = useState('')
 
@@ -56,18 +47,6 @@ export default function Login({ translations, forgot_password_url }: LoginProps)
       <Head title={translations.title} />
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
-
-      {flash?.alert && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-red-500 text-white text-sm">
-          {flash.alert}
-        </div>
-      )}
-
-      {flash?.notice && (
-        <div className="mb-4 px-4 py-3 rounded-md bg-green-500 text-white text-sm">
-          {flash.notice}
-        </div>
-      )}
 
       {processing ? (
         <div className="flex justify-center items-center py-12">
