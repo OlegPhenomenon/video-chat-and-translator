@@ -24,14 +24,15 @@ export default function Toast({ error }: ToastProps = {}) {
       setMessage(flash.notice)
       setType('notice')
       setVisible(true)
+      const timer = setTimeout(() => setVisible(false), 5000)
+      return () => clearTimeout(timer)
     } else if (flash?.alert) {
       setMessage(flash.alert)
       setType('alert')
       setVisible(true)
+      const timer = setTimeout(() => setVisible(false), 5000)
+      return () => clearTimeout(timer)
     }
-
-    const timer = setTimeout(() => setVisible(false), 5000)
-    return () => clearTimeout(timer)
   }, [flash])
 
   useEffect(() => {

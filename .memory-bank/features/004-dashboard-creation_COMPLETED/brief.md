@@ -1,7 +1,7 @@
 # Brief: Создание страницы дашборда
 
 **Related Issue:** [GitHub Issue #4](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/4)
-**Status:** draft
+**Status:** active
 **Date:** 06.04.2026
 
 ### Проблема

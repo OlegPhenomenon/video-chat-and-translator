@@ -3,7 +3,6 @@ import AuthLayout from '../auth/AuthLayout'
 
 interface ProfileTranslations {
   title: string
-  back_to_home: string
   email: {
     section_title: string
     current_email_label: string

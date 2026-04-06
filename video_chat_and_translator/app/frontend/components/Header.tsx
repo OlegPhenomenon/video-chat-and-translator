@@ -26,9 +26,6 @@ export default function Header({ onLogoutError }: HeaderProps) {
         setLoggingOut(false)
         onLogoutError?.('Ошибка выхода из системы. Попробуйте ещё раз.')
       },
-      onFinish: () => {
-        setLoggingOut(false)
-      },
     })
   }
 
@@ -40,7 +37,7 @@ export default function Header({ onLogoutError }: HeaderProps) {
   return (
     <header
       data-testid="header"
-      className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center px-4 md:px-6"
+      className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center px-4 md:px-6 py-3"
     >
       <nav className="w-full flex items-center justify-between">
         <div className="flex items-center gap-1">
