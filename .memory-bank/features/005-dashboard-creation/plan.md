@@ -6,17 +6,29 @@
 
 ## Summary of Reviewer Feedback Fixes
 
-This plan addresses all 5 reviewer comments:
+This plan addresses the original 5 comments + 4 follow-up corrections:
+
+### Original 5 comments (FIXED):
 
 1. **Step 5 (Docker completeness):** Expanded with full Dockerfile/docker-compose.yml analysis, Cuprite stack choice, exact OS packages needed, and headless browser config (Sections 5.1–5.4)
 
-2. **Steps 5, 7 & Definition of Done (Authentication):** Added specific Devise integration helpers for system specs, Warden fallback, and spec/rails_helper.rb requirements (Section 5.2, 6.1)
+2. **Steps 5, 7 & Definition of Done (Authentication):** Added specific Devise integration helpers for system specs, Warden fallback, and spec/rails_helper.rb requirements (Sections 5.2, 6.1)
 
 3. **Steps 3 & 6 (Server unavailability AC):** Added Step 3.1 with INCORRECT vs CORRECT sign-out button patterns, and Step 6.2 Scenario 4 with concrete test assertions for button resilience (Sections 3.1, 6.2)
 
 4. **Step 7 (Frontend validation):** Added Step 7 for TypeScript checking, `npm run check` in verification plan, and DoD requirement for frontend compilation validation (Sections 6, 7)
 
 5. **Definition of Done completeness:** Split into "Always required" vs "Only if approved" checklists with explicit system spec scenario list, including Scenario 4 (Section 7)
+
+### Follow-up 4 corrections (FIXED):
+
+1. **Step 5 (Dockerfile path — CRITICAL):** Corrected to edit `docker/Dockerfile:1` (not video_chat_and_translator/Dockerfile). Docker-compose builds from docker/Dockerfile, so production Dockerfile changes don't affect dev tests (Sections 5.1, 5.4, Risks #1)
+
+2. **Chromium packages (Debian slim specifics):** Corrected package list: use `chromium` (not chromium-browser), include runtime deps (libnss3, libxss1, libappindicator3-1), DO NOT use chromium-driver (Cuprite uses CDP, not WebDriver) (Sections 5.2, Risks #2)
+
+3. **Step 6.1 (System spec authentication):** Clarified that ONLY solution is `config.include Devise::Test::IntegrationHelpers, type: :system` + `login_as(user, scope: :user)` in before hooks. No alternatives, no Warden setup needed (Sections 6.1, Risks #3)
+
+4. **Step 6.2 (Scenario 4 — server error resilience):** Replaced non-working examples with real stubs: use `allow_any_instance_of(Users::SessionsController)` (not Devise base), mock destroy to return error, verify button remains visible/enabled. Includes COMPLIANT React implementation pattern (Sections 6.2.4, Risks #4)
 
 ## 1. Grounding Against Current Code
 
@@ -68,12 +80,11 @@ Because project rules require asking permission before installing new gems, brow
 
 ### Required only if system-test tooling is approved
 
-- `video_chat_and_translator/Gemfile` — browser/system test gems (e.g., Capybara + Cuprite)
-- `video_chat_and_translator/spec/rails_helper.rb` — RSpec system-spec config, Capybara driver setup
-- `video_chat_and_translator/spec/support/capybara.rb` (new) — headless browser config and auth helpers
-- `video_chat_and_translator/Dockerfile` — verify/add OS dependencies for Cuprite (chromium libs)
-- `docker/docker-compose.yml` — verify web service has correct build context
-- `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` (new)
+- `video_chat_and_translator/Gemfile` — add Capybara + Cuprite gems
+- **`docker/Dockerfile`** — add Chromium OS packages (not video_chat_and_translator/Dockerfile!)
+- `video_chat_and_translator/spec/rails_helper.rb` (line 37) — add Devise::Test::IntegrationHelpers for type: :system
+- `video_chat_and_translator/spec/support/capybara.rb` (new) — Cuprite driver config
+- `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` (new) — 4 scenarios with server error resilience test
 
 ### Explicitly not touched
 
@@ -89,7 +100,7 @@ Because project rules require asking permission before installing new gems, brow
 | 2 | Switch authenticated root from `Landing` to `Dashboard` | 1 | `app/controllers/pages_controller.rb` | `GET /` for signed-in user renders `Dashboard`; guest behavior unchanged |
 | 3 | Create minimal dashboard page with heading and exactly two nav actions | 2 | `app/frontend/pages/Dashboard.tsx` | Page shows `Dashboard`, profile link, sign-out control, and a semantic `<main>` wrapper |
 | 4 | Document the new public page and root behavior | 2, 3 | `docs/features/dashboard.md` | Repo docs describe route behavior, files, and sign-out/profile navigation |
-| 5 | Establish browser/system test harness (decision gate + Docker verification) | 1 | `Gemfile`, `Dockerfile`, `docker/docker-compose.yml`, `spec/rails_helper.rb`, `spec/support/capybara.rb` | Docker image supports headless Chromium; `type: :system` specs can run; Devise integration helpers configured |
+| 5 | Establish browser/system test harness (decision gate + Docker verification) | 1 | **`docker/Dockerfile`** (not video_chat_and_translator/), `Gemfile`, `spec/rails_helper.rb`, `spec/support/capybara.rb` | Dev Docker image supports headless Chromium; `type: :system` specs can run; Devise integration helpers configured |
 | 6 | Add browser-level regression for navigation and sign-out flow | 3, 5 | `spec/system/dashboard_navigation_spec.rb` | All 4 scenarios pass: dashboard display, profile link, sign-out flow, **sign-out resilience on server error** |
 | 7 | Validate frontend TypeScript compilation and imports | 3 | Dashboard.tsx via `npm run check` | No TS errors; Dashboard imports are correct; page type-safe |
 | 8 | Run full verification in Docker and validate all layers | 1-7 | none (all previously modified files) | Request specs + system specs + frontend validation all pass; Definition of Done checklist complete |
@@ -211,15 +222,19 @@ This satisfies the repo rule that new public files and feature behavior must be 
 
 This is a blocked step that requires explicit user approval.
 
-#### 5.1 Current Docker/Chromium state
+#### 5.1 Current Docker/Chromium state — CORRECTED
 
-Before proceeding, verify the baseline:
+**CRITICAL:** Dev environment builds from `docker/Dockerfile:1` (not `video_chat_and_translator/Dockerfile`).
 
-- Read `video_chat_and_translator/Dockerfile` line 1-30 to check current OS packages and base image
-- Read `docker/docker-compose.yml` line 1-30 to check web service build context
-- Document what's missing for headless browser (Chromium + supporting libs for Cuprite)
+Verify this:
+- `docker/docker-compose.yml:5-7` specifies `dockerfile: ../docker/Dockerfile`
+- Changes to `video_chat_and_translator/Dockerfile` do NOT affect dev environment
+- Must modify **`docker/Dockerfile`** to add browser dependencies
 
-**Expected issue:** Current Dockerfile likely has only basic packages (Ruby + Node) without Chromium or browser drivers.
+Current `docker/Dockerfile` state (line 1-30):
+- Base: `ruby:3.4.9-slim`
+- Has build-essential, Node.js 22, but NO browser/Chromium packages
+- Missing Cuprite/Ferrum runtime dependencies
 
 #### 5.2 Required additions if gems are approved
 
@@ -239,24 +254,36 @@ group :test do
 end
 ```
 
-**Dockerfile additions (approval needed):**
+**docker/Dockerfile additions (approval needed):**
 
-Must add to `video_chat_and_translator/Dockerfile` BEFORE the Ruby setup:
+Add to `docker/Dockerfile` AFTER Node.js installation (after line 17):
+
 ```dockerfile
-# Install Chromium and dependencies for Cuprite
-RUN apt-get update && apt-get install -y \
-    chromium-browser \
-    chromium-driver \
-    libssl-dev \
-    libffi-dev \
+# Install Chromium and dependencies for Cuprite (headless browser testing)
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    chromium \
+    chromium-common \
+    libnss3 \
+    libxss1 \
+    libappindicator3-1 \
+    libindicator7 \
     && rm -rf /var/lib/apt/lists/*
 ```
+
+**Rationale for packages:**
+- `chromium`: Headless browser executable (for Cuprite)
+- `chromium-common`: Chromium shared libraries
+- `libnss3`, `libxss1`, `libappindicator3-1`: Runtime dependencies for Chromium on Debian slim
+- **NOT chromium-driver** (Cuprite/Ferrum don't use WebDriver protocol)
 
 **spec/support/capybara.rb (new file, if approved):**
 ```ruby
 Capybara.configure do |config|
   config.default_driver = :cuprite
   config.javascript_driver = :cuprite
+  config.server = :webrick
+  config.default_max_wait_time = 2
 end
 
 Capybara.register_driver :cuprite do |app|
@@ -268,23 +295,28 @@ Capybara.register_driver :cuprite do |app|
     browser_options: {
       'disable-gpu' => true,
       'no-sandbox' => true,
+      'disable-dev-shm-usage' => true,
     }
   )
 end
 ```
 
 **spec/rails_helper.rb changes (if approved):**
-- Line ~35: Ensure RSpec config has `config.before(:each, type: :system)` hook
-- If not present, add Devise helper for system specs to support authenticated routes:
+
+Add Devise integration helper for system specs (line 37, add new line after request config):
+
 ```ruby
 RSpec.configure do |config|
-  # ... existing config ...
-  config.before(:each, type: :system) do
-    # Support authenticated user login for system specs
-    # (will be called from dashboard_navigation_spec.rb)
-  end
+  config.include FactoryBot::Syntax::Methods
+  config.include Devise::Test::IntegrationHelpers, type: :request
+  config.include Devise::Test::IntegrationHelpers, type: :system  # ← NEW: Support authenticated system specs
+  config.before(:each) { ActiveJob::Base.queue_adapter = :test }
+  
+  # ... rest of config ...
 end
 ```
+
+This allows system specs to use `login_as(user, scope: :user)` helper.
 
 #### 5.3 If approval is NOT granted
 
@@ -294,34 +326,40 @@ end
 
 #### 5.4 If approval IS granted
 
-- Apply all Dockerfile, Gemfile, and support file changes
-- Ensure Docker image rebuilds with `docker compose build web` before running Step 6
-- Verify Capybara driver initialization with a minimal manual test before writing full spec
+- Add Chromium packages to `docker/Dockerfile` (not video_chat_and_translator/Dockerfile)
+- Add Capybara + Cuprite gems to Gemfile
+- Create `spec/support/capybara.rb` with driver config
+- Add Devise helper line to `spec/rails_helper.rb:37`
+- Rebuild Docker image: `docker compose build web`
+- Verify Capybara initialization with minimal test before writing full spec
 
 ### Step 6. Add browser-level dashboard navigation spec
 
 Create `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` only after Step 5 is complete.
 
-#### 6.1 Authentication for system specs
+#### 6.1 Authentication for system specs — CORRECTED
 
-**Devise helper setup (in spec/rails_helper.rb or spec/support/devise.rb):**
-
-System specs cannot use normal Devise session helpers. Add this helper:
+The Devise integration helper must be added in Step 5 to `spec/rails_helper.rb:37`:
 
 ```ruby
-RSpec.configure do |config|
-  config.include Devise::Test::IntegrationHelpers, type: :system
-end
+config.include Devise::Test::IntegrationHelpers, type: :system
 ```
 
-**Alternative (if helper above doesn't work for system):**
+This allows system spec helper `before` hooks to use:
 
-Use Warden directly in `before` hook:
 ```ruby
 before { login_as(user, scope: :user) }
 ```
 
-Verify approach by reading `video_chat_and_translator/spec/rails_helper.rb:35` and checking what's already configured.
+This is the **ONLY way** to authenticate system specs in Rails + Devise. It logs in the user into the browser session before test execution.
+
+**Why this works:**
+- `Devise::Test::IntegrationHelpers` injects Warden test helpers into integration/system tests
+- `login_as(user, scope: :user)` sets up a valid session inside Capybara's browser context
+- Does NOT rely on cookies or request headers (those are for :request specs)
+- Works inside Cuprite's headless Chromium process
+
+No alternative setup is needed in `spec/support/` for authentication.
 
 #### 6.2 Spec scenarios
 
@@ -361,53 +399,78 @@ And the session is destroyed
 
 This is acceptance criterion #4 from spec.md — **must be verified**.
 
-Implementation approach:
+#### 6.2.4.1 Implementation approach — CORRECTED
 
-1. **Setup:** Mock/intercept the DELETE request to `/users/sign_out` to simulate server failure or delay
-   - Use Capybara's request stubbing OR
-   - Use a before_action hook that aborts the DELETE request with an error status
-
-2. **Action:** User clicks "Sign Out" button while mock intercepts the request
-
-3. **Assertion:** Verify that:
-   - The sign-out button element **remains visible** in the DOM (no `display: none`)
-   - The button **remains clickable/enabled** (no `disabled` attribute, no `opacity: 0.5`)
-   - No loading spinner or processing state persists indefinitely
-   - Page does NOT crash or show a blank state
+The key is to stub the **actual** `Users::SessionsController#destroy` (not Devise's) and make it behave like a server error.
 
 ```ruby
 describe 'Sign Out button resilience' do
   scenario 'button remains visible/active when sign_out request fails' do
-    # Setup: intercept DELETE /users/sign_out and return 500
-    allow_any_instance_of(Devise::SessionsController)
-      .to receive(:destroy).and_return(head 500)
+    user = create(:user)
     
-    # OR use Capybara request stubbing:
-    # page.driver.network_traffic.select { |req| req.url.include?('sign_out') }
-    #   .first.abort if present
+    # Setup: Make Users::SessionsController#destroy raise an error or return failure
+    allow_any_instance_of(Users::SessionsController).to receive(:destroy) do |instance|
+      # Simulate server error: render error response instead of redirecting
+      instance.render json: { error: 'Service unavailable' }, status: :service_unavailable
+    end
     
-    # Action
+    # Action: User is logged in and visits dashboard
+    login_as(user, scope: :user)
     visit '/'
+    
+    # Verify button is present and clickable
+    expect(page).to have_button('Sign Out')
+    sign_out_button = find_button('Sign Out')
+    expect(sign_out_button).to be_enabled
+    expect(sign_out_button).to be_visible
+    
+    # Click the button (request will fail, but button stays visible)
     click_button 'Sign Out'
     
-    # Assertion: button is still visible and clickable
-    sign_out_button = find_button('Sign Out')
-    expect(sign_out_button).to be_visible
-    expect(sign_out_button).not_to be_disabled
+    # Assertion: button remains present and NOT disabled/hidden
+    # (Page does not hang, crash, or show persistent loading state)
+    expect(page).to have_button('Sign Out')
+    expect(find_button('Sign Out')).to be_enabled
     
-    # Assertion: no persistent spinner/loading state
-    expect(page).not_to have_css('[data-testid="sign-out-loading"]')
+    # Optional: verify still on dashboard (user still authenticated)
+    expect(page).to have_content('Dashboard')
   end
 end
 ```
 
-**Implementation tip for Dashboard.tsx:**
+**Why this stub approach works:**
 
-To pass scenario 4, the sign-out button must:
-- NOT use `disabled={processing}` state tied to request completion
-- NOT render a spinner that only clears on success
-- Remain clickable/visible regardless of request state
-- Optionally show brief feedback but recover to enabled state
+1. `allow_any_instance_of(Users::SessionsController)` patches the correct controller (not Devise's base)
+2. `.to receive(:destroy).and_call_original` would let the real code run; here we override it
+3. `.render` is a valid ActionController method that Cuprite can handle
+4. Simulates realistic failure: server returns error, page does NOT redirect, button remains visible
+
+**Implementation requirement for Dashboard.tsx:**
+
+To **pass** this scenario, the sign-out button must:
+
+- **NOT use `disabled={processing}` or `disabled={isLoading}`**
+  - Disabling the button violates the AC: "remains visible and active"
+- **NOT show a spinner that persists after failure**
+  - A persistent loading state is visually equivalent to disabling
+- **Remain clickable even if request fails**
+  - Button handler should allow re-clicking on failure (idempotent)
+- **Optional UX:** Brief toast/flash message is acceptable, but don't block interaction
+
+Example of COMPLIANT implementation:
+```tsx
+const handleSignOut = () => {
+  router.delete('/users/sign_out', {
+    onError: () => {
+      // Optional: Log error, show flash, but do NOT disable button
+      console.error('Sign out failed');
+    },
+  });
+  // Button remains enabled and clickable regardless of request outcome
+};
+
+return <button onClick={handleSignOut}>Sign Out</button>;
+```
 
 Keep this spec focused on user-visible behavior. Do not duplicate lower-level redirect assertions already covered in request specs.
 
@@ -419,25 +482,34 @@ Keep this spec focused on user-visible behavior. Do not duplicate lower-level re
 - Existing `/users/profile` and `/users/sign_out` endpoints already satisfy the dashboard navigation requirements.
 - No callback, concern, service object, migration, or route refactor is justified here.
 
-### Actual risks (discovered after reviewer feedback)
+### Actual risks (discovered after reviewer feedback) — CORRECTED
 
-1. **Docker image missing Chromium dependencies**
-   - Current `Dockerfile` likely lacks browser/driver packages needed for Cuprite
-   - System specs will FAIL unless Dockerfile is updated with OS packages
-   - Must be fixed BEFORE Step 5 begins
+1. **Dev Docker image missing Chromium — CRITICAL**
+   - Dev environment builds from `docker/Dockerfile:1` (via docker-compose.yml:5-7)
+   - Changes to `video_chat_and_translator/Dockerfile` (production image) do NOT affect dev tests
+   - System specs will FAIL unless **`docker/Dockerfile`** is updated with Chromium packages
+   - Must edit the **correct** Dockerfile: `docker/Dockerfile` (not video_chat_and_translator/Dockerfile)
 
-2. **System spec authentication not configured**
-   - Devise integration helpers are not documented in current `spec/rails_helper.rb`
-   - Specs cannot authenticate users without explicit setup
-   - Must add Devise helper or Warden.test_mode setup
+2. **Chromium packages must be correct for Debian slim**
+   - `chromium-browser` is unreliable on Debian slim; use `chromium` instead
+   - Do NOT use `chromium-driver` (Cuprite/Ferrum use CDP protocol, not WebDriver)
+   - Must include runtime deps: `libnss3`, `libxss1`, `libappindicator3-1`
+   - Without correct packages, Cuprite will fail to start headless browser
 
-3. **Sign-Out button implementation must not use processing state**
-   - Naive implementation with `disabled={processing}` violates AC #4
-   - Button can persist in disabled state if request fails
-   - Spec explicitly requires button to remain **visible and active** even on error
-   - Implementation must avoid processing-state tie-in (Step 3.1)
+3. **System spec authentication — CORRECTED**
+   - Must add `config.include Devise::Test::IntegrationHelpers, type: :system` to `spec/rails_helper.rb:37`
+   - Allows `login_as(user, scope: :user)` helper in system spec `before` hooks
+   - This is the **ONLY way** to set up authenticated browser sessions for Devise + Capybara
+   - No alternative setup needed
 
-4. **Frontend validation missing from verification**
+4. **Sign-Out button error handling must be testable — CORRECTED**
+   - Cannot use `allow_any_instance_of(Devise::SessionsController)` (wrong controller)
+   - Must stub `Users::SessionsController#destroy` (the actual custom controller)
+   - Use `.to receive(:destroy).and_call_original` with controller action override
+   - Scenario 4 verifies button remains visible/enabled even when request returns error
+   - Button implementation must NOT use `disabled={processing}` tied to request state
+
+5. **Frontend validation missing from verification**
    - Request specs only verify component NAME in response, not file compilation
    - TS errors in Dashboard.tsx can hide from request-level tests
    - Must run `npm run check` as part of verification (Step 7/8)
@@ -500,15 +572,17 @@ Expected: All specs pass (request + system, if system tooling was approved).
 
 ### Required only if system-test gems are approved and added
 
-- [ ] Dockerfile updated with Chromium/browser dependencies (if approval granted)
-- [ ] Gemfile updated with Capybara + Cuprite (if approval granted)
-- [ ] spec/support/capybara.rb created with headless driver config (if approval granted)
-- [ ] spec/rails_helper.rb updated with Devise integration helper for system specs (if approval granted)
+- [ ] **`docker/Dockerfile`** updated with Chromium packages: `chromium`, `chromium-common`, `libnss3`, `libxss1`, `libappindicator3-1` (if approval granted)
+  - CRITICAL: Update `docker/Dockerfile` (not video_chat_and_translator/Dockerfile — that's production-only)
+  - Verify via `docker compose build web` that image builds successfully
+- [ ] Gemfile updated with `capybara` and `cuprite` gems (if approval granted)
+- [ ] spec/rails_helper.rb line 37 updated: add `config.include Devise::Test::IntegrationHelpers, type: :system` (if approval granted)
+- [ ] spec/support/capybara.rb created with headless Cuprite driver config (if approval granted)
 - [ ] System spec `spec/system/dashboard_navigation_spec.rb` passes **all 4 scenarios**, including:
   - Scenario 1: Dashboard heading + exactly 2 nav elements
   - Scenario 2: Profile link navigates to `/users/profile`
   - Scenario 3: Sign Out logs out and redirects to login
-  - **Scenario 4: Sign Out button remains visible/active even if server request fails** (AC from spec.md line 73)
+  - **Scenario 4: Sign Out button remains visible/active even if `Users::SessionsController#destroy` returns 500 error** (AC from spec.md line 73)
 
 ### If system-test approval is NOT granted
 
