@@ -1,6 +1,6 @@
 # Specification: Настроить CI / CD
 
-**Статус:** Draft  
+**Статус:** Active  
 **Версия:** 1.1  
 **Related Issue:** [GitHub Issue #7](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/7)  
 **Тех. стек:** GitHub Actions, Docker / Docker Compose, Ruby on Rails 8, Kamal, PostgreSQL (в compose), RSpec (планируется в приложении), RuboCop / Brakeman / bundler-audit (уже в Gemfile приложения).

@@ -1,6 +1,6 @@
 # Implementation Plan: 007 — Configure CI / CD
 
-**Статус:** Draft  
+**Статус:** Active  
 **Версия:** 1.1  
 **Спецификация:** [spec.md](./spec.md)  
 **Бриф:** [brief.md](./brief.md)

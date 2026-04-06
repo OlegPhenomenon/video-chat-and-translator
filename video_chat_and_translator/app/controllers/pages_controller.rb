@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class PagesController < InertiaController
+  skip_before_action :authenticate_user!, only: [ :index ]
+
   def index
-    render inertia: "Landing", props: {
-      app_name: "Video Chat & Translator"
-    }
+    render inertia: "Dashboard"
   end
 end

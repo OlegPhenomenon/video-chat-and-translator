@@ -1,7 +1,7 @@
 # Brief: Настроить CI / CD
 
 **Related Issue:** [GitHub Issue #7](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/7)
-**Status:** draft
+**Status:** active
 **Date:** 04.04.2026
 
 ### Проблема
