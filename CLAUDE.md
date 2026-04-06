@@ -33,6 +33,11 @@ See PROJECT.md for project description.
 - **Testing Requirements:** You MUST write automated tests in parallel with implementing new features.
 - **Verification:** Before considering a task complete or submitting work for review, you MUST run the automated test suite to verify that your changes are correct and haven't broken anything.
 
+## Требования:
+1. Ты должен пушить только в локальный репозиторий, а не в репозиторий из которого был сделан форк! 
+2. Ты не должен сам ничего мерджить! В комментариях ты не указываешь что коммит был сгенерирован Claude Code. 
+3. В коммите ты также указываешь в конце "Close #<номер issue/ссылка>"!
+
 ## Architecture & Conventions
 
 - **Service Objects:** Use *only* for third-party API calls or as independent processors with entirely independent logic (no standard PORO objects for general logic).
