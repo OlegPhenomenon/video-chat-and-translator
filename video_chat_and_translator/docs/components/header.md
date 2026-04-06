@@ -8,34 +8,29 @@ Global navigation header rendered on all Inertia pages via `AppLayout`. Shows di
 
 ## Props
 
-| Prop             | Type                              | Description                                                                 |
-| ---------------- | --------------------------------- | --------------------------------------------------------------------------- |
-| `onLogoutError`  | `(message: string) => void`       | Optional callback called when logout request fails (network/server error)   |
+- `onLogoutError` — optional `(message: string) => void` callback called when logout request fails (network/server error)
 
 ## Shared Props (via `usePage`)
 
-| Prop           | Type                                         | Description                                    |
-| -------------- | -------------------------------------------- | ---------------------------------------------- |
-| `current_user` | `{ id: number; email: string } \| undefined` | Current authenticated user or undefined (guest) |
-
-The `page.url` is used to determine the current path for active-state styling.
+- `current_user` — `{ id: number; email: string } | undefined` — current authenticated user or `undefined` for guests
+- `page.url` — used to determine the current path for active-state styling
 
 ## Guest Menu (unauthenticated)
 
-| Item              | `data-testid` | Path             | Condition                           |
-| ----------------- | ------------- | ---------------- | ----------------------------------- |
-| Главная           | `menu-home`   | `/`              | Hidden when `currentPath === '/'`   |
-| Зарегистрироваться | `menu-signup` | `/users/sign_up` | Always shown                        |
-| Авторизоваться    | `menu-signin` | `/users/sign_in` | Always shown                        |
+| data-testid   | Label              | Path             | Condition                         |
+| ------------- | ------------------ | ---------------- | --------------------------------- |
+| `menu-home`   | Главная            | `/`              | Hidden when `currentPath === '/'` |
+| `menu-signup` | Зарегистрироваться | `/users/sign_up` | Always shown                      |
+| `menu-signin` | Авторизоваться     | `/users/sign_in` | Always shown                      |
 
 ## Auth Menu (authenticated)
 
-| Item     | `data-testid`     | Path              |
-| -------- | ----------------- | ----------------- |
-| Главная  | `menu-home-auth`  | `/`               |
-| Дашборд  | `menu-dashboard`  | `/dashboard`      |
-| Профиль  | `menu-profile`    | `/users/profile`  |
-| Выйти    | `menu-logout`     | DELETE `/users/sign_out` |
+| data-testid      | Label   | Path                      |
+| ---------------- | ------- | ------------------------- |
+| `menu-home-auth` | Главная | `/`                       |
+| `menu-dashboard` | Дашборд | `/dashboard`              |
+| `menu-profile`   | Профиль | `/users/profile`          |
+| `menu-logout`    | Выйти   | DELETE `/users/sign_out`  |
 
 ## Tailwind Specs
 

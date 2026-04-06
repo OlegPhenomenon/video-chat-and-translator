@@ -2,15 +2,15 @@
 
 ## Route Map
 
-| Route                   | Controller                              | Auth Required | Behavior                                         |
-| ----------------------- | --------------------------------------- | ------------- | ------------------------------------------------ |
-| `GET /`                 | `Pages::LandingController#show`         | No            | Available to all users                           |
-| `GET /dashboard`        | `Pages::DashboardController#show`       | Yes           | Guests redirected to `/`                         |
-| `GET /users/sign_in`    | `Users::SessionsController#new`         | No            | Authenticated → redirect to `/dashboard`         |
-| `GET /users/sign_up`    | `Users::RegistrationsController#new`    | No            | Authenticated → redirect to `/dashboard`         |
-| `POST /users/sign_in`   | `Users::SessionsController#create`      | No            | On success → redirect to `/dashboard`            |
-| `DELETE /users/sign_out` | `Users::SessionsController#destroy`    | No            | On success → redirect to `/`                     |
-| `GET /users/profile`    | `Users::ProfileController#show`         | Yes           | Guests redirected to `/users/sign_in`            |
+| Method | Path                  | Controller                           | Auth | Behavior                             |
+| ------ | --------------------- | ------------------------------------ | ---- | ------------------------------------ |
+| GET    | `/`                   | `Pages::LandingController#show`      | No   | Available to all users               |
+| GET    | `/dashboard`          | `Pages::DashboardController#show`    | Yes  | Guests redirected to `/`             |
+| GET    | `/users/sign_in`      | `Users::SessionsController#new`      | No   | Authenticated redirect to dashboard  |
+| GET    | `/users/sign_up`      | `Users::RegistrationsController#new` | No   | Authenticated redirect to dashboard  |
+| POST   | `/users/sign_in`      | `Users::SessionsController#create`   | No   | On success redirect to dashboard     |
+| DELETE | `/users/sign_out`     | `Users::SessionsController#destroy`  | No   | On success redirect to `/`           |
+| GET    | `/users/profile`      | `Users::ProfileController#show`      | Yes  | Guests redirected to sign_in         |
 
 ## Controllers
 
@@ -23,7 +23,7 @@
 ### `Pages::DashboardController`
 
 - Inherits from `InertiaController`
-- Skips `authenticate_user!`, uses custom `require_authenticated_user` which redirects to `/` (not `/users/sign_in`) for guests
+- Skips `authenticate_user!`, uses custom `require_authenticated_user` which redirects to `/` for guests
 - Renders `Dashboard` component
 
 ### `Users::SessionsController`
@@ -44,23 +44,23 @@ All Inertia pages are wrapped by `AppLayout` (set via persistent layout in `iner
 
 ```text
 AppLayout
-  ├── Header (navigation)
-  ├── Toast (flash + logout error notifications)
-  └── <main> (page content)
+  Header (navigation)
+  Toast (flash + logout error notifications)
+  main (page content)
 ```
 
 ## Key Conventions
 
-- **Auth redirect target**: Authenticated users always redirect to `/dashboard` (controlled via `after_sign_in_path_for` in `ApplicationController`)
-- **Guest redirect target for protected pages**: `/users/sign_in` (Devise default, except `/dashboard` which redirects to `/`)
-- **Flash centralization**: `Toast` is rendered only in `AppLayout`. Flash blocks removed from all individual pages (Login, Register, ForgotPassword, ResetPassword, Profile).
-- **Logout error**: Network/server errors on logout are caught client-side via `router.delete` callbacks and displayed via Toast's `error` prop (bypassing flash).
+- **Auth redirect target**: Authenticated users always redirect to `/dashboard` (via `after_sign_in_path_for` in `ApplicationController`)
+- **Guest redirect for protected pages**: `/users/sign_in` (Devise default), except `/dashboard` which redirects to `/`
+- **Flash centralization**: `Toast` is rendered only in `AppLayout`. Flash blocks removed from Login, Register, ForgotPassword, ResetPassword, Profile pages.
+- **Logout error**: Network/server errors on logout are caught client-side via `router.delete` callbacks and shown via Toast's `error` prop.
 
 ## `RedirectAuthenticatedUser` Concern
 
 **File:** `app/controllers/concerns/redirect_authenticated_user.rb`
 
-Provides the `redirect_if_authenticated` helper method used in `new` actions of Devise controllers. This avoids `before_action` in concerns to prevent conflicts with Devise's own `prepend_before_action` chain.
+Provides `redirect_if_authenticated` helper method called explicitly in `new` actions of Devise controllers. Avoids `before_action` in concerns to prevent conflicts with Devise's `prepend_before_action` chain.
 
 ```ruby
 def redirect_if_authenticated
