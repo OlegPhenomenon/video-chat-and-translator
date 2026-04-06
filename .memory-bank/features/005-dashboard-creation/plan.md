@@ -38,6 +38,14 @@ This plan addresses the original 5 comments + 4 follow-up corrections + 3 final 
 
 3. **Capybara server config:** Removed `config.server = :webrick` from Section 5.2 since webrick is not in Gemfile. Use Capybara's default server. Avoids requiring additional gems beyond capybara + cuprite (Sections 5.2, Risks #6)
 
+### Latest 3 critical additions (FIXED):
+
+1. **type: :system metadata requirement:** Added explicit requirement to use `RSpec.describe "...", type: :system` in spec/system/dashboard_navigation_spec.rb because config.infer_spec_type_from_file_location! is disabled. Without this, Warden helpers and cleanup hooks won't apply (Sections 6.1, 6.2, Risks #7, Definition of Done)
+
+2. **Warden.test_reset! cleanup hook:** Added `config.after(:each, type: :system) { Warden.test_reset! }` to spec/rails_helper.rb (line 42+) to prevent login state leakage between system specs. Without this, tests become order-dependent and flaky (Sections 5.2, Risks #8, Definition of Done)
+
+3. **Confirmed users in factories:** Updated all system spec scenarios to use `create(:user, :confirmed)` (not bare `create(:user)`). Default factory creates unconfirmed users, but login_as() in browser tests expects confirmed user. Uses existing `:confirmed` trait from spec/factories/users.rb:8 (Sections 6.2, Risks #9, Definition of Done)
+
 ## 1. Grounding Against Current Code
 
 ### Current state
@@ -320,7 +328,7 @@ Two changes required:
 Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 ```
 
-**Change 2 (line 37+):** Add Warden integration helper for system specs:
+**Change 2 (line 37+):** Add Warden integration helper and cleanup for system specs:
 
 ```ruby
 RSpec.configure do |config|
@@ -329,13 +337,17 @@ RSpec.configure do |config|
   config.include Warden::Test::Helpers, type: :system  # ← NEW: For authenticated system specs with login_as
   config.before(:each) { ActiveJob::Base.queue_adapter = :test }
   
+  # Cleanup Warden state after each system spec to prevent login leakage between tests
+  config.after(:each, type: :system) { Warden.test_reset! }
+  
   # ... rest of config ...
 end
 ```
 
-**Why Warden::Test::Helpers for system specs:**
+**Why Warden::Test::Helpers + Warden.test_reset! for system specs:**
 - `Devise::Test::IntegrationHelpers` provides `sign_in()` for request specs, but system specs (Capybara) require session setup at browser level
 - `Warden::Test::Helpers` provides `login_as(user, scope: :user)` which sets up a valid Warden session that Capybara browser can use
+- **CRITICAL:** `Warden.test_reset!` must be called after each system spec to clear Warden's test state. Without it, authenticated sessions leak between tests, making specs order-dependent and flaky
 - This is the standard pattern for Devise + Capybara system tests
 
 #### 5.3 If approval is NOT granted
@@ -360,61 +372,90 @@ Create `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` only
 
 #### 6.1 Authentication for system specs — CORRECTED
 
-System specs with Capybara require Warden (not Devise) authentication helpers.
+System specs with Capybara require Warden (not Devise) authentication helpers, plus explicit type metadata.
 
 **Required setup in Step 5:**
 
-1. Add Warden helper to `spec/rails_helper.rb:37+`:
+1. Add Warden helper to `spec/rails_helper.rb:37+` (see Section 5.2 Change 2)
+2. Add Warden cleanup hook to `spec/rails_helper.rb:42+`:
 ```ruby
-config.include Warden::Test::Helpers, type: :system
+config.after(:each, type: :system) { Warden.test_reset! }
 ```
 
-2. Use `login_as()` in spec `before` hooks:
+**In the system spec file (`spec/system/dashboard_navigation_spec.rb`):**
+
+Use `type: :system` explicitly in describe block (because `config.infer_spec_type_from_file_location!` is commented out in rails_helper.rb:74):
+
 ```ruby
-before { login_as(user, scope: :user) }
+RSpec.describe "Dashboard Navigation", type: :system do
+  before { login_as(user, scope: :user) }
+  
+  # ... scenarios ...
+end
 ```
 
-**Why Warden::Test::Helpers:**
+**Why Warden::Test::Helpers + explicit type + Warden.test_reset!:**
 - `Devise::Test::IntegrationHelpers` with `sign_in()` works for request specs (no JS, standard HTTP session)
 - System specs with Capybara (Cuprite) require browser-level session setup
 - `Warden::Test::Helpers` provides `login_as(user, scope: :user)` which sets up a valid Warden session that Capybara's headless browser can use
+- **CRITICAL:** `Warden.test_reset!` after each test prevents login leakage between specs (order-dependent flakiness)
+- Explicit `type: :system` in describe ensures Warden helpers and cleanup hooks are applied
 - This is the standard, tested pattern for Devise + Capybara system tests
-- Works inside Cuprite's headless Chromium process
 
 **Note:** Do not mix Devise and Warden helpers. For system specs, use Warden only.
 
 #### 6.2 Spec scenarios
 
-Create `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` with these scenarios:
+Create `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` with these scenarios. Use `type: :system` in the describe block and `create(:user, :confirmed)` for factory (since confirmable is required).
 
 **Scenario 1: Dashboard displays with correct heading and exactly two nav actions**
 
-```gherkin
-Given an authenticated user
-When they visit `/`
-Then they see "Dashboard" heading
-And they see exactly two nav elements:
-  - Link to "Profile" (href: /users/profile)
-  - Button "Sign Out" (form with DELETE action)
+```ruby
+scenario 'authenticated user sees dashboard heading and two nav elements' do
+  user = create(:user, :confirmed)
+  login_as(user, scope: :user)
+  
+  visit '/'
+  
+  expect(page).to have_content('Dashboard')
+  
+  # Exactly two nav elements: Profile link + Sign Out button
+  nav_elements = page.all('a[href="/users/profile"], button')
+  expect(nav_elements.count).to eq(2)
+  expect(page).to have_link('', href: '/users/profile')
+  expect(page).to have_button('Sign Out')
+end
 ```
 
 **Scenario 2: Profile link navigates to user profile page**
 
-```gherkin
-Given an authenticated user on dashboard
-When they click "Profile" link
-Then they are redirected to `/users/profile`
-And they see profile content
+```ruby
+scenario 'profile link navigates to user profile page' do
+  user = create(:user, :confirmed)
+  login_as(user, scope: :user)
+  
+  visit '/'
+  click_link href: '/users/profile'
+  
+  expect(page).to have_current_path('/users/profile')
+  # (Assuming profile page has some identifying content)
+end
 ```
 
 **Scenario 3: Sign Out button logs out and redirects**
 
-```gherkin
-Given an authenticated user on dashboard
-When they click "Sign Out" button
-Then a DELETE request is sent to `/users/sign_out`
-And they are redirected to login page
-And the session is destroyed
+```ruby
+scenario 'sign out button logs out user and redirects to login' do
+  user = create(:user, :confirmed)
+  login_as(user, scope: :user)
+  
+  visit '/'
+  click_button 'Sign Out'
+  
+  # After successful logout, should be on login page
+  expect(page).to have_current_path(new_user_session_path)
+  expect(page).to have_content('Sign in')
+end
 ```
 
 **Scenario 4 (CRITICAL): Sign Out button remains visible and active even if server is unreachable**
@@ -426,11 +467,12 @@ This is acceptance criterion #4 from spec.md — **must be verified**.
 The key is to stub the **actual** `Users::SessionsController#destroy` (not Devise's) and make it behave like a server error.
 
 ```ruby
-describe 'Sign Out button resilience' do
+describe 'Sign Out button resilience', type: :system do
   scenario 'button remains visible/active when sign_out request fails' do
-    user = create(:user)
+    # Create a confirmed user (required for login; factory default is unconfirmed)
+    user = create(:user, :confirmed)
     
-    # Setup: Make Users::SessionsController#destroy raise an error or return failure
+    # Setup: Make Users::SessionsController#destroy render error instead of redirecting
     allow_any_instance_of(Users::SessionsController).to receive(:destroy) do |instance|
       # Simulate server error: render error response instead of redirecting
       instance.render json: { error: 'Service unavailable' }, status: :service_unavailable
@@ -440,21 +482,23 @@ describe 'Sign Out button resilience' do
     login_as(user, scope: :user)
     visit '/'
     
-    # Verify button is present and clickable
+    # Verify button is present and clickable BEFORE attempting logout
     expect(page).to have_button('Sign Out')
     sign_out_button = find_button('Sign Out')
     expect(sign_out_button).to be_enabled
     expect(sign_out_button).to be_visible
     
-    # Click the button (request will fail, but button stays visible)
+    # Click the button (request will fail due to stubbed destroy, but button stays visible)
     click_button 'Sign Out'
     
     # Assertion: button remains present and NOT disabled/hidden
     # (Page does not hang, crash, or show persistent loading state)
+    # This verifies AC #4: "button remains visible and active even if server is unreachable"
     expect(page).to have_button('Sign Out')
     expect(find_button('Sign Out')).to be_enabled
+    expect(find_button('Sign Out')).to be_visible
     
-    # Optional: verify still on dashboard (user still authenticated)
+    # Optional: verify still on dashboard (user still authenticated since logout failed)
     expect(page).to have_content('Dashboard')
   end
 end
@@ -542,7 +586,25 @@ Keep this spec focused on user-visible behavior. Do not duplicate lower-level re
    - Removed from Section 5.2 — use Capybara's default server (WEBrick is auto-loaded by Capybara if needed)
    - No additional gems needed beyond capybara + cuprite
 
-7. **Frontend validation missing from verification**
+7. **type: :system metadata not inferred**
+   - Current `spec/rails_helper.rb:74` has `config.infer_spec_type_from_file_location!` commented out
+   - Files in spec/system/ do NOT automatically get `type: :system` metadata
+   - System spec helpers (Warden, Capybara cleanup) won't be applied without explicit `RSpec.describe "...", type: :system`
+   - Must add `type: :system` explicitly in spec/system/dashboard_navigation_spec.rb describe block
+
+8. **Warden.test_reset! cleanup required**
+   - Using Warden::Test::Helpers without cleanup causes login state to leak between tests
+   - Specs become order-dependent and flaky (random pass/fail based on test execution order)
+   - Must add `config.after(:each, type: :system) { Warden.test_reset! }` to spec/rails_helper.rb
+   - This is required for reliable, reproducible system spec execution
+
+9. **Confirmable users in factories**
+   - Factory default creates unconfirmed users (confirmed_at: nil)
+   - Devise allows unconfirmed users to log in only if :confirmable skip is set
+   - System spec login_as(user) expects confirmed user or login will fail during browser test
+   - Must use `create(:user, :confirmed)` in all system spec scenarios
+
+10. **Frontend validation missing from verification**
    - Request specs only verify component NAME in response, not file compilation
    - TS errors in Dashboard.tsx can hide from request-level tests
    - Must run `npm run check` as part of verification (Step 7/8)
@@ -613,12 +675,18 @@ Expected: All specs pass (request + system, if system tooling was approved).
   - This ensures spec/support/capybara.rb is loaded before tests run
 - [ ] spec/rails_helper.rb line 37+ updated: add `config.include Warden::Test::Helpers, type: :system` (if approval granted)
   - Use Warden (not Devise) helpers for system specs with Capybara/Cuprite
+- [ ] spec/rails_helper.rb line 42+ updated: add `config.after(:each, type: :system) { Warden.test_reset! }` (if approval granted)
+  - CRITICAL: Clears Warden test state after each system spec to prevent login leakage
 - [ ] spec/support/capybara.rb created with headless Cuprite driver config (if approval granted)
-- [ ] System spec `spec/system/dashboard_navigation_spec.rb` passes **all 4 scenarios**, including:
-  - Scenario 1: Dashboard heading + exactly 2 nav elements
-  - Scenario 2: Profile link navigates to `/users/profile`
-  - Scenario 3: Sign Out logs out and redirects to login
-  - **Scenario 4: Sign Out button remains visible/active even if `Users::SessionsController#destroy` returns 500 error** (AC from spec.md line 73)
+- [ ] System spec `spec/system/dashboard_navigation_spec.rb` created with:
+  - Explicit `type: :system` in `RSpec.describe` block (because config.infer_spec_type_from_file_location! is disabled)
+  - All scenarios use `create(:user, :confirmed)` (not bare `create(:user)` — confirmable is required)
+  - All scenarios use `login_as(user, scope: :user)` helper in before/setup blocks
+  - **All 4 scenarios pass:**
+    - Scenario 1: Dashboard heading + exactly 2 nav elements
+    - Scenario 2: Profile link navigates to `/users/profile`
+    - Scenario 3: Sign Out logs out and redirects to login
+    - **Scenario 4: Sign Out button remains visible/active even if `Users::SessionsController#destroy` returns 500 error** (AC from spec.md line 73)
 
 ### If system-test approval is NOT granted
 
