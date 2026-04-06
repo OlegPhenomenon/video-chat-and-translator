@@ -19,7 +19,6 @@ RSpec.describe "Pages", type: :request do
         expect(response).to be_successful
         expect(response.body).to include("Dashboard")
       end
-
     end
   end
 end

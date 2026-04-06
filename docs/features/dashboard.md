@@ -7,17 +7,20 @@ The Dashboard is the authenticated user's root page (`GET /`). It replaces the m
 ## Behavior
 
 ### Authenticated Users
+
 - **Route:** `GET /`
 - **Rendered Component:** `Dashboard` (Inertia.js)
 - **Location:** `app/frontend/pages/Dashboard.tsx`
 - **Access:** Protected by `before_action :authenticate_user!` in `ApplicationController`
 
 ### Guest Users
+
 - **Route:** `GET /`
 - **Behavior:** Redirects to login page (`new_user_session_path`)
 - **Routing:** Managed by Devise configuration in `config/routes.rb`
 
 ### Landing Page
+
 - **Preserved:** The marketing page `app/frontend/pages/Landing.tsx` remains in the codebase but is not rendered via the root route
 - **Reason:** Allows future re-use (e.g., marketing subdomain, alternate landing routes)
 
@@ -41,14 +44,17 @@ The Dashboard contains exactly two navigation actions:
 ## Files Changed
 
 ### Modified
+
 - `app/controllers/pages_controller.rb` — Changed index action to render Dashboard
 - `spec/requests/pages_spec.rb` — Updated expectations for Dashboard component
 
 ### Created
+
 - `app/frontend/pages/Dashboard.tsx` — New authenticated root page
 - `docs/features/dashboard.md` — This documentation file
 
 ### Unchanged
+
 - `app/frontend/pages/Landing.tsx` — Preserved marketing page
 - `config/routes.rb` — No route changes needed
 - Database schema — No changes
@@ -56,11 +62,13 @@ The Dashboard contains exactly two navigation actions:
 ## Testing
 
 ### Request-Level Specs
+
 - `spec/requests/pages_spec.rb` verifies:
   - Authenticated users see Dashboard component
   - Guest users redirect to login
 
 ### System-Level Specs (Optional)
+
 - `spec/system/dashboard_navigation_spec.rb` (if system testing tooling is approved):
   - Dashboard displays with heading and nav elements
   - Profile link navigates correctly
@@ -70,6 +78,7 @@ The Dashboard contains exactly two navigation actions:
 ## Future Enhancements
 
 The Dashboard page is intentionally minimal to serve as a foundation for:
+
 - User statistics and activity summary
 - Quick-access links to main features
 - Recent activity feed
