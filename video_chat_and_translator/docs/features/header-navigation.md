@@ -2,35 +2,39 @@
 
 ## Route Map
 
-| Route | Controller | Auth Required | Behavior |
-|-------|-----------|---------------|---------|
-| `GET /` | `Pages::LandingController#show` | No | Available to all users |
-| `GET /dashboard` | `Pages::DashboardController#show` | Yes | Guests redirected to `/` |
-| `GET /users/sign_in` | `Users::SessionsController#new` | No | Authenticated → redirect to `/dashboard` |
-| `GET /users/sign_up` | `Users::RegistrationsController#new` | No | Authenticated → redirect to `/dashboard` |
-| `POST /users/sign_in` | `Users::SessionsController#create` | No | On success → redirect to `/dashboard` |
-| `DELETE /users/sign_out` | `Users::SessionsController#destroy` | No | On success → redirect to `/` |
-| `GET /users/profile` | `Users::ProfileController#show` | Yes | Guests redirected to `/users/sign_in` |
+| Route                   | Controller                              | Auth Required | Behavior                                         |
+| ----------------------- | --------------------------------------- | ------------- | ------------------------------------------------ |
+| `GET /`                 | `Pages::LandingController#show`         | No            | Available to all users                           |
+| `GET /dashboard`        | `Pages::DashboardController#show`       | Yes           | Guests redirected to `/`                         |
+| `GET /users/sign_in`    | `Users::SessionsController#new`         | No            | Authenticated → redirect to `/dashboard`         |
+| `GET /users/sign_up`    | `Users::RegistrationsController#new`    | No            | Authenticated → redirect to `/dashboard`         |
+| `POST /users/sign_in`   | `Users::SessionsController#create`      | No            | On success → redirect to `/dashboard`            |
+| `DELETE /users/sign_out` | `Users::SessionsController#destroy`    | No            | On success → redirect to `/`                     |
+| `GET /users/profile`    | `Users::ProfileController#show`         | Yes           | Guests redirected to `/users/sign_in`            |
 
 ## Controllers
 
 ### `Pages::LandingController`
+
 - Inherits from `InertiaController`
 - Skips `authenticate_user!`
 - Renders `Landing` component with `app_name` prop
 
 ### `Pages::DashboardController`
+
 - Inherits from `InertiaController`
 - Skips `authenticate_user!`, uses custom `require_authenticated_user` which redirects to `/` (not `/users/sign_in`) for guests
 - Renders `Dashboard` component
 
 ### `Users::SessionsController`
+
 - Includes `RedirectAuthenticatedUser` concern (provides `redirect_if_authenticated` method)
 - `new` action: calls `redirect_if_authenticated` to send authenticated users to `/dashboard`
 - `create` action: on success redirects to `dashboard_path`
 - `destroy` action: redirects to `root_path` (not login page)
 
 ### `Users::RegistrationsController`
+
 - Includes `RedirectAuthenticatedUser` concern
 - `new` action: calls `redirect_if_authenticated` to send authenticated users to `/dashboard`
 
@@ -38,7 +42,7 @@
 
 All Inertia pages are wrapped by `AppLayout` (set via persistent layout in `inertia.tsx`):
 
-```
+```text
 AppLayout
   ├── Header (navigation)
   ├── Toast (flash + logout error notifications)
