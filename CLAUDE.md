@@ -33,10 +33,11 @@ See PROJECT.md for project description.
 - **Testing Requirements:** You MUST write automated tests in parallel with implementing new features.
 - **Verification:** Before considering a task complete or submitting work for review, you MUST run the automated test suite to verify that your changes are correct and haven't broken anything.
 
-## Требования:
-1. Ты должен пушить только в локальный репозиторий, а не в репозиторий из которого был сделан форк! 
-2. Ты не должен сам ничего мерджить! В комментариях ты не указываешь что коммит был сгенерирован Claude Code. 
-3. В коммите ты также указываешь в конце "Close #<номер issue/ссылка>"!
+## Требования
+
+1. Пушить только в локальный репозиторий (форк), а не в upstream.
+2. Ничего не мерджить самостоятельно. В коммитах не указывать, что коммит сгенерирован Claude Code.
+3. В конце каждого коммита указывать `Close #<номер issue>`.
 
 ## Architecture & Conventions
 
