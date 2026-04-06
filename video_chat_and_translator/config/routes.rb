@@ -28,6 +28,8 @@ Rails.application.routes.draw do
   # letter_opener_web (development only)
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
+  resources :videos, only: [ :index, :show ]
+
   root "pages/landing#show"
   get "dashboard", to: "pages/dashboard#show", as: :dashboard
 

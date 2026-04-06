@@ -11,6 +11,8 @@
 | POST   | `/users/sign_in`      | `Users::SessionsController#create`   | No   | On success redirect to dashboard     |
 | DELETE | `/users/sign_out`     | `Users::SessionsController#destroy`  | No   | On success redirect to `/`           |
 | GET    | `/users/profile`      | `Users::ProfileController#show`      | Yes  | Guests redirected to sign_in         |
+| GET    | `/videos`             | `VideosController#index`             | Yes  | Guests redirected to sign_in         |
+| GET    | `/videos/:id`         | `VideosController#show`              | Yes  | Guests redirected to sign_in         |
 
 ## Controllers
 
@@ -39,6 +41,8 @@
 - `new` action: calls `redirect_if_authenticated` to send authenticated users to `/dashboard`
 
 ## Global Layout
+
+Authenticated users see a **«Видео»** nav link in the Header pointing to `/videos`.
 
 All Inertia pages are wrapped by `AppLayout` (set via persistent layout in `inertia.tsx`):
 

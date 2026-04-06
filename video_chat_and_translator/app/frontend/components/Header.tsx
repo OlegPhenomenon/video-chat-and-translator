@@ -64,6 +64,13 @@ export default function Header({ onLogoutError }: HeaderProps) {
                 Дашборд
               </Link>
               <Link
+                href="/videos"
+                data-testid="menu-videos"
+                className={linkClass('/videos')}
+              >
+                Видео
+              </Link>
+              <Link
                 href="/users/profile"
                 data-testid="menu-profile"
                 className={linkClass('/users/profile')}
