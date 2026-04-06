@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react'
+import { Head, Link, router } from '@inertiajs/react'
 import { useEffect, useRef, useState } from 'react'
 import { StorageError, StoredVideoRecord, listVideos, saveVideo } from '../../features/videos/storage'
 
@@ -46,10 +46,10 @@ export default function VideosIndex() {
   }, [])
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
     if (!e.target.files) return
     e.target.value = ''
 
+    const file = e.target.files[0]
     if (!file) return
 
     if (!file.type.startsWith('video/')) {
@@ -130,13 +130,12 @@ export default function VideosIndex() {
                       {formatSize(video.size)} · {formatDate(video.createdAt)}
                     </p>
                   </div>
-                  <a
+                  <Link
                     href={`/videos/${video.id}`}
-                    onClick={(e) => { e.preventDefault(); router.visit(`/videos/${video.id}`) }}
                     className="shrink-0 text-sm font-medium text-indigo-600 hover:text-indigo-800"
                   >
                     Смотреть
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

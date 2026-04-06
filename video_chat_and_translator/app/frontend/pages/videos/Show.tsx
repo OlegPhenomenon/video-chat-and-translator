@@ -18,10 +18,12 @@ export default function VideosShow() {
   const [state, setState] = useState<VideoState>({ status: 'loading' })
 
   useEffect(() => {
+    let cancelled = false
     let objectURL: string | null = null
 
     findVideo(id)
       .then((record) => {
+        if (cancelled) return
         if (!record) {
           setState({ status: 'not_found' })
           return
@@ -30,6 +32,7 @@ export default function VideosShow() {
         setState({ status: 'success', record, objectURL })
       })
       .catch((err: unknown) => {
+        if (cancelled) return
         const message =
           err instanceof StorageError
             ? err.message
@@ -38,6 +41,7 @@ export default function VideosShow() {
       })
 
     return () => {
+      cancelled = true
       if (objectURL) URL.revokeObjectURL(objectURL)
     }
   }, [id])
