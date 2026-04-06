@@ -26,7 +26,7 @@ This plan addresses the original 5 comments + 4 follow-up corrections + 3 final 
 
 2. **Chromium packages (Debian slim specifics):** Corrected package list: use `chromium` (not chromium-browser), include runtime deps (libnss3, libxss1, libappindicator3-1), DO NOT use chromium-driver (Cuprite uses CDP, not WebDriver) (Sections 5.2, Risks #2)
 
-3. **Step 6.1 (System spec authentication):** Clarified that ONLY solution is `config.include Devise::Test::IntegrationHelpers, type: :system` + `login_as(user, scope: :user)` in before hooks. No alternatives, no Warden setup needed (Sections 6.1, Risks #3)
+3. **Step 6.1 (System spec authentication):** Clarified that ONLY solution is `config.include Warden::Test::Helpers, type: :system` + `login_as(user, scope: :user)` in before hooks + `config.after(:each, type: :system) { Warden.test_reset! }` cleanup. Devise helpers are for request specs only; Warden is required for Capybara system tests (Sections 6.1, Risks #3)
 
 4. **Step 6.2 (Scenario 4 — server error resilience):** Replaced non-working examples with real stubs: use `allow_any_instance_of(Users::SessionsController)` (not Devise base), mock destroy to return error, verify button remains visible/enabled. Includes COMPLIANT React implementation pattern (Sections 6.2.4, Risks #4)
 
@@ -117,7 +117,7 @@ Because project rules require asking permission before installing new gems, brow
 | 2 | Switch authenticated root from `Landing` to `Dashboard` | 1 | `app/controllers/pages_controller.rb` | `GET /` for signed-in user renders `Dashboard`; guest behavior unchanged |
 | 3 | Create minimal dashboard page with heading and exactly two nav actions | 2 | `app/frontend/pages/Dashboard.tsx` | Page shows `Dashboard`, profile link, sign-out control, and a semantic `<main>` wrapper |
 | 4 | Document the new public page and root behavior | 2, 3 | `docs/features/dashboard.md` | Repo docs describe route behavior, files, and sign-out/profile navigation |
-| 5 | Establish browser/system test harness (decision gate + Docker verification) | 1 | **`docker/Dockerfile`** (not video_chat_and_translator/), `Gemfile`, `spec/rails_helper.rb`, `spec/support/capybara.rb` | Dev Docker image supports headless Chromium; `type: :system` specs can run; Devise integration helpers configured |
+| 5 | Establish browser/system test harness (decision gate + Docker verification) | 1 | **`docker/Dockerfile`** (not video_chat_and_translator/), `Gemfile`, `spec/rails_helper.rb`, `spec/support/capybara.rb` | Dev Docker image supports headless Chromium; `type: :system` specs can run; Warden::Test::Helpers + cleanup configured |
 | 6 | Add browser-level regression for navigation and sign-out flow | 3, 5 | `spec/system/dashboard_navigation_spec.rb` | All 4 scenarios pass: dashboard display, profile link, sign-out flow, **sign-out resilience on server error** |
 | 7 | Validate frontend TypeScript compilation and imports | 3 | Dashboard.tsx via `npm run check` | No TS errors; Dashboard imports are correct; page type-safe |
 | 8 | Run full verification in Docker and validate all layers | 1-7 | none (all previously modified files) | Request specs + system specs + frontend validation all pass; Definition of Done checklist complete |
