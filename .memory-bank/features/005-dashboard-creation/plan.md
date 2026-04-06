@@ -6,7 +6,7 @@
 
 ## Summary of Reviewer Feedback Fixes
 
-This plan addresses the original 5 comments + 4 follow-up corrections:
+This plan addresses the original 5 comments + 4 follow-up corrections + 3 final refinements:
 
 ### Original 5 comments (FIXED):
 
@@ -29,6 +29,14 @@ This plan addresses the original 5 comments + 4 follow-up corrections:
 3. **Step 6.1 (System spec authentication):** Clarified that ONLY solution is `config.include Devise::Test::IntegrationHelpers, type: :system` + `login_as(user, scope: :user)` in before hooks. No alternatives, no Warden setup needed (Sections 6.1, Risks #3)
 
 4. **Step 6.2 (Scenario 4 — server error resilience):** Replaced non-working examples with real stubs: use `allow_any_instance_of(Users::SessionsController)` (not Devise base), mock destroy to return error, verify button remains visible/enabled. Includes COMPLIANT React implementation pattern (Sections 6.2.4, Risks #4)
+
+### Final 3 refinements (FIXED):
+
+1. **spec/support auto-loading (Step 5 completeness):** Corrected to explicitly uncomment `spec/rails_helper.rb:26` so spec/support/capybara.rb is loaded. Without this, Capybara config won't be applied (Sections 5.2, Risks #5, Definition of Done)
+
+2. **System spec authentication (Warden vs Devise):** Corrected Section 6.1 and Definition of Done to use `config.include Warden::Test::Helpers, type: :system` (not Devise). Devise::Test::IntegrationHelpers only works for request specs; Warden is required for Capybara system tests with browser-level sessions (Sections 5.2, 6.1, Risks #3)
+
+3. **Capybara server config:** Removed `config.server = :webrick` from Section 5.2 since webrick is not in Gemfile. Use Capybara's default server. Avoids requiring additional gems beyond capybara + cuprite (Sections 5.2, Risks #6)
 
 ## 1. Grounding Against Current Code
 
@@ -82,7 +90,8 @@ Because project rules require asking permission before installing new gems, brow
 
 - `video_chat_and_translator/Gemfile` — add Capybara + Cuprite gems
 - **`docker/Dockerfile`** — add Chromium OS packages (not video_chat_and_translator/Dockerfile!)
-- `video_chat_and_translator/spec/rails_helper.rb` (line 37) — add Devise::Test::IntegrationHelpers for type: :system
+- `video_chat_and_translator/spec/rails_helper.rb` (line 26) — **uncomment** auto-load of spec/support/**/*.rb
+- `video_chat_and_translator/spec/rails_helper.rb` (line 37+) — add Warden::Test::Helpers for type: :system
 - `video_chat_and_translator/spec/support/capybara.rb` (new) — Cuprite driver config
 - `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` (new) — 4 scenarios with server error resilience test
 
@@ -282,7 +291,6 @@ RUN apt-get update -qq && \
 Capybara.configure do |config|
   config.default_driver = :cuprite
   config.javascript_driver = :cuprite
-  config.server = :webrick
   config.default_max_wait_time = 2
 end
 
@@ -303,20 +311,32 @@ end
 
 **spec/rails_helper.rb changes (if approved):**
 
-Add Devise integration helper for system specs (line 37, add new line after request config):
+Two changes required:
+
+**Change 1 (line 26):** Uncomment spec/support auto-loading so Capybara config is loaded:
+
+```ruby
+# Line 26 — UNCOMMENT this line:
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+```
+
+**Change 2 (line 37+):** Add Warden integration helper for system specs:
 
 ```ruby
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::IntegrationHelpers, type: :request
-  config.include Devise::Test::IntegrationHelpers, type: :system  # ← NEW: Support authenticated system specs
+  config.include Warden::Test::Helpers, type: :system  # ← NEW: For authenticated system specs with login_as
   config.before(:each) { ActiveJob::Base.queue_adapter = :test }
   
   # ... rest of config ...
 end
 ```
 
-This allows system specs to use `login_as(user, scope: :user)` helper.
+**Why Warden::Test::Helpers for system specs:**
+- `Devise::Test::IntegrationHelpers` provides `sign_in()` for request specs, but system specs (Capybara) require session setup at browser level
+- `Warden::Test::Helpers` provides `login_as(user, scope: :user)` which sets up a valid Warden session that Capybara browser can use
+- This is the standard pattern for Devise + Capybara system tests
 
 #### 5.3 If approval is NOT granted
 
@@ -328,8 +348,9 @@ This allows system specs to use `login_as(user, scope: :user)` helper.
 
 - Add Chromium packages to `docker/Dockerfile` (not video_chat_and_translator/Dockerfile)
 - Add Capybara + Cuprite gems to Gemfile
+- Uncomment spec/support auto-loading in `spec/rails_helper.rb:26`
 - Create `spec/support/capybara.rb` with driver config
-- Add Devise helper line to `spec/rails_helper.rb:37`
+- Add Warden helper line to `spec/rails_helper.rb:37+`
 - Rebuild Docker image: `docker compose build web`
 - Verify Capybara initialization with minimal test before writing full spec
 
@@ -339,27 +360,28 @@ Create `video_chat_and_translator/spec/system/dashboard_navigation_spec.rb` only
 
 #### 6.1 Authentication for system specs — CORRECTED
 
-The Devise integration helper must be added in Step 5 to `spec/rails_helper.rb:37`:
+System specs with Capybara require Warden (not Devise) authentication helpers.
 
+**Required setup in Step 5:**
+
+1. Add Warden helper to `spec/rails_helper.rb:37+`:
 ```ruby
-config.include Devise::Test::IntegrationHelpers, type: :system
+config.include Warden::Test::Helpers, type: :system
 ```
 
-This allows system spec helper `before` hooks to use:
-
+2. Use `login_as()` in spec `before` hooks:
 ```ruby
 before { login_as(user, scope: :user) }
 ```
 
-This is the **ONLY way** to authenticate system specs in Rails + Devise. It logs in the user into the browser session before test execution.
-
-**Why this works:**
-- `Devise::Test::IntegrationHelpers` injects Warden test helpers into integration/system tests
-- `login_as(user, scope: :user)` sets up a valid session inside Capybara's browser context
-- Does NOT rely on cookies or request headers (those are for :request specs)
+**Why Warden::Test::Helpers:**
+- `Devise::Test::IntegrationHelpers` with `sign_in()` works for request specs (no JS, standard HTTP session)
+- System specs with Capybara (Cuprite) require browser-level session setup
+- `Warden::Test::Helpers` provides `login_as(user, scope: :user)` which sets up a valid Warden session that Capybara's headless browser can use
+- This is the standard, tested pattern for Devise + Capybara system tests
 - Works inside Cuprite's headless Chromium process
 
-No alternative setup is needed in `spec/support/` for authentication.
+**Note:** Do not mix Devise and Warden helpers. For system specs, use Warden only.
 
 #### 6.2 Spec scenarios
 
@@ -497,10 +519,10 @@ Keep this spec focused on user-visible behavior. Do not duplicate lower-level re
    - Without correct packages, Cuprite will fail to start headless browser
 
 3. **System spec authentication — CORRECTED**
-   - Must add `config.include Devise::Test::IntegrationHelpers, type: :system` to `spec/rails_helper.rb:37`
+   - Must add `config.include Warden::Test::Helpers, type: :system` to `spec/rails_helper.rb:37+`
    - Allows `login_as(user, scope: :user)` helper in system spec `before` hooks
-   - This is the **ONLY way** to set up authenticated browser sessions for Devise + Capybara
-   - No alternative setup needed
+   - Warden (not Devise) is required for Capybara system specs: Devise::Test::IntegrationHelpers with `sign_in()` is for request specs only
+   - This is the standard pattern for Devise + Capybara/Cuprite browser tests
 
 4. **Sign-Out button error handling must be testable — CORRECTED**
    - Cannot use `allow_any_instance_of(Devise::SessionsController)` (wrong controller)
@@ -509,7 +531,18 @@ Keep this spec focused on user-visible behavior. Do not duplicate lower-level re
    - Scenario 4 verifies button remains visible/enabled even when request returns error
    - Button implementation must NOT use `disabled={processing}` tied to request state
 
-5. **Frontend validation missing from verification**
+5. **spec/support auto-loading disabled — CRITICAL for Step 5**
+   - Current `spec/rails_helper.rb:26` has auto-loading of spec/support/**/*.rb commented out
+   - Plan creates `spec/support/capybara.rb`, but it won't be loaded without fixing this line
+   - Must uncomment line 26 to ensure Capybara driver config is applied before system specs run
+   - Otherwise Cuprite driver registration will fail and system specs will not run
+
+6. **Capybara server config — CORRECTED**
+   - Plan originally specified `config.server = :webrick`, but webrick gem is not in current Gemfile
+   - Removed from Section 5.2 — use Capybara's default server (WEBrick is auto-loaded by Capybara if needed)
+   - No additional gems needed beyond capybara + cuprite
+
+7. **Frontend validation missing from verification**
    - Request specs only verify component NAME in response, not file compilation
    - TS errors in Dashboard.tsx can hide from request-level tests
    - Must run `npm run check` as part of verification (Step 7/8)
@@ -576,7 +609,10 @@ Expected: All specs pass (request + system, if system tooling was approved).
   - CRITICAL: Update `docker/Dockerfile` (not video_chat_and_translator/Dockerfile — that's production-only)
   - Verify via `docker compose build web` that image builds successfully
 - [ ] Gemfile updated with `capybara` and `cuprite` gems (if approval granted)
-- [ ] spec/rails_helper.rb line 37 updated: add `config.include Devise::Test::IntegrationHelpers, type: :system` (if approval granted)
+- [ ] spec/rails_helper.rb line 26 uncommented: auto-load spec/support/**/*.rb (if approval granted)
+  - This ensures spec/support/capybara.rb is loaded before tests run
+- [ ] spec/rails_helper.rb line 37+ updated: add `config.include Warden::Test::Helpers, type: :system` (if approval granted)
+  - Use Warden (not Devise) helpers for system specs with Capybara/Cuprite
 - [ ] spec/support/capybara.rb created with headless Cuprite driver config (if approval granted)
 - [ ] System spec `spec/system/dashboard_navigation_spec.rb` passes **all 4 scenarios**, including:
   - Scenario 1: Dashboard heading + exactly 2 nav elements
