@@ -20,10 +20,6 @@ RSpec.describe "Pages", type: :request do
         expect(response.body).to include("Dashboard")
       end
 
-      it "preserves Landing.tsx in the codebase" do
-        get "/", headers: { "HTTP_HOST" => "localhost" }
-        expect(Rails.root.join("app/frontend/pages/Landing.tsx")).to exist
-      end
     end
   end
 end

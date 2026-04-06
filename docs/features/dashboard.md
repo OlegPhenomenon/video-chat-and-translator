@@ -59,7 +59,6 @@ The Dashboard contains exactly two navigation actions:
 - `spec/requests/pages_spec.rb` verifies:
   - Authenticated users see Dashboard component
   - Guest users redirect to login
-  - Landing.tsx file still exists in codebase
 
 ### System-Level Specs (Optional)
 - `spec/system/dashboard_navigation_spec.rb` (if system testing tooling is approved):
