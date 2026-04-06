@@ -4,7 +4,7 @@ RSpec.describe "Pages", type: :request do
   describe "GET /" do
     context "when not authenticated" do
       it "redirects to login page" do
-        get "/"
+        get "/", headers: { "HTTP_HOST" => "localhost" }
         expect(response).to redirect_to(new_user_session_path)
       end
     end
@@ -12,10 +12,17 @@ RSpec.describe "Pages", type: :request do
     context "when authenticated with confirmed user" do
       let!(:user) { create(:user, :confirmed) }
 
-      it "returns success" do
-        sign_in user
-        get "/"
+      before { sign_in user }
+
+      it "renders the Dashboard inertia component" do
+        get "/", headers: { "HTTP_HOST" => "localhost" }
         expect(response).to be_successful
+        expect(response.body).to include("Dashboard")
+      end
+
+      it "preserves Landing.tsx in the codebase" do
+        get "/", headers: { "HTTP_HOST" => "localhost" }
+        expect(Rails.root.join("app/frontend/pages/Landing.tsx")).to exist
       end
     end
   end
