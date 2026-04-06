@@ -2,10 +2,10 @@
 
 ## Route Map
 
-| Method | Path          | Controller              | Inertia Component | Auth |
-| ------ | ------------- | ----------------------- | ----------------- | ---- |
-| GET    | `/videos`     | `VideosController#index` | `videos/Index`   | Yes — guests redirected to sign_in |
-| GET    | `/videos/:id` | `VideosController#show`  | `videos/Show`    | Yes — guests redirected to sign_in |
+| Method | Path           | Controller               | Inertia Component | Auth                               |
+| ------ | -------------- | ------------------------ | ----------------- | ---------------------------------- |
+| GET    | `/videos`      | `VideosController#index` | `videos/Index`    | Yes — guests redirected to sign_in |
+| GET    | `/videos/:id`  | `VideosController#show`  | `videos/Show`     | Yes — guests redirected to sign_in |
 
 ## Architecture Boundary
 
@@ -39,11 +39,9 @@ end
 
 ### API
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `saveVideo` | `(file: File) => Promise<StoredVideoRecord>` | Saves a File/Blob to IndexedDB, generates UUID id |
-| `listVideos` | `() => Promise<StoredVideoRecord[]>` | Returns all records sorted by `createdAt DESC` |
-| `findVideo` | `(id: string) => Promise<StoredVideoRecord \| null>` | Finds a record by id; returns null if not found |
+- **`saveVideo(file: File): Promise<StoredVideoRecord>`** — saves a File/Blob to IndexedDB, generates a UUID id.
+- **`listVideos(): Promise<StoredVideoRecord[]>`** — returns all records sorted by `createdAt DESC`.
+- **`findVideo(id: string): Promise<StoredVideoRecord | null>`** — finds a record by id; returns `null` if not found.
 
 ### `StoredVideoRecord`
 
@@ -67,37 +65,33 @@ class StorageError extends Error {
 }
 ```
 
-| Code | Cause |
-|------|-------|
-| `unsupported` | `window.indexedDB` is unavailable |
+| Code             | Cause                                                 |
+| ---------------- | ----------------------------------------------------- |
+| `unsupported`    | `window.indexedDB` is unavailable                     |
 | `quota_exceeded` | Browser storage quota exceeded (`QuotaExceededError`) |
-| `unknown` | Any other DOMException or unexpected error |
+| `unknown`        | Any other DOMException or unexpected error            |
 
 ## UI States
 
-### `videos/Index` (file: `app/frontend/pages/videos/Index.tsx`)
+### `videos/Index` (`app/frontend/pages/videos/Index.tsx`)
 
-| State | Trigger | Behavior |
-|-------|---------|----------|
-| `loading` | Initial mount, `listVideos()` in flight | Shows "Загрузка..." text; input still visible |
-| `unsupported` | `StorageError.code === 'unsupported'` | Warning banner shown; file input disabled |
-| `error` (list) | Any other error from `listVideos()` | Error message shown; file input still usable |
-| `empty` | `listVideos()` returns `[]` | "Нет загруженных видео" message |
-| `ready` | `listVideos()` returns records | Video list rendered with name, size, date, watch link |
-| `saving` | `saveVideo()` in flight | Input disabled; "Сохранение..." shown |
-| `invalid-file` | Selected file type doesn't start with `video/` | Error shown; no `saveVideo()` call |
-| `quota_exceeded` | `StorageError.code === 'quota_exceeded'` from save | Error shown; stays on page; input re-enabled |
-| `save-error` | Other error from `saveVideo()` | Generic error shown; stays on page |
-| Success | `saveVideo()` resolves | Redirects to `/videos/:id` |
+- **`loading`** — initial mount, `listVideos()` in flight. Shows "Загрузка...", input visible.
+- **`unsupported`** — `StorageError.code === 'unsupported'`. Warning banner shown; input disabled.
+- **`error`** — other error from `listVideos()`. Error message shown; input still usable.
+- **`empty`** — `listVideos()` returns `[]`. Shows "Нет загруженных видео".
+- **`ready`** — list loaded. Renders video entries with name, size, date, watch link.
+- **`saving`** — `saveVideo()` in flight. Input disabled; "Сохранение..." shown.
+- **`invalid-file`** — selected file type doesn't start with `video/`. Error shown; `saveVideo` not called.
+- **`quota_exceeded`** — `StorageError.code === 'quota_exceeded'` on save. Error shown; stays on page; input re-enabled.
+- **`save-error`** — other error from `saveVideo()`. Generic error shown; stays on page.
+- **success** — `saveVideo()` resolves. Redirects to `/videos/:id`.
 
-### `videos/Show` (file: `app/frontend/pages/videos/Show.tsx`)
+### `videos/Show` (`app/frontend/pages/videos/Show.tsx`)
 
-| State | Trigger | Behavior |
-|-------|---------|----------|
-| `loading` | Initial mount, `findVideo()` in flight | Shows "Загрузка..." |
-| `success` | `findVideo()` resolves with record | Video title + `<video controls>` rendered; object URL created |
-| `not_found` | `findVideo()` returns `null` | Informational message + back link to `/videos` |
-| `error` | `StorageError` from `findVideo()` | Error message + back link to `/videos` |
+- **`loading`** — initial mount, `findVideo()` in flight. Shows "Загрузка...".
+- **`success`** — `findVideo()` resolves with record. Renders video title + `<video controls>` with object URL.
+- **`not_found`** — `findVideo()` returns `null`. Message + back link to `/videos`.
+- **`error`** — `StorageError` from `findVideo()`. Error message + back link to `/videos`.
 
 Object URL lifecycle: created after successful `findVideo`, revoked in `useEffect` cleanup to prevent memory leaks.
 
