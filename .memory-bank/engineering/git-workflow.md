@@ -1,0 +1,42 @@
+---
+title: Git Workflow
+doc_kind: engineering
+doc_function: convention
+purpose: Правила работы с ветками, коммитами и PR в контексте client-side монорепозитория.
+derived_from:
+  - ../dna/governance.md
+status: active
+audience: humans_and_agents
+---
+
+# Git Workflow
+
+## Default Branch
+
+Основная ветка проекта — `main`. На ветку завязаны хуки деплоя веб-приложения и бэкенда. Разработка ведется в отведённых feature-ветках.
+
+## Commits
+
+Придерживаемся [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat: integrate whisper tiny WASM model`
+- `fix: prevent audio overlap on youtube overlay`
+- `refactor: extract worker initialization logic`
+- `docs: update operations runbooks`
+
+В монорепозитории обязательно использование scope для четкого разграничения:
+- `feat(ext): add popup context menu`
+- `fix(web): correct tutor sandbox layout`
+- `chore(api): update Active Record schema for Anki bot`
+
+## Pull Requests
+
+- Лимит: PR должен включать только одну логическую фичу/багфикс.
+- Обязательно прохождение локальных линтеров (`rubocop`, `eslint`) и тестов (`rspec`, `vitest`).
+- Если PR касается браузерного расширения (`ext`), необходимо убедиться, что список `permissions` в `manifest.json` не превышает допущенные ограничения. При их расширении требуется обоснование в body PR (иначе Google Web Store отклонит обновление).
+- В комментариях к инфраструктурным изменениям (смена сборщика или путей моделей) необходимо описать шаги для локального тестирования.
+
+## Worktrees
+
+При работе с несколькими ветками (через `git worktree`) учитывайте:
+- Папка с ML моделями (`public/models` или аналогичная) может весить сотни мегабайт/гигабайты.
+- Рекомендуется добавлять её загрузку в скрипт стартапа, либо вручную создавать символические ссылки (symlink) на общий кэш скачанных моделей между всеми worktree, чтобы не переполнять жесткий диск компьютера.

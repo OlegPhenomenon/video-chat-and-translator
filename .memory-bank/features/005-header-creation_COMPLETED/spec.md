@@ -1,6 +1,6 @@
 # Tech Spec: Единый хедер/меню для сайта
 
-**Source:** `brief.md` (06.04.2026) | **Status:** ready for implementation  
+**Source:** `brief.md` (06.04.2026) | **Status:** COMPLETED  
 **See also:** `definition_of_done.md` (DoD checklist), `brief.md` (требования)
 
 ---

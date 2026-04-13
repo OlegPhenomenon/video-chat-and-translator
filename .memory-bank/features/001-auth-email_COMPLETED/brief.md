@@ -1,7 +1,7 @@
 # Brief: Система авторизации и подтверждения Email
 
 **Related Issue:** [GitHub Issue #1](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/1)
-**Status:** active
+**Status:** COMPLETED
 **Date:** 03.04.2026
 
 ### Цель

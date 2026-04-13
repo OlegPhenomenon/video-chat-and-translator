@@ -1,6 +1,6 @@
 # Specification: Система авторизации и подтверждения Email
 
-**Статус:** Active  
+**Статус:** COMPLETED
 **Версия:** 1.0
 **Related Issue:** [GitHub Issue #1](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/1)
 **Тех. стек:** Ruby on Rails, Inertia.js, React, PostgreSQL, Devise, Redis (для очередей), Sidekiq, Rspec.

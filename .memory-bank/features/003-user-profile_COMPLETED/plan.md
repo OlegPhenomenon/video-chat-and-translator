@@ -1,6 +1,6 @@
 # Implementation Plan: Профиль пользователя
 
-**Статус:** Ready  
+**Статус:** COMPLETED
 **Спецификация:** `.memory-bank/features/003-user-profile/spec.md`  
 **Дата:** 2026-04-05
 

@@ -2,7 +2,7 @@
 
 **Feature:** 003-user-profile
 **Date:** 05.04.2026
-**Status:** completed
+**Status:** COMPLETED
 
 ---
 

@@ -1,7 +1,7 @@
 # Implementation Plan: Система авторизации и подтверждения Email
 
 **Spec:** `.memory-bank/features/001-auth-email/spec.md`  
-**Статус:** Reviewed (v3 — 11 + 2 замечания ревью исправлены)  
+**Статус:** COMPLETED
 **Дата:** 03.04.2026
 
 ---

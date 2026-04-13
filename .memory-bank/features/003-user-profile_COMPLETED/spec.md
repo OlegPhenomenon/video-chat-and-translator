@@ -1,6 +1,6 @@
 # Specification: Профиль пользователя
 
-**Статус:** Ready for Implementation
+**Статус:** COMPLETED
 **Версия:** 1.1
 **Related Issue:** [GitHub Issue #3](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/3)
 **Тех. стек:** Ruby on Rails 8, Inertia.js, React, PostgreSQL, Devise 5.0.3, Redis, Sidekiq 8, RSpec.

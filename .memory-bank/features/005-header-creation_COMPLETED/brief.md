@@ -1,7 +1,7 @@
 # Brief: Создание хедера/меню для сайта
 
 **Related Issue:** [GitHub Issue #5](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/5)
-**Status:** draft
+**Status:** COMPLETED
 **Date:** 06.04.2026
 **Owner:** Product/Tech Lead (для принятия решений по маршрутам и приоритету)
 

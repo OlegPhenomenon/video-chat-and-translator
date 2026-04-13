@@ -1,6 +1,6 @@
 # Specification: Система сброса пароля
 
-**Статус:** Completed (04.04.2026)  
+**Статус:** COMPLETED
 **Версия:** 2.0 (grounding после завершения 001-auth-email)  
 **Related Issue:** [GitHub Issue #2](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/2)  
 **Тех. стек:** Ruby on Rails 8, Inertia.js, React, PostgreSQL, Devise 5.0.3, Redis, Sidekiq 8, RSpec.

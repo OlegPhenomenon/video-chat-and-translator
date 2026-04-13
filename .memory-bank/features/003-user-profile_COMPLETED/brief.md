@@ -1,7 +1,7 @@
 # Brief: Профиль пользователя
 
 **Related Issue:** [GitHub Issue #3](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/3)
-**Status:** active
+**Status:** COMPLETED
 **Date:** 04.04.2026
 
 ### Цель

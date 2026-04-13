@@ -1,7 +1,7 @@
 # Implementation Plan: Система сброса пароля
 
 **Spec:** `.memory-bank/features/002-forgot-password/spec.md` (v2.0)  
-**Статус:** COMPLETED (04.04.2026)  
+**Статус:** COMPLETED
 **Зависимость:** 001-auth-email **завершена и смержена**.
 
 ---
