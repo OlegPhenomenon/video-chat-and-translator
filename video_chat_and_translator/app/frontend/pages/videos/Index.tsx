@@ -46,11 +46,9 @@ export default function VideosIndex() {
   }, [])
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files) return
-    e.target.value = ''
-
-    const file = e.target.files[0]
+    const file = e.target.files?.[0]
     if (!file) return
+    e.target.value = ''
 
     if (!file.type.startsWith('video/')) {
       setSaveError('Выбранный файл не является видео. Пожалуйста, выберите видеофайл.')
