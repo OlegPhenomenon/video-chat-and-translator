@@ -9,14 +9,18 @@ interface RegisterTranslations {
   submit: string
   have_account: string
   login_link: string
+  success_heading: string
+  success_check_email: string
+  success_login_link: string
 }
 
 interface RegisterProps {
   translations: RegisterTranslations
+  registration_success: boolean
   errors?: Record<string, string[]>
 }
 
-export default function Register({ translations, errors = {} }: RegisterProps) {
+export default function Register({ translations, registration_success, errors = {} }: RegisterProps) {
   const { data, setData, post, processing } = useForm({
     user: {
       email: '',
@@ -40,78 +44,90 @@ export default function Register({ translations, errors = {} }: RegisterProps) {
     <AuthLayout>
       <Head title={translations.title} />
 
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            {translations.email}
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={data.user.email}
-            onChange={e => setData('user', { ...data.user, email: e.target.value })}
-            className={fieldClass('email')}
-            required
-          />
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            {translations.password}
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            value={data.user.password}
-            onChange={e => setData('user', { ...data.user, password: e.target.value })}
-            className={fieldClass('password')}
-            required
-          />
-          {errors.password && (
-            <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-1">
-            {translations.password_confirmation}
-          </label>
-          <input
-            id="password_confirmation"
-            type="password"
-            autoComplete="new-password"
-            value={data.user.password_confirmation}
-            onChange={e => setData('user', { ...data.user, password_confirmation: e.target.value })}
-            className={fieldClass('password_confirmation')}
-            required
-          />
-          {errors.password_confirmation && (
-            <p className="mt-1 text-xs text-red-600">{errors.password_confirmation[0]}</p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          disabled={processing}
-          className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
-        >
-          {translations.submit}
-        </button>
-
-        <div className="text-center text-sm text-gray-500">
-          {translations.have_account}{' '}
-          <a href="/users/sign_in" className="text-indigo-600 hover:underline">
-            {translations.login_link}
+      {registration_success ? (
+        <div className="rounded-md border border-green-200 bg-green-50 p-6">
+          <h1 className="text-lg font-semibold text-green-800">{translations.success_heading}</h1>
+          <p className="mt-2 text-sm text-green-700">{translations.success_check_email}</p>
+          <a href="/users/sign_in" className="mt-4 inline-block text-indigo-600 hover:underline">
+            {translations.success_login_link}
           </a>
         </div>
-      </form>
+      ) : (
+        <>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-6">{translations.title}</h1>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                {translations.email}
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={data.user.email}
+                onChange={e => setData('user', { ...data.user, email: e.target.value })}
+                className={fieldClass('email')}
+                required
+              />
+              {errors.email && (
+                <p className="mt-1 text-xs text-red-600">{errors.email[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                {translations.password}
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                value={data.user.password}
+                onChange={e => setData('user', { ...data.user, password: e.target.value })}
+                className={fieldClass('password')}
+                required
+              />
+              {errors.password && (
+                <p className="mt-1 text-xs text-red-600">{errors.password[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700 mb-1">
+                {translations.password_confirmation}
+              </label>
+              <input
+                id="password_confirmation"
+                type="password"
+                autoComplete="new-password"
+                value={data.user.password_confirmation}
+                onChange={e => setData('user', { ...data.user, password_confirmation: e.target.value })}
+                className={fieldClass('password_confirmation')}
+                required
+              />
+              {errors.password_confirmation && (
+                <p className="mt-1 text-xs text-red-600">{errors.password_confirmation[0]}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={processing}
+              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors disabled:opacity-50"
+            >
+              {translations.submit}
+            </button>
+
+            <div className="text-center text-sm text-gray-500">
+              {translations.have_account}{' '}
+              <a href="/users/sign_in" className="text-indigo-600 hover:underline">
+                {translations.login_link}
+              </a>
+            </div>
+          </form>
+        </>
+      )}
     </AuthLayout>
   )
 }

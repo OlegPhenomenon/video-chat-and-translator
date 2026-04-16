@@ -8,7 +8,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
     return if performed?
 
     render inertia: "auth/Register", props: {
-      translations: I18n.t("auth.register")
+      translations: I18n.t("auth.register"),
+      registration_success: flash[:registration_success] || false
     }
   end
 
@@ -16,11 +17,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
     build_resource(sign_up_params)
 
     if resource.save
+      flash[:registration_success] = true
       redirect_to new_user_registration_path,
                   notice: I18n.t("auth.register.success")
     else
       render inertia: "auth/Register", props: {
         translations: I18n.t("auth.register"),
+        registration_success: false,
         errors: resource.errors.messages
       }
     end

@@ -36,6 +36,14 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.before(:each) { ActiveJob::Base.queue_adapter = :test }
+  config.before(:each, type: :request) { host! "localhost" }
+  config.around(:each, type: :request) do |example|
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = false
+    example.run
+  ensure
+    ActionController::Base.allow_forgery_protection = original
+  end
 
   # Force routes to load before first test so Devise/Warden is properly configured.
   # Without this, Warden copies the config before strategies are registered.
