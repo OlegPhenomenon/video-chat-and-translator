@@ -109,6 +109,20 @@ flowchart LR
 - [ ] `feature.md` → `delivery_status: done`
 - [ ] `implementation-plan.md` → `status: archived`
 
+### Git / PR / CI Workflow (Execution → Done)
+
+Независимо от task tracker, завершённая фича должна пройти полный git/PR/CI цикл:
+
+1. **Branch**: работа над фичей ведётся в отдельной ветке (не `main`). Если агент начал работу в `main`, он обязан зафиксировать это в `implementation-plan.md` как отклонение.
+2. **Commit**: изменения по фиче закоммичены с осмысленным сообщением, в котором в конце присутствует `Close #<issue>` или эквивалентная ссылка на исходную задачу.
+3. **Push**: ветка запушена в `origin` репозитория проекта (не в upstream fork).
+4. **PR**: создан Pull Request из рабочей ветки в целевую ветку (обычно `main`), с кратким summary, ссылкой на feature package (`feature.md`, `implementation-plan.md`) и привязкой к исходному issue.
+5. **Remote CI**: PR считается готовым к merge только если:
+   - локальный `bin/ci` зелёный;
+   - GitHub Actions job `App checks (Docker)` зелёная на этом PR;
+   - другие обязательные CI jobs (если добавятся) зелёные.
+6. **Evidence**: ссылка на PR и ссылка на зелёный CI-run зафиксированы в `EVID-*` соответствующего feature package.
+
 ### → Cancelled (из любой стадии после Draft)
 
 - [ ] `feature.md` → `delivery_status: cancelled`
