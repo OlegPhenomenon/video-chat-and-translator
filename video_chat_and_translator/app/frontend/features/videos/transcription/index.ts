@@ -1,4 +1,9 @@
-export { transcribeToVtt, type TranscribeToVttParams } from './client'
+export {
+  transcribeToVtt,
+  type TranscribeToVttParams,
+  type TranscriptionUploadProgress,
+  type TranscriptionUploadProgressPhase,
+} from './client'
 export {
   providerDefaultModel,
   providerLabel,
