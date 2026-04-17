@@ -140,6 +140,7 @@ Verify должен быть исполнимым и задавать миним
 ### Evidence
 
 - `EVID-01` Какой артефакт должен остаться после проверки.
+- `EVID-REVIEW-01` Ссылка на ревью/approve `feature.md` (другой агент или человек): issue comment / PR review / ticket approval.
 
 ### Evidence contract
 

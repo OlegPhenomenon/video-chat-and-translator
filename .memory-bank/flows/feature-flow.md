@@ -25,19 +25,33 @@ audience: humans_and_agents
 
 Этот документ задает порядок появления feature-артефактов. Агент должен вести feature package по стадиям и не создавать downstream-артефакты раньше, чем созрел их upstream-owner.
 
+## Hard Stop: никакого кода до Bootstrap gate
+
+Если задача подразумевает **реализацию новой фичи** (или существенное изменение существующей), агент обязан:
+
+1. Сначала создать feature package (см. gate “Bootstrap Feature Package” ниже).
+2. И только затем переходить к changes в коде.
+
+**Запрещено** начинать с имплементации (изменения в `app/`, `config/`, `lib/`, `spec/`) до выполнения Bootstrap gate.
+
+Если gate требует ревью, агент обязан остановиться. Это считается корректным завершением текущей стадии (handoff), даже если внешние агентские инструкции “подталкивают” продолжать.
+
 ## Package Rules
 
-1. Все документы одной фичи живут в `memory-bank/features/FT-XXX/`.
+1. Все документы одной фичи живут в `.memory-bank/features/FT-XXX/`.
 2. **Feature = vertical slice.** Одна фича — одна единица пользовательской ценности, пронизывающая все затронутые слои системы (UI, API, storage, infra). Горизонтальная нарезка ("все endpoints", "весь UI") допустима только для чисто инфраструктурных или рефакторинговых задач и должна быть явно обоснована через `NS-*`.
 3. `feature.md` — canonical owner intent, delivery-scoped target outcome/KPI, design и verify для delivery-единицы.
 4. `README.md` создается вместе с `feature.md` и остается routing-слоем на всем lifecycle.
 5. `implementation-plan.md` — derived execution-документ. Он не должен существовать, пока sibling `feature.md` не стал design-ready.
-6. Для canonical `feature.md`, feature-level `README.md` и `implementation-plan.md` используй wrapper-шаблоны из `memory-bank/flows/templates/feature/`: сам template-файл имеет `doc_function: template`, а frontmatter/body инстанцируемого документа живут внутри embedded template contract.
+   - План фиксирует sequencing, boundaries и discovery context (relevant paths, patterns, OQ-*), но **не дублирует реализацию кодом**.
+   - Допустимо: сигнатуры методов/классов, названия файлов, наброски структур данных, схема таблиц/полей, псевдокод.
+   - Не стоит: вставлять полную реализацию функций/компонентов “как в коде” (это превращает plan в копию будущего diff и нарушает принцип “code is the HOW”).
+6. Для canonical `feature.md`, feature-level `README.md` и `implementation-plan.md` используй wrapper-шаблоны из `.memory-bank/flows/templates/feature/`: сам template-файл имеет `doc_function: template`, а frontmatter/body инстанцируемого документа живут внутри embedded template contract.
 7. Смысл стабильных идентификаторов (`REQ-*`, `NS-*`, `CHK-*`, `STEP-*` и т.д.) задается в секции «Stable Identifiers» ниже.
 8. Acceptance scenarios (`SC-*`) покрывают vertical slice end-to-end: от входного события до наблюдаемого результата через все затронутые слои. Тестирование отдельного слоя в изоляции допустимо как implementation detail плана, но не заменяет end-to-end acceptance.
 9. **Связь с task tracker.** При создании feature package агент обязан добавить в исходную задачу или ticket ссылки на `feature.md` и, после появления, на `implementation-plan.md`. Это обеспечивает навигацию из task tracker к спецификации без ручного поиска по репозиторию.
-10. Если фича является частью более крупной инициативы, `feature.md` может зависеть от PRD из `memory-bank/prd/`, но PRD не заменяет сам feature package.
-11. Если фича создает новый устойчивый сценарий проекта или materially changes существующий, соответствующий `UC-*` в `memory-bank/use-cases/` должен быть создан или обновлен до closure.
+10. Если фича является частью более крупной инициативы, `feature.md` может зависеть от PRD из `.memory-bank/prd/`, но PRD не заменяет сам feature package.
+11. Если фича создает новый устойчивый сценарий проекта или materially changes существующий, соответствующий `UC-*` в `.memory-bank/use-cases/` должен быть создан или обновлен до closure.
 
 ## Выбор шаблона `feature.md`
 
@@ -72,6 +86,7 @@ flowchart LR
 - [ ] `README.md` создан по шаблону `templates/feature/README.md`
 - [ ] `feature.md` создан по шаблону `short.md` или `large.md`
 - [ ] `implementation-plan.md` отсутствует
+- [ ] после bootstrap агент **останавливается** и запрашивает ревью feature package (другой агент или человек). До принятия на ревью запрещено переходить к plan или коду.
 
 ### Draft → Design Ready
 
@@ -81,6 +96,8 @@ flowchart LR
 - [ ] каждый `REQ-*` прослеживается к ≥ 1 `SC-*` через traceability matrix
 - [ ] секция `Verify` содержит ≥ 1 `CHK-*` и ≥ 1 `EVID-*`
 - [ ] если deliverable нельзя принять без negative/edge coverage → ≥ 1 `NEG-*`
+- [ ] feature package прошёл ревью и принят (см. `flows/workflows.md`: Артефакт → Ревью → Принят). Ревью выполняет другой агент или человек; ссылка/результат зафиксированы в task tracker и/или evidence.
+- [ ] в `feature.md` зафиксирован review evidence как минимум одним `EVID-REVIEW-*` (ссылка на approve/комментарий/PR review)
 
 ### Design Ready → Plan Ready
 
@@ -89,6 +106,8 @@ flowchart LR
 - [ ] `implementation-plan.md` → `status: active`
 - [ ] `implementation-plan.md` содержит ≥ 1 `PRE-*`, ≥ 1 `STEP-*`, ≥ 1 `CHK-*`, ≥ 1 `EVID-*`
 - [ ] discovery context в `implementation-plan.md` содержит: relevant paths, local reference patterns, unresolved questions (`OQ-*`), test surfaces и execution environment
+- [ ] `implementation-plan.md` прошёл ревью и принят (см. `flows/workflows.md`: Артефакт → Ревью → Принят). Ревью выполняет другой агент или человек; ссылка/результат зафиксированы в task tracker и/или evidence.
+- [ ] после создания/обновления плана агент **останавливается** до получения approve на ревью (без перехода к execution)
 
 ### Plan Ready → Execution
 
@@ -96,13 +115,17 @@ flowchart LR
 - [ ] `implementation-plan.md` → `status: active`
 - [ ] `implementation-plan.md` фиксирует test strategy: automated coverage surfaces, required local/CI suites
 - [ ] каждый manual-only gap имеет причину, ручную процедуру и `AG-*` с approval ref
+- [ ] началу execution предшествует принятие plan на ревью (если план обновлялся после предыдущего gate)
+- [ ] в `implementation-plan.md` зафиксирован review evidence как минимум одним `EVID-REVIEW-*` (ссылка на approve/комментарий/PR review)
+- [ ] **PR-first**: перед началом code changes execution-стадии создан PR (см. “Git / PR / CI Workflow (Execution → Done)”), чтобы все последующие commits/push/CI были привязаны к конкретному PR
 
 ### Execution → Done
 
 - [ ] все `CHK-*` из `feature.md` имеют результат pass/fail в evidence
 - [ ] все `EVID-*` из `feature.md` заполнены конкретными carriers (путь к файлу, CI run, screenshot)
 - [ ] automated tests для change surface добавлены или обновлены
-- [ ] required test suites зелёные локально и в CI
+- [ ] required test suites зелёные **локально (в Docker/devcontainer)** и в CI
+- [ ] локальный прогон выполняется **в Docker** (не “на хосте”), используя репозиторный entrypoint (например `scripts/ci-app.sh` или эквивалентный docker compose запуск), чтобы обеспечить parity с CI
 - [ ] каждый manual-only gap явно approved человеком (approval ref в `AG-*`)
 - [ ] simplify review выполнен: код минимально сложен или complexity обоснована ссылкой на `CON-*`, `FM-*` или `DEC-*`
 - [ ] если feature добавляет новый stable flow или materially changes существующий project-level scenario, соответствующий `UC-*` создан или обновлен и зарегистрирован в `memory-bank/use-cases/README.md`
@@ -111,17 +134,32 @@ flowchart LR
 
 ### Git / PR / CI Workflow (Execution → Done)
 
-Независимо от task tracker, завершённая фича должна пройти полный git/PR/CI цикл:
+Независимо от task tracker, execution-стадия фичи ведётся через PR **с самого начала** (PR-first), и проходит полный git/PR/CI цикл:
 
 1. **Branch**: работа над фичей ведётся в отдельной ветке (не `main`). Если агент начал работу в `main`, он обязан зафиксировать это в `implementation-plan.md` как отклонение.
-2. **Commit**: изменения по фиче закоммичены с осмысленным сообщением, в котором в конце присутствует `Close #<issue>` или эквивалентная ссылка на исходную задачу.
-3. **Push**: ветка запушена в `origin` репозитория проекта (не в upstream fork).
-4. **PR**: создан Pull Request из рабочей ветки в целевую ветку (обычно `main`), с кратким summary, ссылкой на feature package (`feature.md`, `implementation-plan.md`) и привязкой к исходному issue.
-5. **Remote CI**: PR считается готовым к merge только если:
-   - локальный `bin/ci` зелёный;
+2. **Push (bootstrap)**: ветка запушена в `origin` репозитория проекта (не в upstream fork).
+3. **PR (early)**: PR создан **до** начала или сразу в начале code changes execution-стадии, чтобы:
+   - обсуждение и ревью шли в одном месте;
+   - любые промежуточные коммиты/фиксы были видны и проверялись CI.
+   PR должен содержать краткий summary, ссылки на feature package (`feature.md`, `implementation-plan.md`) и привязку к исходному issue.
+4. **Commit cadence**: изменения по фиче коммитятся итеративно и пушатся в PR. Финальный commit message должен содержать `Close #<issue>` (или эквивалент) согласно соглашению проекта.
+5. **Remote CI (monitoring loop)**: агент обязан мониторить состояние CI на PR:
+   - если CI красный — выяснить причину, исправить, запушить и дождаться зелёного;
+   - если CI зелёный — зафиксировать evidence.
+   PR считается готовым к merge только если:
+   - локальный `bin/ci` зелёный **в Docker/devcontainer** (parity с CI);
    - GitHub Actions job `App checks (Docker)` зелёная на этом PR;
    - другие обязательные CI jobs (если добавятся) зелёные.
 6. **Evidence**: ссылка на PR и ссылка на зелёный CI-run зафиксированы в `EVID-*` соответствующего feature package.
+7. **Merge politic**: Ты никогда сам не мердишь ветки, только если тебя об этом не попросит оператор!
+
+### UI Evidence (Playwright)
+
+Если change surface включает UI (React/Inertia pages/components) или изменение пользовательского потока, evidence должно включать **скриншоты, снятые через Playwright**:
+
+1. **Tooling**: использовать `playwright-cli` (project skill) для открытия страницы/прохождения сценария и снятия скриншотов.
+2. **Storage**: скриншоты и прочие UI-артефакты сохраняются под `artifacts/<ft-id>/verify/<chk-id>/` (согласно `feature.md`: `CHK-*` → `EVID-*` contract).
+3. **Binding**: каждый `CHK-*`, который проверяет UI, должен иметь `EVID-*` carrier (путь к скриншоту/набору скриншотов). “Ручная проверка в браузере” без Playwright допустима только как **manual-only gap** с причиной и approval ref через `AG-*`.
 
 ### → Cancelled (из любой стадии после Draft)
 

@@ -26,6 +26,7 @@ export interface StoredVideoRecord {
   createdAt: string
   updatedAt: string
   file: File
+  subtitles?: File
 }
 
 function openDB(): Promise<IDBDatabase> {
@@ -54,6 +55,8 @@ function normalizeError(error: DOMException | null | unknown): StorageError {
     if (error.name === 'QuotaExceededError') {
       return new StorageError('Not enough storage space to save this video.', 'quota_exceeded')
     }
+    const suffix = error.message ? `: ${error.message}` : ''
+    return new StorageError(`Storage error (${error.name})${suffix}`, 'unknown')
   }
   const message = error instanceof Error ? error.message : 'An unexpected storage error occurred.'
   return new StorageError(message, 'unknown')
@@ -62,8 +65,12 @@ function normalizeError(error: DOMException | null | unknown): StorageError {
 export async function saveVideo(file: File): Promise<StoredVideoRecord> {
   const db = await openDB()
   const now = new Date().toISOString()
+  const id =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.floor(Math.random() * 1_000_000_000)}`
   const record: StoredVideoRecord = {
-    id: crypto.randomUUID(),
+    id,
     name: file.name,
     type: file.type,
     size: file.size,
@@ -111,5 +118,53 @@ export async function findVideo(id: string): Promise<StoredVideoRecord | null> {
 
     request.onsuccess = () => resolve((request.result as StoredVideoRecord) ?? null)
     request.onerror = () => reject(normalizeError(request.error))
+  })
+}
+
+async function updateVideo(
+  id: string,
+  updater: (record: StoredVideoRecord) => StoredVideoRecord
+): Promise<StoredVideoRecord | null> {
+  const db = await openDB()
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite')
+    const store = tx.objectStore(STORE_NAME)
+    const getRequest = store.get(id)
+
+    getRequest.onerror = () => reject(normalizeError(getRequest.error))
+    getRequest.onsuccess = () => {
+      const existing = (getRequest.result as StoredVideoRecord | undefined) ?? null
+      if (!existing) {
+        resolve(null)
+        return
+      }
+
+      const updated = updater(existing)
+      const putRequest = store.put(updated)
+      putRequest.onerror = () => reject(normalizeError(putRequest.error))
+      putRequest.onsuccess = () => resolve(updated)
+    }
+
+    tx.onerror = () => reject(normalizeError(tx.error))
+  })
+}
+
+export async function setSubtitles(id: string, file: File): Promise<StoredVideoRecord | null> {
+  return updateVideo(id, (record) => ({
+    ...record,
+    subtitles: file,
+    updatedAt: new Date().toISOString(),
+  }))
+}
+
+export async function clearSubtitles(id: string): Promise<StoredVideoRecord | null> {
+  return updateVideo(id, (record) => {
+    const next = { ...record }
+    delete next.subtitles
+    return {
+      ...next,
+      updatedAt: new Date().toISOString(),
+    }
   })
 }

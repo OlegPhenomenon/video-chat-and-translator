@@ -12,7 +12,7 @@ audience: humans_and_agents
 
 # Feature Packages Index
 
-Каталог `memory-bank/features/` хранит instantiated feature packages вида `FT-XXX/`.
+Каталог `.memory-bank/features/` хранит instantiated feature packages вида `FT-XXX/`.
 
 ## Rules
 
@@ -20,6 +20,10 @@ audience: humans_and_agents
 - Для bootstrap используй шаблоны из [`../flows/templates/feature/`](../flows/templates/feature/).
 - Если feature реализует или существенно меняет устойчивый сценарий проекта, она должна ссылаться на соответствующий `UC-*` из [`../use-cases/README.md`](../use-cases/README.md).
 - В шаблонном репозитории этот каталог может быть пустым. Это нормально.
+
+## Hard Gate (feature-first)
+
+Правила стадий, gates и запреты “код до Bootstrap” — canonical в [`../flows/feature-flow.md`](../flows/feature-flow.md). Этот индекс предназначен для навигации по instantiated packages, а не для дублирования flow-правил.
 
 ## Naming
 

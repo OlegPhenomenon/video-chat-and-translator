@@ -180,6 +180,7 @@ Verify должен быть исполнимым.
 ### Evidence
 
 - `EVID-01` Какой артефакт обязан появиться после проверки.
+- `EVID-REVIEW-01` Ссылка на ревью/approve `feature.md` (другой агент или человек): issue comment / PR review / ticket approval.
 
 ### Evidence contract
 

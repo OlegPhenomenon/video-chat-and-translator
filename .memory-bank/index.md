@@ -45,4 +45,5 @@ audience: humans_and_agents
   **Что:** Найти или завести Architecture Decision Record при смене курса/стека.
 
 - [`features/README.md`](features/README.md)
-  **Что:** Директория с исполняемыми спецификациями и планами фич (feature packages).
+  **Что:** Директория с instantiated feature packages (`FT-XXX/`: `README.md`, `feature.md`, далее `implementation-plan.md` по gate-правилам).
+  **Читать, чтобы:** создать новую фичу **в документации прежде чем писать код** (см. gates в `flows/feature-flow.md`).

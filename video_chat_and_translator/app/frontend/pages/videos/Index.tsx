@@ -60,11 +60,15 @@ export default function VideosIndex() {
 
     try {
       const record = await saveVideo(file)
-      router.visit(`/videos/${record.id}`)
+      router.visit(`/videos/${encodeURIComponent(record.id)}`)
     } catch (err: unknown) {
       setSaveState('idle')
       if (err instanceof StorageError && err.code === 'quota_exceeded') {
         setSaveError('Недостаточно места для сохранения видео. Освободите место в браузере и попробуйте снова.')
+      } else if (err instanceof StorageError) {
+        setSaveError(err.message)
+      } else if (err instanceof Error) {
+        setSaveError(err.message || 'Не удалось сохранить видео. Попробуйте ещё раз.')
       } else {
         setSaveError('Не удалось сохранить видео. Попробуйте ещё раз.')
       }

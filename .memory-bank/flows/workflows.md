@@ -29,6 +29,20 @@ audience: humans_and_agents
 
 Артефакт — то, что создаётся на каждом этапе: спецификация, дизайн-док, план, код, PR, статические ассеты.
 
+### Правило ревью (anti-autopilot)
+
+Если workflow содержит этапы **feature package** или **implementation plan**, то переход на следующий этап запрещён, пока артефакт не принят на ревью.
+
+- Ревью должен выполняться **не тем агентом**, который создал артефакт (или человеком).
+- Результат ревью должен быть зафиксирован как ссылка/комментарий в task tracker (issue/ticket) и/или как evidence в feature package.
+
+### Правило разрешения конфликтов инструкций (Memory Bank > agent persistence)
+
+Если внешние инструкции агента (например, “не останавливаться, пока не решено”) конфликтуют с gates из `flows/feature-flow.md`, приоритет имеет Memory Bank:
+
+- **Остановка для ревью = корректное завершение текущего шага.** Это не “недоделка”, а handoff на следующий актор (другой агент/человек).
+- После создания/обновления `feature.md` или `implementation-plan.md`, когда gate требует ревью, агент обязан **остановиться** и запросить approve/evidence, а не продолжать к коду “для завершения задачи”.
+
 ## Градиент участия человека
 
 Чем ближе к бизнес-требованиям, тем больше участия человека. Чем ближе к изолированному коду и локальному verify, тем больше агент работает автономно.
@@ -46,7 +60,7 @@ audience: humans_and_agents
 - scope локален на одном слое (только UI или только Rails API);
 - решение помещается в одну сессию или один компактный change set.
 Flow:
-`issue/task -> routing -> implementation -> tests (RSpec/Vitest) -> review -> merge`
+`issue/task -> routing -> implementation -> tests (RSpec/Vitest, локально в Docker/devcontainer) -> review -> merge`
 
 ### 2. Средняя или большая фича (Full-Stack)
 Когда:
@@ -54,7 +68,7 @@ Flow:
 - требует design choices, нового use-case;
 - нужны explicit checkpoints и execution plan.
 Flow:
-`issue/task -> spec -> feature package -> implementation plan -> execution -> review -> release check -> handoff`
+`issue/task -> spec -> feature package -> review gate -> implementation plan -> review gate -> execution -> review -> release check -> handoff`
 
 ### 3. Интеграция / Обновление новой ML-модели (ONNX WASM)
 *Специфичный workflow проекта*

@@ -34,6 +34,10 @@ template_target_path: ../../../features/FT-XXX/implementation-plan.md
 
 Если неизвестность меняет scope, архитектуру, acceptance criteria, blocker-state или evidence contract, она сначала поднимается upstream в sibling `feature.md` или ADR и только после этого фигурирует в плане.
 
+План **не должен** содержать полную реализацию “как в коде”. Допустимы сигнатуры, имена файлов/классов/методов, схема таблиц/полей и псевдокод. Реализация остаётся источником правды для HOW.
+
+План обязан содержать как минимум один `EVID-REVIEW-*` со ссылкой на approve ревью этого плана (другой агент или человек): issue comment / PR review / ticket approval.
+
 ## Instantiated Frontmatter
 
 ```yaml
