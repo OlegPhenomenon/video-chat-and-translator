@@ -1,13 +1,13 @@
 import { Head, Link, usePage } from '@inertiajs/react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
-import { StorageError, StoredVideoRecord, findVideo, setSubtitles } from '../../features/videos/storage'
+import { StorageError, StoredVideoRecord, findVideo, setSubtitles } from '@/features/videos/storage'
 import {
   TranscriptionError,
   providerDefaultModel,
   providerLabel,
   transcribeToVtt,
   type TranscriptionProvider,
-} from '../../features/videos/transcription'
+} from '@/features/videos/transcription'
 
 interface PageProps {
   id: string
@@ -248,10 +248,11 @@ export default function VideosShow() {
               <h1 className="text-2xl font-bold text-gray-900 mb-4 truncate">{state.record.name}</h1>
 
               <div className="mb-6">
-                <label className="block mb-2 text-sm font-medium text-gray-700">
+                <label htmlFor="subtitles-upload" className="block mb-2 text-sm font-medium text-gray-700">
                   Субтитры (.vtt)
                 </label>
                 <input
+                  id="subtitles-upload"
                   type="file"
                   accept=".vtt"
                   onChange={handleSubtitlesChange}

@@ -1,7 +1,7 @@
 import React from 'react'
 import '@testing-library/jest-dom/vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import VideosShow from '@/pages/videos/Show'
 
 const findVideo = vi.fn()
@@ -23,9 +23,26 @@ afterEach(() => {
   cleanup()
   findVideo.mockReset()
   setSubtitles.mockReset()
+  vi.restoreAllMocks()
 })
 
 describe('VideosShow subtitles', () => {
+  beforeEach(() => {
+    // Ensure test environment has these browser APIs used by the page.
+    if (!('createObjectURL' in URL)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(URL as any).createObjectURL = vi.fn(() => 'blob:mock')
+    } else {
+      vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock')
+    }
+    if (!('revokeObjectURL' in URL)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(URL as any).revokeObjectURL = vi.fn()
+    } else {
+      vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+    }
+  })
+
   it('shows validation error when non-.vtt is selected', async () => {
     const videoFile = new File(['video'], 'video.mp4', { type: 'video/mp4' })
     findVideo.mockResolvedValue({
