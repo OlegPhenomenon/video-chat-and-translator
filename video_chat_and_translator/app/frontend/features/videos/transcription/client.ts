@@ -1,12 +1,22 @@
 import { TranscriptionError, type TranscriptionProvider } from './errors'
 import { assertWithinProviderLimit, providerBaseUrl, providerTranscriptionPath } from './providers'
 
+export type TranscriptionUploadProgressPhase = 'uploading' | 'awaiting_response'
+
+export interface TranscriptionUploadProgress {
+  phase: TranscriptionUploadProgressPhase
+  loaded: number
+  total: number
+}
+
 export interface TranscribeToVttParams {
   provider: TranscriptionProvider
   apiKey: string
   videoFile: File
   model: string
   language?: string
+  /** Сценарий B: прогресс отправки multipart-тела (fetch этого не даёт). */
+  onUploadProgress?: (progress: TranscriptionUploadProgress) => void
 }
 
 function normalizeUnknownError(provider: TranscriptionProvider, err: unknown): TranscriptionError {
@@ -53,8 +63,60 @@ function normalizeHttpError(provider: TranscriptionProvider, status: number, bod
   })
 }
 
+function postMultipartTranscription(params: {
+  url: string
+  bearerToken: string
+  form: FormData
+  videoFile: File
+  onUploadProgress?: TranscribeToVttParams['onUploadProgress']
+}): Promise<{ status: number; bodyText: string }> {
+  const { url, bearerToken, form, videoFile, onUploadProgress } = params
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+    xhr.setRequestHeader('Authorization', `Bearer ${bearerToken}`)
+    xhr.responseType = 'text'
+
+    xhr.upload.addEventListener('progress', (e: ProgressEvent) => {
+      if (!onUploadProgress) return
+      const denom =
+        e.lengthComputable && e.total > 0
+          ? e.total
+          : videoFile.size > 0
+            ? videoFile.size
+            : Math.max(e.loaded, 1)
+      onUploadProgress({ phase: 'uploading', loaded: e.loaded, total: denom })
+    })
+
+    xhr.upload.addEventListener('load', () => {
+      const size = videoFile.size > 0 ? videoFile.size : 1
+      onUploadProgress?.({ phase: 'awaiting_response', loaded: size, total: size })
+    })
+
+    xhr.addEventListener('error', () => {
+      reject(new TypeError('Network request failed'))
+    })
+
+    xhr.addEventListener('abort', () => {
+      reject(new DOMException('Aborted', 'AbortError'))
+    })
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 0) {
+        reject(new TypeError('Network request failed'))
+        return
+      }
+      const bodyText = typeof xhr.response === 'string' ? xhr.response : xhr.responseText
+      resolve({ status: xhr.status, bodyText })
+    })
+
+    xhr.send(form)
+  })
+}
+
 export async function transcribeToVtt(params: TranscribeToVttParams): Promise<string> {
-  const { provider, apiKey, videoFile, model, language } = params
+  const { provider, apiKey, videoFile, model, language, onUploadProgress } = params
 
   if (!apiKey.trim()) {
     throw new TranscriptionError({ provider, code: 'invalid_api_key', message: 'API key обязателен.' })
@@ -71,21 +133,19 @@ export async function transcribeToVtt(params: TranscribeToVttParams): Promise<st
   const url = `${providerBaseUrl(provider)}${providerTranscriptionPath(provider)}`
 
   try {
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: form,
+    const { status, bodyText } = await postMultipartTranscription({
+      url,
+      bearerToken: apiKey,
+      form,
+      videoFile,
+      onUploadProgress,
     })
 
-    const text = await resp.text()
-
-    if (!resp.ok) {
-      throw normalizeHttpError(provider, resp.status, text)
+    if (!status || status < 200 || status >= 300) {
+      throw normalizeHttpError(provider, status, bodyText)
     }
 
-    const trimmed = text.trim()
+    const trimmed = bodyText.trim()
     if (!trimmed.startsWith('WEBVTT')) {
       throw new TranscriptionError({
         provider,
@@ -99,4 +159,3 @@ export async function transcribeToVtt(params: TranscribeToVttParams): Promise<st
     throw normalizeUnknownError(provider, err)
   }
 }
-

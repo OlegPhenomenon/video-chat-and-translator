@@ -2,11 +2,12 @@ import { Head, Link, usePage } from '@inertiajs/react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { StorageError, StoredVideoRecord, findVideo, setSubtitles } from '@/features/videos/storage'
 import {
-  TranscriptionError,
+  isTranscriptionError,
   providerDefaultModel,
   providerLabel,
   transcribeToVtt,
   type TranscriptionProvider,
+  type TranscriptionUploadProgress,
 } from '@/features/videos/transcription'
 
 interface PageProps {
@@ -20,6 +21,70 @@ type VideoState =
   | { status: 'not_found' }
   | { status: 'error'; message: string }
 
+type TranscriptionStage = 'idle' | 'preparing' | 'processing' | 'saving' | 'success' | 'error' | 'validation_failed'
+
+function transcriptionStageLabel(stage: TranscriptionStage): string {
+  switch (stage) {
+    case 'idle':
+      return 'Ожидание'
+    case 'preparing':
+      return 'Подготовка запроса'
+    case 'processing':
+      return 'Отправка и распознавание'
+    case 'saving':
+      return 'Сохранение субтитров'
+    case 'success':
+      return 'Готово'
+    case 'validation_failed':
+      return 'Нужно действие'
+    case 'error':
+      return 'Ошибка'
+  }
+}
+
+function formatElapsed(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  const mm = String(minutes).padStart(2, '0')
+  const ss = String(seconds).padStart(2, '0')
+  return `${mm}:${ss}`
+}
+
+function formatUploadDetail(progress: TranscriptionUploadProgress): string {
+  if (progress.phase === 'awaiting_response') return 'Получаем ответ от провайдера…'
+  const pct = Math.min(100, Math.round((100 * progress.loaded) / Math.max(progress.total, 1)))
+  return `Отправка файла на сервер: ${pct}%`
+}
+
+function TranscriptionSpinner() {
+  return (
+    <span
+      className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin"
+      aria-hidden
+    />
+  )
+}
+
+function transcriptionErrorMessage(err: unknown): string {
+  if (!isTranscriptionError(err)) return 'Не удалось выполнить транскрибацию.'
+
+  switch (err.code) {
+    case 'invalid_api_key':
+      return 'Проверьте API key и попробуйте ещё раз.'
+    case 'network':
+      return 'Не удалось выполнить запрос к провайдеру. Возможны проблемы сети или CORS (запрос выполняется напрямую из браузера).'
+    case 'file_too_large':
+      return err.message
+    case 'invalid_response':
+      return 'Провайдер вернул некорректный ответ. Попробуйте другую модель/провайдера или повторите попытку позже.'
+    case 'provider_error':
+      return err.message
+    case 'unknown':
+      return err.message || 'Неизвестная ошибка.'
+  }
+}
+
 export default function VideosShow() {
   const { id } = usePage<PageProps>().props
   const [state, setState] = useState<VideoState>({ status: 'loading' })
@@ -31,18 +96,25 @@ export default function VideosShow() {
   const [transcriptionApiKey, setTranscriptionApiKey] = useState<string>('')
   const [rememberApiKey, setRememberApiKey] = useState<boolean>(false)
   const [overwriteSubtitles, setOverwriteSubtitles] = useState<boolean>(false)
-  const [transcriptionStatus, setTranscriptionStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage>('idle')
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null)
+  const [transcriptionStartedAtMs, setTranscriptionStartedAtMs] = useState<number | null>(null)
+  const [transcriptionElapsedMs, setTranscriptionElapsedMs] = useState<number>(0)
+  const [transcriptionUploadProgress, setTranscriptionUploadProgress] = useState<TranscriptionUploadProgress | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const hasSubtitles = useMemo(() => state.status === 'success' && Boolean(state.record.subtitles), [state])
+  const transcriptionIsInProgress = transcriptionStage === 'preparing' || transcriptionStage === 'processing' || transcriptionStage === 'saving'
 
   useEffect(() => {
     setSubtitlesEnabled(false)
     setSubtitlesError(null)
     setOverwriteSubtitles(false)
-    setTranscriptionStatus('idle')
+    setTranscriptionStage('idle')
     setTranscriptionError(null)
+    setTranscriptionStartedAtMs(null)
+    setTranscriptionElapsedMs(0)
+    setTranscriptionUploadProgress(null)
   }, [id])
 
   useEffect(() => {
@@ -56,8 +128,21 @@ export default function VideosShow() {
     }
     setTranscriptionModel(providerDefaultModel(transcriptionProvider))
     setTranscriptionError(null)
-    setTranscriptionStatus('idle')
+    setTranscriptionStage('idle')
+    setTranscriptionStartedAtMs(null)
+    setTranscriptionElapsedMs(0)
+    setTranscriptionUploadProgress(null)
   }, [transcriptionProvider])
+
+  useEffect(() => {
+    if (!transcriptionIsInProgress) return
+    if (transcriptionStartedAtMs === null) return
+
+    const tick = () => setTranscriptionElapsedMs(Date.now() - transcriptionStartedAtMs)
+    tick()
+    const interval = window.setInterval(tick, 250)
+    return () => window.clearInterval(interval)
+  }, [transcriptionIsInProgress, transcriptionStartedAtMs])
 
   useEffect(() => {
     const key = `ft-017:transcription_api_key:${transcriptionProvider}`
@@ -154,30 +239,45 @@ export default function VideosShow() {
   async function handleTranscribe() {
     if (state.status !== 'success') return
 
+    // Recovery: repeated click always starts from a clean state.
+    setTranscriptionError(null)
+    setTranscriptionStage('idle')
+    setTranscriptionStartedAtMs(null)
+    setTranscriptionElapsedMs(0)
+    setTranscriptionUploadProgress(null)
+
     const hasSubtitlesNow = Boolean(state.record.subtitles)
     if (hasSubtitlesNow && !overwriteSubtitles) {
-      setTranscriptionError('У видео уже есть субтитры. Подтвердите перезапись, чтобы запустить транскрибацию.')
-      setTranscriptionStatus('error')
+      setTranscriptionError('У видео уже есть субтитры. Включите “Перезаписать существующие субтитры”, чтобы запустить транскрибацию.')
+      setTranscriptionStage('validation_failed')
       return
     }
 
-    setTranscriptionError(null)
-    setTranscriptionStatus('loading')
+    const startedAt = Date.now()
+    setTranscriptionStartedAtMs(startedAt)
+    setTranscriptionStage('preparing')
 
     try {
+      // Give React a chance to paint the "preparing" stage before the network await.
+      await new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+      setTranscriptionStage('processing')
       const vtt = await transcribeToVtt({
         provider: transcriptionProvider,
         apiKey: transcriptionApiKey,
         videoFile: state.record.file,
         model: transcriptionModel,
         language: transcriptionLanguage.trim() || undefined,
+        onUploadProgress: setTranscriptionUploadProgress,
       })
 
+      setTranscriptionUploadProgress(null)
+      setTranscriptionStage('saving')
       const subtitlesFile = new File([vtt], 'subtitles.vtt', { type: 'text/vtt' })
       const updated = await setSubtitles(id, subtitlesFile)
       if (!updated) {
         setTranscriptionError('Видео не найдено. Возможно, оно было удалено.')
-        setTranscriptionStatus('error')
+        setTranscriptionStage('error')
         return
       }
 
@@ -188,11 +288,17 @@ export default function VideosShow() {
         return { ...prev, record: updated, subtitlesURL: nextSubtitlesURL }
       })
 
-      setTranscriptionStatus('success')
+      setTranscriptionStage('success')
+      setTranscriptionStartedAtMs(null)
+      setTranscriptionElapsedMs(0)
     } catch (err: unknown) {
-      const message = err instanceof TranscriptionError ? err.message : 'Не удалось выполнить транскрибацию.'
+      setTranscriptionUploadProgress(null)
+      const message =
+        err instanceof StorageError
+          ? 'Не удалось сохранить субтитры в браузере (IndexedDB). Проверьте доступное место и попробуйте ещё раз.'
+          : transcriptionErrorMessage(err)
       setTranscriptionError(message)
-      setTranscriptionStatus('error')
+      setTranscriptionStage('error')
     }
   }
 
@@ -365,23 +471,61 @@ export default function VideosShow() {
                   <button
                     type="button"
                     onClick={handleTranscribe}
-                    disabled={transcriptionStatus === 'loading' || (hasSubtitles && !overwriteSubtitles)}
+                    disabled={transcriptionIsInProgress}
                     className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {transcriptionStatus === 'loading' ? 'Транскрибация...' : 'Транскрибировать в .vtt'}
+                    {transcriptionIsInProgress ? 'Транскрибация...' : 'Транскрибировать в .vtt'}
                   </button>
+
+                  {transcriptionStage !== 'idle' && (
+                    <div
+                      className={[
+                        'rounded-md border px-3 py-2 text-sm',
+                        transcriptionIsInProgress ? 'border-indigo-200 bg-indigo-50 text-indigo-800' : '',
+                        transcriptionStage === 'success' ? 'border-green-200 bg-green-50 text-green-800' : '',
+                        transcriptionStage === 'validation_failed' ? 'border-amber-200 bg-amber-50 text-amber-900' : '',
+                        transcriptionStage === 'error' ? 'border-red-200 bg-red-50 text-red-800' : '',
+                      ].join(' ')}
+                      role={transcriptionStage === 'error' ? 'alert' : undefined}
+                      aria-live={transcriptionIsInProgress ? 'polite' : undefined}
+                    >
+                      {transcriptionIsInProgress ? (
+                        <div className="flex gap-3 items-start">
+                          <TranscriptionSpinner />
+                          <div className="min-w-0 flex-1 space-y-1.5">
+                            <p className="font-medium text-indigo-950">Выполняется транскрибация</p>
+                            <p className="text-xs leading-relaxed text-indigo-900/90">
+                              Транскрибация выполняется на стороне выбранного провайдера и может занять некоторое время.
+                              Пожалуйста, подождите — не закрывайте страницу.
+                            </p>
+                            <p className="text-xs text-indigo-900/80">
+                              <span className="font-medium">{transcriptionStageLabel(transcriptionStage)}</span>
+                              {transcriptionStartedAtMs !== null && (
+                                <span>{` · ${formatElapsed(transcriptionElapsedMs)}`}</span>
+                              )}
+                            </p>
+                            {transcriptionStage === 'processing' && transcriptionUploadProgress && (
+                              <p className="text-xs text-indigo-900/85">{formatUploadDetail(transcriptionUploadProgress)}</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-medium">Транскрибация:</span>
+                            <span>{transcriptionStageLabel(transcriptionStage)}</span>
+                          </div>
+                          {transcriptionError && <div className="mt-1">{transcriptionError}</div>}
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   <p className="text-xs text-gray-500">
                     Запрос выполняется напрямую из браузера к {providerLabel(transcriptionProvider)}. Возможны ограничения сети/CORS.
                   </p>
 
-                  {transcriptionStatus === 'success' && (
-                    <p className="text-sm text-green-700">Готово: субтитры сохранены.</p>
-                  )}
-
-                  {transcriptionError && (
-                    <p className="text-sm text-red-600">{transcriptionError}</p>
-                  )}
+                  {transcriptionStage === 'success' && <p className="text-sm text-green-700">Готово: субтитры сохранены.</p>}
                 </div>
               </div>
 
