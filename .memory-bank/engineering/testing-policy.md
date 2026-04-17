@@ -26,7 +26,9 @@ audience: humans_and_agents
 - Модули таймингов субтитров и смещения `AudioContext` в браузере покрываются точными `vitest` unit-тестами.
 - Тестирование Machine Learning ONNX инференса на CI-серверах выполняется стабами. Полный прогон не автоматизируется из-за ограничения CPU на раннерах.
 - Любые изменения, затрагивающие change surface фичи, должны сопровождаться тестами (RSpec/Vitest по месту) и **локальный прогон должен быть зелёным до пуша в PR**.
-- **Execution environment:** локальные тесты и проверки запускаются **в Docker/devcontainer**, а не на хост-машине, чтобы избежать расхождений окружений. Используй репозиторный entrypoint для parity с CI (например `scripts/ci-app.sh` или эквивалентный docker compose запуск).
+- **Execution environment:** локальные тесты и проверки запускаются **в Docker (docker compose)**, а не на хост-машине, чтобы избежать расхождений окружений.
+  - Источник истины: `docker/docker-compose.yml` (dev) и `docker/docker-compose.ci.yml` + `scripts/ci-app.sh` (CI parity).
+  - `devcontainer` допускается как способ *запустить Docker*, но не является “отдельной” средой проекта и не должен подразумевать запуск `bin/dev` на хосте.
 
 ## Manual-Only Exceptions (Ручные ограничения)
 

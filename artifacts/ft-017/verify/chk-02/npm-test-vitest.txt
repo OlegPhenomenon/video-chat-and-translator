@@ -1,0 +1,16 @@
+> npm test
+> vitest run
+
+ RUN  v3.2.4 /Users/oleghasjanov/Documents/projects/video-chat-and-translator/video_chat_and_translator
+
+ ✓ spec/frontend/features/videos/transcription/client.test.ts (4 tests) 3ms
+ ✓ spec/frontend/pages/auth/Register.test.tsx (2 tests) 98ms
+ ✓ spec/frontend/pages/videos/Show.test.tsx (2 tests) 132ms
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+   Start at  14:23:27
+   Duration  944ms (transform 117ms, setup 0ms, collect 317ms, tests 234ms, environment 1.18s, prepare 147ms)
+
+(exit 0)
+

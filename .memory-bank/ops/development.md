@@ -15,24 +15,26 @@ audience: humans_and_agents
 
 ## Setup
 
-Для старта требуются: Ruby (3.2+), Node.js (v20+), PostgreSQL (или встроенный SQLite, в зависимости от `database.yml`).
+Проект запускается и проверяется **через Docker Compose**.
+
+Для старта на машине требуется только Docker (Compose v2) и доступ к репозиторию.
 
 ```bash
-# Установка Ruby-зависимостей
-bundle install
+# Build images
+docker compose -f docker/docker-compose.yml build
 
-# Установка Node-зависимостей (React, Tailwind, WASM tools)
-npm install # или yarn / pnpm
-
-# Настройка локальной БД среды
-rails db:setup
+# Start the full stack (Rails + Vite + services)
+docker compose -f docker/docker-compose.yml up
 ```
 
 ## Daily Commands
 
 ```bash
-# Запуск всего стека (Rails сервер + Frontend сборщик/Vite + background workers)
-bin/dev
+# Stop the stack
+docker compose -f docker/docker-compose.yml down
+
+# Run a one-off command inside the web container
+docker compose -f docker/docker-compose.yml run --rm web <command>
 
 # Сборка браузерного расширения
 npm run build:extension --watch
@@ -40,7 +42,7 @@ npm run build:extension --watch
 
 ## Browser Testing And Extension
 
-- **Web App:** Доступно локально на `http://localhost:3000`. Inertia.js отдает React-страницы с Rails-сервера. Ассеты и WASM модели доставляются через Vite dev server.
+- **Web App:** Доступно на `http://localhost:3100` (см. `docker/docker-compose.yml`). Inertia.js отдает React-страницы с Rails-сервера. Ассеты и WASM модели доставляются через Vite dev server.
 - **Browser Extension:** Для тестирования расширения необходимо:
   1. Запустить сборку `npm run build:extension`.
   2. Открыть в браузере `chrome://extensions/`.
@@ -50,4 +52,4 @@ npm run build:extension --watch
 ## Database And Services
 
 - Полноценная разработка использует Active Record миграции (`rails db:migrate`).
-- Фоновые задачи (Telegram Bot, Anki sync) запускаются через SolidQueue или Sidekiq (уточняется в конфиге Rails), которые автоматически поднимаются через `bin/dev`.
+- Фоновые задачи (Telegram Bot, Anki sync) запускаются через SolidQueue или Sidekiq (уточняется в конфиге Rails) и поднимаются отдельным сервисом в `docker/docker-compose.yml`.

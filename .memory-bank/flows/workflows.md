@@ -60,7 +60,7 @@ audience: humans_and_agents
 - scope локален на одном слое (только UI или только Rails API);
 - решение помещается в одну сессию или один компактный change set.
 Flow:
-`issue/task -> routing -> implementation -> tests (RSpec/Vitest, локально в Docker/devcontainer) -> review -> merge`
+`issue/task -> routing -> implementation -> tests (RSpec/Vitest, локально в Docker compose) -> review -> merge`
 
 ### 2. Средняя или большая фича (Full-Stack)
 Когда:
