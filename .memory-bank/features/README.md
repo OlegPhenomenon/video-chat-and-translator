@@ -34,5 +34,9 @@ audience: humans_and_agents
 
 ## Active / Draft packages
 
-- [`FT-018/`](FT-018/)
+(нет активных черновиков в этом индексе)
+
+## Completed packages
+
+- [`FT-018_COMPLETED/`](FT-018_COMPLETED/)
   Показывать прогресс транскрибации (Issue #22).

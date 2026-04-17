@@ -28,11 +28,11 @@ function transcriptionStageLabel(stage: TranscriptionStage): string {
     case 'idle':
       return 'Ожидание'
     case 'preparing':
-      return 'Подготовка'
+      return 'Подготовка запроса'
     case 'processing':
-      return 'Обработка у провайдера'
+      return 'Отправка и распознавание'
     case 'saving':
-      return 'Сохранение результата'
+      return 'Сохранение субтитров'
     case 'success':
       return 'Готово'
     case 'validation_failed':
@@ -52,9 +52,18 @@ function formatElapsed(ms: number): string {
 }
 
 function formatUploadDetail(progress: TranscriptionUploadProgress): string {
-  if (progress.phase === 'awaiting_response') return 'Ожидание ответа провайдера…'
+  if (progress.phase === 'awaiting_response') return 'Получаем ответ от провайдера…'
   const pct = Math.min(100, Math.round((100 * progress.loaded) / Math.max(progress.total, 1)))
-  return `Отправка файла: ${pct}%`
+  return `Отправка файла на сервер: ${pct}%`
+}
+
+function TranscriptionSpinner() {
+  return (
+    <span
+      className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin"
+      aria-hidden
+    />
+  )
 }
 
 function transcriptionErrorMessage(err: unknown): string {
@@ -280,6 +289,8 @@ export default function VideosShow() {
       })
 
       setTranscriptionStage('success')
+      setTranscriptionStartedAtMs(null)
+      setTranscriptionElapsedMs(0)
     } catch (err: unknown) {
       setTranscriptionUploadProgress(null)
       const message =
@@ -476,21 +487,37 @@ export default function VideosShow() {
                         transcriptionStage === 'error' ? 'border-red-200 bg-red-50 text-red-800' : '',
                       ].join(' ')}
                       role={transcriptionStage === 'error' ? 'alert' : undefined}
+                      aria-live={transcriptionIsInProgress ? 'polite' : undefined}
                     >
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                        <span className="font-medium">Транскрибация:</span>
-                        <span>{transcriptionStageLabel(transcriptionStage)}</span>
-                        {transcriptionIsInProgress && (
-                          <span className="text-xs opacity-80">(идёт выполнение)</span>
-                        )}
-                        {transcriptionStartedAtMs !== null && (
-                          <span className="text-xs opacity-80">· {formatElapsed(transcriptionElapsedMs)}</span>
-                        )}
-                      </div>
-                      {transcriptionStage === 'processing' && transcriptionUploadProgress && (
-                        <div className="mt-1 text-xs opacity-90">{formatUploadDetail(transcriptionUploadProgress)}</div>
+                      {transcriptionIsInProgress ? (
+                        <div className="flex gap-3 items-start">
+                          <TranscriptionSpinner />
+                          <div className="min-w-0 flex-1 space-y-1.5">
+                            <p className="font-medium text-indigo-950">Выполняется транскрибация</p>
+                            <p className="text-xs leading-relaxed text-indigo-900/90">
+                              Транскрибация выполняется на стороне выбранного провайдера и может занять некоторое время.
+                              Пожалуйста, подождите — не закрывайте страницу.
+                            </p>
+                            <p className="text-xs text-indigo-900/80">
+                              <span className="font-medium">{transcriptionStageLabel(transcriptionStage)}</span>
+                              {transcriptionStartedAtMs !== null && (
+                                <span>{` · ${formatElapsed(transcriptionElapsedMs)}`}</span>
+                              )}
+                            </p>
+                            {transcriptionStage === 'processing' && transcriptionUploadProgress && (
+                              <p className="text-xs text-indigo-900/85">{formatUploadDetail(transcriptionUploadProgress)}</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-medium">Транскрибация:</span>
+                            <span>{transcriptionStageLabel(transcriptionStage)}</span>
+                          </div>
+                          {transcriptionError && <div className="mt-1">{transcriptionError}</div>}
+                        </>
                       )}
-                      {transcriptionError && <div className="mt-1">{transcriptionError}</div>}
                     </div>
                   )}
 
