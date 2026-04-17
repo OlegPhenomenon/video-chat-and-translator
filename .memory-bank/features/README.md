@@ -30,3 +30,4 @@ audience: humans_and_agents
 - Базовый формат: `FT-XXX/`
 - Вместо `XXX` используй идентификатор, принятый в проекте: issue id, ticket id или другой стабильный ключ
 - Один package = одна delivery-единица
+- После закрытия фичи (см. gate `Execution → Done` в [`../flows/feature-flow.md`](../flows/feature-flow.md)) директория package должна быть переименована, добавив в конец `_COMPLETED` (например `FT-016_COMPLETED/`). После переименования нужно обновить все ссылки/индексы на пакет.

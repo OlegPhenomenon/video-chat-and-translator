@@ -131,6 +131,7 @@ flowchart LR
 - [ ] если feature добавляет новый stable flow или materially changes существующий project-level scenario, соответствующий `UC-*` создан или обновлен и зарегистрирован в `memory-bank/use-cases/README.md`
 - [ ] `feature.md` → `delivery_status: done`
 - [ ] `implementation-plan.md` → `status: archived`
+- [ ] директория feature package в `.memory-bank/features/` переименована с суффиксом `_COMPLETED` (по аналогии с существующими пакетами), и все ссылки/индексы обновлены (parent `README.md`, task tracker, cross-references)
 
 ### Git / PR / CI Workflow (Execution → Done)
 
