@@ -1,0 +1,16 @@
+
+> test
+> vitest run spec/frontend/features/videos/subtitles/active-segment.test.ts spec/frontend/features/videos/subtitles/vtt.test.ts spec/frontend/pages/videos/Show.test.tsx
+
+
+ RUN  v3.2.4 /app
+
+ ✓ spec/frontend/features/videos/subtitles/active-segment.test.ts (3 tests) 2ms
+ ✓ spec/frontend/features/videos/subtitles/vtt.test.ts (3 tests) 5ms
+ ✓ spec/frontend/pages/videos/Show.test.tsx (6 tests) 263ms
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  19:55:42
+   Duration  1.45s (transform 257ms, setup 0ms, collect 481ms, tests 270ms, environment 1.44s, prepare 215ms)
+
