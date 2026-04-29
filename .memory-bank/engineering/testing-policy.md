@@ -29,6 +29,8 @@ audience: humans_and_agents
 - **Execution environment:** локальные тесты и проверки запускаются **в Docker (docker compose)**, а не на хост-машине, чтобы избежать расхождений окружений.
   - Источник истины: `docker/docker-compose.yml` (dev) и `docker/docker-compose.ci.yml` + `scripts/ci-app.sh` (CI parity).
   - `devcontainer` допускается как способ *запустить Docker*, но не является “отдельной” средой проекта и не должен подразумевать запуск `bin/dev` на хосте.
+- UI-facing изменения требуют двух уровней evidence: automated coverage (Vitest/RSpec по change surface) и browser evidence через Playwright, если меняется видимое поведение или пользовательский поток.
+- Для документационных и evidence-изменений запускай markdownlint по релевантному scope и исключай generated/vendor directories (`node_modules`, build output), если задача не является full-repo docs audit.
 
 ## Manual-Only Exceptions (Ручные ограничения)
 

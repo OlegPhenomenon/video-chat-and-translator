@@ -29,4 +29,5 @@ RUN if [ -f package.json ]; then yarn install; fi
 
 EXPOSE 3100 3036
 
+ENTRYPOINT ["./bin/docker-entrypoint"]
 CMD ["bin/dev"]

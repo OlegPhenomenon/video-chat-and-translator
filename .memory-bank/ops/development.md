@@ -53,3 +53,7 @@ npm run build:extension --watch
 
 - Полноценная разработка использует Active Record миграции (`rails db:migrate`).
 - Фоновые задачи (Telegram Bot, Anki sync) запускаются через SolidQueue или Sidekiq (уточняется в конфиге Rails) и поднимаются отдельным сервисом в `docker/docker-compose.yml`.
+
+## Known Local Runtime Friction
+
+- Rails dev server may leave stale `tmp/pids/server.pid` after an interrupted Docker run. The project Docker entrypoint/compose setup is the preferred place to clean this before boot; avoid asking for manual deletion until the entrypoint path has been checked and a clean retry has failed.
