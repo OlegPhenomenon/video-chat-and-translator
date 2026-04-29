@@ -166,6 +166,7 @@ Namespace `features/videos/transcription/` не трогаем — это отд
 - `EVID-REVIEW-01` Approved by project owner in chat (2026-04-22). Persisted at `artifacts/ft-019/reviews/feature-approved.md`.
 - `EVID-PR-01` PR created for closure: [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25). Persisted at `artifacts/ft-019/reviews/pr-created.md`.
 - `EVID-CI-LOCAL-01` Local Docker parity CI passed on 2026-04-29 via `scripts/ci-app.sh`: `artifacts/ft-019/verify/chk-02/local-docker-ci.md`.
+- `EVID-CI-REMOTE-01` GitHub Actions CI for PR [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25) is tracked at `artifacts/ft-019/verify/chk-02/remote-ci.md`.
 - `EVID-AG-01` Manual/skill-driven UI evidence approval for `AG-01`: `artifacts/ft-019/reviews/ag-01-approved.md`.
 - `EVID-SIMPLIFY-01` Simplify review: `artifacts/ft-019/reviews/simplify-review.md`.
 - `EVID-UC-01` `UC-*` update decision: `artifacts/ft-019/reviews/uc-decision.md`.
