@@ -5,7 +5,7 @@ doc_function: derived
 purpose: "Execution-план реализации FT-019. Фиксирует discovery context, шаги, риски и test strategy без переопределения canonical feature-фактов."
 derived_from:
   - feature.md
-status: active
+status: archived
 audience: humans_and_agents
 must_not_define:
   - ft_019_scope
@@ -30,7 +30,7 @@ must_not_define:
 | `video_chat_and_translator/spec/frontend/features/videos/transcription/client.test.ts` | Pure frontend helper tests на `vitest` с моками браузерных API | Локальный reference для новых pure тестов `vtt.ts` и `active-segment.ts` | Отзеркалить стиль: table-like fixtures, deterministic inputs, без Rails/runtime зависимости |
 | `video_chat_and_translator/package.json` | В репозитории есть `vitest`, `@testing-library/react`, `npm test`, `npm run check`; repo-local Playwright suite не настроен | План обязан опираться на реальный frontend test stack и явно отметить gap для UI evidence | Unit/component automation делаем через Vitest; Playwright evidence собирается отдельным verify-runner/skill по canonical contract |
 | `.memory-bank/use-cases/README.md` | Реестр project-level `UC-*`; instantiated `UC-*` для video playback/transcript flow сейчас отсутствуют | Нужно явно зафиксировать, требуется ли `UC-*` update для closure этой фичи | Default stance: `FT-019` не вводит новый project-level use case; если sidebar transcript будет признан стабильным upstream flow, сначала создаётся/обновляется `UC-*`, потом closure |
-| `.memory-bank/features/FT-019/feature.md` | Canonical scope, contracts (`CTR-01`, `CTR-02`), verify (`CHK-01..03`) и evidence contract | План не имеет права переопределять требования, а только sequencing | Ссылаться на `REQ-*`, `CTR-*`, `FM-*`, `CHK-*`, `EVID-*` |
+| `.memory-bank/features/FT-019_COMPLETED/feature.md` | Canonical scope, contracts (`CTR-01`, `CTR-02`), verify (`CHK-01..03`) и evidence contract | План не имеет права переопределять требования, а только sequencing | Ссылаться на `REQ-*`, `CTR-*`, `FM-*`, `CHK-*`, `EVID-*` |
 
 ## Test Strategy
 
@@ -145,3 +145,7 @@ must_not_define:
 `EVID-REVIEW-PLAN-01`: Changes requested by reviewer in chat (2026-04-22). Persisted at `artifacts/ft-019/reviews/plan-review-01-changes-requested.md`.
 
 `EVID-REVIEW-PLAN-02`: Approved by project owner in chat (2026-04-22). Persisted at `artifacts/ft-019/reviews/plan-approved.md`.
+
+`EVID-CLOSURE-01`: Execution closed on 2026-04-29 after `CP-01`..`CP-03` passed. Evidence carriers are listed in sibling `feature.md` (`EVID-01`..`EVID-03`) and under `artifacts/ft-019/verify/`.
+
+`EVID-PR-01`: PR [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25) created for branch `ft-019-subtitles-panel`.

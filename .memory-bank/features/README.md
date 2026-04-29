@@ -51,7 +51,7 @@ audience: humans_and_agents
 | `FT-016_COMPLETED` | completed | Subtitles for uploaded videos | First completed Memory Bank package |
 | `FT-017_COMPLETED` | completed | Transcription via user API key | Depends on `FT-016` |
 | `FT-018_COMPLETED` | completed | Transcription progress UI | Depends on `FT-017` |
-| `FT-019` | active | Right-side subtitles panel | Current active package |
+| `FT-019_COMPLETED` | completed | Right-side subtitles panel | Issue #18 |
 
 ## Rules
 
@@ -73,8 +73,7 @@ audience: humans_and_agents
 
 ## Active / Draft packages
 
-- [`FT-019/`](FT-019/)
-  UI-панель субтитров справа от видео с возможностью скрывать/раскрывать (Issue #18). Bootstrap: ждёт ревью `feature.md`.
+No active/draft packages at this time.
 
 ## Completed packages
 
@@ -86,3 +85,6 @@ audience: humans_and_agents
 
 - [`FT-018_COMPLETED/`](FT-018_COMPLETED/)
   Показывать прогресс транскрибации (Issue #22).
+
+- [`FT-019_COMPLETED/`](FT-019_COMPLETED/)
+  UI-панель субтитров справа от видео с возможностью скрывать/раскрывать и подсветкой активного сегмента (Issue #18).

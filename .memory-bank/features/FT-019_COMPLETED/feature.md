@@ -8,7 +8,7 @@ derived_from:
   - ../../project/overview.md
   - ../FT-018_COMPLETED/feature.md
 status: active
-delivery_status: in_progress
+delivery_status: done
 audience: humans_and_agents
 must_not_define:
   - implementation_sequence
@@ -160,10 +160,15 @@ Namespace `features/videos/transcription/` не трогаем — это отд
 
 ### Evidence
 
-- `EVID-01` Playwright-скриншоты UI-состояний панели: (a) раскрыта со списком сегментов, (b) свёрнута (только toggle-control), (c) empty state (нет субтитров), (d) error state (невалидный VTT).
-- `EVID-02` Вывод прогонки Vitest (лог `bin/ci`/`npm test` в Docker) с зелёными unit-тестами парсера VTT (включая фикстуры с BOM, NOTE, cue identifiers, multi-line, cue settings, оба формата таймкода, partial, invalid) и логики активного сегмента.
-- `EVID-03` Playwright-артефакты синхронизации: скриншоты «активный сегмент = N» и «активный сегмент = N+1» после программного сдвига `video.currentTime`, плюс лог ассерций по маркеру/классу активного сегмента в DOM.
+- `EVID-01` Playwright-скриншоты UI-состояний панели: `artifacts/ft-019/verify/chk-01/panel-expanded.png`, `panel-collapsed.png`, `panel-empty-state.png`, `panel-error-state.png`, assertion log `artifacts/ft-019/verify/chk-01/playwright-assertions.log`.
+- `EVID-02` Docker/Vitest/typecheck evidence: `artifacts/ft-019/verify/chk-02/vitest.log`, `artifacts/ft-019/verify/chk-02/typecheck.log`. Re-run on 2026-04-29: targeted Vitest 3 files / 12 tests passed; `npm run check` passed in Docker.
+- `EVID-03` Playwright-артефакты синхронизации: `artifacts/ft-019/verify/chk-03/active-segment-0.png`, `active-segment-1.png`, assertion log `artifacts/ft-019/verify/chk-03/playwright-assertions.log` (`consoleErrors: []`, `failed: []`).
 - `EVID-REVIEW-01` Approved by project owner in chat (2026-04-22). Persisted at `artifacts/ft-019/reviews/feature-approved.md`.
+- `EVID-PR-01` PR created for closure: [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25). Persisted at `artifacts/ft-019/reviews/pr-created.md`.
+- `EVID-CI-LOCAL-01` Local Docker parity CI passed on 2026-04-29 via `scripts/ci-app.sh`: `artifacts/ft-019/verify/chk-02/local-docker-ci.md`.
+- `EVID-AG-01` Manual/skill-driven UI evidence approval for `AG-01`: `artifacts/ft-019/reviews/ag-01-approved.md`.
+- `EVID-SIMPLIFY-01` Simplify review: `artifacts/ft-019/reviews/simplify-review.md`.
+- `EVID-UC-01` `UC-*` update decision: `artifacts/ft-019/reviews/uc-decision.md`.
 
 ### Evidence contract
 
