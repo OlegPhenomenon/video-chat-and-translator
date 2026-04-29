@@ -17,6 +17,7 @@ audience: humans_and_agents
 - **Ruby:** `rubocop` (Rails стиль по-умолчанию)
 - **Frontend / React:** `eslint` + `prettier`
 - **Typings:** `tsc --noEmit`
+- **Markdown:** `markdownlint-cli2` по релевантному scope. Generated/vendor directories исключаются, если задача не требует полного аудита документации.
 
 ## Backend Addendum (Rails 8)
 

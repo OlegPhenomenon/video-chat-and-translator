@@ -53,5 +53,5 @@ docker compose -f docker/docker-compose.yml run --rm web yarn install
 
 ## Troubleshooting
 
-- **PID file error**: Remove `tmp/pids/server.pid` before restarting
+- **PID file error**: dev container now removes stale `tmp/pids/server.pid` automatically on start; if you still see it, rebuild and restart the `web` service
 - **Port mismatch**: Check `$PORT` env variable on host (set by `port-selector`)

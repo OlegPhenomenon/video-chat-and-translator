@@ -1,0 +1,159 @@
+### Result
+"{\n  \"results\": [\n    {\n      \"check\": \"valid panel renders segment 0\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"panel collapsed\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"panel expanded after toggle\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"empty state visible\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"invalid state visible\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"native track remains mounted for invalid VTT\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"active segment 0 at 0.5s\",\n      \"pass\": true\n    },\n    {\n      \"check\": \"active segment 1 at 2.0s\",\n      \"pass\": true\n    }\n  ],\n  \"consoleErrors\": [],\n  \"failed\": []\n}"
+### Ran Playwright code
+```js
+await (async page => {
+  const origin = 'http://localhost:3017'
+  const consoleErrors = []
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') consoleErrors.push(msg.text())
+  })
+
+  await page.goto(`${origin}/dashboard`, { waitUntil: 'domcontentloaded' })
+  await page.evaluate(async () => {
+    const videoFile = new File([new Uint8Array([0])], 'ft019-sample.webm', { type: 'video/webm' })
+    const now = new Date().toISOString()
+    const validVtt = [
+      'WEBVTT - FT-019 evidence',
+      '',
+      '00:00.000 --> 00:01.500',
+      'First synced subtitle segment.',
+      '',
+      '00:01.500 --> 00:03.000',
+      'Second synced subtitle segment.',
+      '',
+      '00:03.000 --> 00:04.000',
+      'Third synced subtitle segment.',
+    ].join('\n')
+    const records = [
+      {
+        id: 'ft019-valid',
+        name: 'FT-019 valid subtitles.webm',
+        type: 'video/webm',
+        size: videoFile.size,
+        createdAt: now,
+        updatedAt: now,
+        file: videoFile,
+        subtitles: new File([validVtt], 'subtitles.vtt', { type: 'text/vtt' }),
+      },
+      {
+        id: 'ft019-empty',
+        name: 'FT-019 empty subtitles.webm',
+        type: 'video/webm',
+        size: videoFile.size,
+        createdAt: now,
+        updatedAt: now,
+        file: videoFile,
+      },
+      {
+        id: 'ft019-invalid',
+        name: 'FT-019 invalid subtitles.webm',
+        type: 'video/webm',
+        size: videoFile.size,
+        createdAt: now,
+        updatedAt: now,
+        file: videoFile,
+        subtitles: new File(['not-a-valid-vtt'], 'broken.vtt', { type: 'text/vtt' }),
+      },
+    ]
+
+    await new Promise((resolve, reject) => {
+      const request = indexedDB.open('video_library', 1)
+      request.onupgradeneeded = () => {
+        const db = request.result
+        if (!db.objectStoreNames.contains('videos')) db.createObjectStore('videos', { keyPath: 'id' })
+      }
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        const db = request.result
+        const tx = db.transaction('videos', 'readwrite')
+        const store = tx.objectStore('videos')
+        for (const record of records) store.put(record)
+        tx.oncomplete = () => {
+          db.close()
+          resolve()
+        }
+        tx.onerror = () => reject(tx.error)
+      }
+    })
+  })
+
+  const results = []
+
+  await page.goto(`${origin}/videos/ft019-valid`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('[data-subtitles-panel]')
+  await page.waitForSelector('[data-subtitles-segment-index="0"]')
+  results.push({
+    check: 'valid panel renders segment 0',
+    pass: await page.locator('[data-subtitles-segment-index="0"]').count() === 1,
+  })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-01/panel-expanded.png', fullPage: true })
+
+  await page.locator('[data-subtitles-panel] button[aria-expanded="true"]').click()
+  await page.waitForSelector('#subtitles-panel-content', { state: 'detached' })
+  results.push({
+    check: 'panel collapsed',
+    pass: await page.locator('[data-subtitles-panel] button[aria-expanded="false"]').count() === 1,
+  })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-01/panel-collapsed.png', fullPage: true })
+
+  await page.locator('[data-subtitles-panel] button[aria-expanded="false"]').click()
+  await page.waitForSelector('[data-subtitles-segment-index="0"]')
+  results.push({
+    check: 'panel expanded after toggle',
+    pass: await page.locator('[data-subtitles-panel] button[aria-expanded="true"]').count() === 1,
+  })
+
+  await page.goto(`${origin}/videos/ft019-empty`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('[data-subtitles-panel]')
+  await page.waitForSelector('#subtitles-panel-content p')
+  results.push({
+    check: 'empty state visible',
+    pass: (await page.locator('#subtitles-panel-content p').textContent()).includes('не загружены'),
+  })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-01/panel-empty-state.png', fullPage: true })
+
+  await page.goto(`${origin}/videos/ft019-invalid`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('[data-subtitles-panel]')
+  await page.waitForSelector('[role="alert"]')
+  const trackCount = await page.locator('track[kind="subtitles"]').count()
+  results.push({ check: 'invalid state visible', pass: await page.locator('[role="alert"]').count() === 1 })
+  results.push({ check: 'native track remains mounted for invalid VTT', pass: trackCount === 1 })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-01/panel-error-state.png', fullPage: true })
+
+  await page.goto(`${origin}/videos/ft019-valid`, { waitUntil: 'domcontentloaded' })
+  await page.waitForSelector('[data-subtitles-segment-index="1"]')
+  const video = page.locator('video')
+  await video.evaluate((el) => {
+    el.currentTime = 0.5
+    el.dispatchEvent(new Event('timeupdate'))
+  })
+  await page.waitForFunction(() => document.querySelector('[data-subtitles-segment-index="0"]')?.getAttribute('data-active') === 'true')
+  results.push({
+    check: 'active segment 0 at 0.5s',
+    pass: await page.locator('[data-subtitles-segment-index="0"][data-active="true"]').count() === 1,
+  })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-03/active-segment-0.png', fullPage: true })
+
+  await video.evaluate((el) => {
+    el.currentTime = 2.0
+    el.dispatchEvent(new Event('timeupdate'))
+  })
+  await page.waitForFunction(() => document.querySelector('[data-subtitles-segment-index="1"]')?.getAttribute('data-active') === 'true')
+  results.push({
+    check: 'active segment 1 at 2.0s',
+    pass: await page.locator('[data-subtitles-segment-index="1"][data-active="true"]').count() === 1,
+  })
+  await page.screenshot({ path: 'artifacts/ft-019/verify/chk-03/active-segment-1.png', fullPage: true })
+
+  const relevantConsoleErrors = consoleErrors.filter((message) => !message.includes('/favicon.ico'))
+  const failed = results.filter((result) => !result.pass)
+  return JSON.stringify({ results, consoleErrors: relevantConsoleErrors, failed }, null, 2)
+}
+)(page);
+```
+### Page
+- Page URL: http://localhost:3017/videos/ft019-valid
+- Page Title: FT-019 valid subtitles.webm
+### Events
+- New console entries: .playwright-cli/console-2026-04-29T10-15-33-763Z.log#L6-L20

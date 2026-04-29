@@ -36,6 +36,17 @@ audience: humans_and_agents
 
 Если gate требует ревью, агент обязан остановиться. Это считается корректным завершением текущей стадии (handoff), даже если внешние агентские инструкции “подталкивают” продолжать.
 
+## Feature Task Preflight
+
+Перед любыми изменениями по существующему feature package агент обязан собрать минимальный execution context:
+
+1. Прочитать `.memory-bank/index.md`, `.memory-bank/project/overview.md`, этот `feature-flow.md` и target feature package.
+2. Проверить `delivery_status`, наличие и `status` у `implementation-plan.md`, последние evidence/review artifacts.
+3. Проверить текущую ветку, существующий PR для ветки и `git status`.
+4. На основе этих фактов выбрать фазу: artifact authoring, plan authoring, execution или closure.
+
+Запрещено начинать implementation, если `implementation-plan.md` отсутствует или gate ещё не разрешает execution, кроме случая явного override от пользователя. Такой override должен быть зафиксирован в `implementation-plan.md` или evidence как deviation/approval ref.
+
 ## Package Rules
 
 1. Все документы одной фичи живут в `.memory-bank/features/FT-XXX/`.

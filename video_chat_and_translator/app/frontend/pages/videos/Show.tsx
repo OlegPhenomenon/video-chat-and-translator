@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { StorageError, StoredVideoRecord, findVideo, setSubtitles } from '@/features/videos/storage'
+import { getActiveSegmentIndex, parseVtt, SubtitlesPanel, type Segment } from '@/features/videos/subtitles'
 import {
   isTranscriptionError,
   providerDefaultModel,
@@ -22,6 +23,11 @@ type VideoState =
   | { status: 'error'; message: string }
 
 type TranscriptionStage = 'idle' | 'preparing' | 'processing' | 'saving' | 'success' | 'error' | 'validation_failed'
+type ParsedSubtitlesState =
+  | { status: 'loading' }
+  | { status: 'empty'; message: string }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; segments: Segment[] }
 
 function transcriptionStageLabel(stage: TranscriptionStage): string {
   switch (stage) {
@@ -85,11 +91,25 @@ function transcriptionErrorMessage(err: unknown): string {
   }
 }
 
+function readTextFromFile(file: File): Promise<string> {
+  if (typeof file.text === 'function') return file.text()
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '')
+    reader.onerror = () => reject(reader.error ?? new Error('Не удалось прочитать файл.'))
+    reader.readAsText(file)
+  })
+}
+
 export default function VideosShow() {
   const { id } = usePage<PageProps>().props
   const [state, setState] = useState<VideoState>({ status: 'loading' })
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false)
   const [subtitlesError, setSubtitlesError] = useState<string | null>(null)
+  const [parsedSubtitles, setParsedSubtitles] = useState<ParsedSubtitlesState>({ status: 'empty', message: 'Субтитры не загружены.' })
+  const [subtitlesPanelOpen, setSubtitlesPanelOpen] = useState(true)
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0)
   const [transcriptionProvider, setTranscriptionProvider] = useState<TranscriptionProvider>('openai')
   const [transcriptionModel, setTranscriptionModel] = useState<string>(providerDefaultModel('openai'))
   const [transcriptionLanguage, setTranscriptionLanguage] = useState<string>('')
@@ -104,11 +124,18 @@ export default function VideosShow() {
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const hasSubtitles = useMemo(() => state.status === 'success' && Boolean(state.record.subtitles), [state])
+  const activeSubtitleIndex = useMemo(
+    () => (parsedSubtitles.status === 'ready' ? getActiveSegmentIndex(videoCurrentTime, parsedSubtitles.segments) : null),
+    [parsedSubtitles, videoCurrentTime]
+  )
   const transcriptionIsInProgress = transcriptionStage === 'preparing' || transcriptionStage === 'processing' || transcriptionStage === 'saving'
 
   useEffect(() => {
     setSubtitlesEnabled(false)
     setSubtitlesError(null)
+    setParsedSubtitles({ status: 'empty', message: 'Субтитры не загружены.' })
+    setSubtitlesPanelOpen(true)
+    setVideoCurrentTime(0)
     setOverwriteSubtitles(false)
     setTranscriptionStage('idle')
     setTranscriptionError(null)
@@ -204,6 +231,64 @@ export default function VideosShow() {
     video.addEventListener('loadedmetadata', applyMode)
     return () => video.removeEventListener('loadedmetadata', applyMode)
   }, [state, subtitlesEnabled])
+
+  useEffect(() => {
+    if (state.status !== 'success') return
+
+    const video = videoRef.current
+    if (!video) return
+
+    const syncCurrentTime = () => setVideoCurrentTime(video.currentTime || 0)
+    syncCurrentTime()
+    video.addEventListener('loadedmetadata', syncCurrentTime)
+    video.addEventListener('timeupdate', syncCurrentTime)
+    return () => {
+      video.removeEventListener('loadedmetadata', syncCurrentTime)
+      video.removeEventListener('timeupdate', syncCurrentTime)
+    }
+  }, [state.status === 'success' ? state.objectURL : null])
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (state.status !== 'success') return
+    if (!state.record.subtitles) {
+      setParsedSubtitles({ status: 'empty', message: 'Субтитры не загружены.' })
+      return
+    }
+
+    setParsedSubtitles({ status: 'loading' })
+
+    readTextFromFile(state.record.subtitles)
+      .then((vtt) => {
+        if (cancelled) return
+
+        const result = parseVtt(vtt)
+        if (result.status === 'invalid') {
+          const firstError = result.errors[0]?.reason
+          setParsedSubtitles({
+            status: 'error',
+            message: firstError ? `Не удалось разобрать сохранённые субтитры: ${firstError}` : 'Не удалось разобрать сохранённые субтитры.',
+          })
+          return
+        }
+
+        if (result.segments.length === 0) {
+          setParsedSubtitles({ status: 'empty', message: 'В субтитрах нет читаемых сегментов.' })
+          return
+        }
+
+        setParsedSubtitles({ status: 'ready', segments: result.segments })
+      })
+      .catch(() => {
+        if (cancelled) return
+        setParsedSubtitles({ status: 'error', message: 'Не удалось прочитать сохранённый файл субтитров.' })
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [state.status === 'success' ? state.record.subtitles : null])
 
   async function handleSubtitlesChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -321,7 +406,7 @@ export default function VideosShow() {
     <>
       <Head title={state.status === 'success' ? state.record.name : 'Видео'} />
       <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mx-auto max-w-7xl px-4 py-8">
           {state.status === 'loading' && (
             <p className="text-gray-500">Загрузка...</p>
           )}
@@ -529,22 +614,35 @@ export default function VideosShow() {
                 </div>
               </div>
 
-              <video
-                ref={videoRef}
-                controls
-                src={state.objectURL}
-                className="w-full rounded-xl border border-gray-200 bg-black"
-              >
-                {state.subtitlesURL && (
-                  <track
-                    kind="subtitles"
-                    src={state.subtitlesURL}
-                    srcLang="ru"
-                    label="Subtitles"
-                    default={false}
-                  />
-                )}
-              </video>
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+                <div className="min-w-0 flex-1">
+                  <video
+                    ref={videoRef}
+                    controls
+                    src={state.objectURL}
+                    className="w-full rounded-xl border border-gray-200 bg-black"
+                  >
+                    {state.subtitlesURL && (
+                      <track
+                        kind="subtitles"
+                        src={state.subtitlesURL}
+                        srcLang="ru"
+                        label="Subtitles"
+                        default={false}
+                      />
+                    )}
+                  </video>
+                </div>
+
+                <SubtitlesPanel
+                  activeIndex={activeSubtitleIndex}
+                  errorMessage={parsedSubtitles.status === 'error' ? parsedSubtitles.message : undefined}
+                  isOpen={subtitlesPanelOpen}
+                  onToggle={() => setSubtitlesPanelOpen((prev) => !prev)}
+                  segments={parsedSubtitles.status === 'ready' ? parsedSubtitles.segments : []}
+                  status={parsedSubtitles.status}
+                />
+              </div>
             </div>
           )}
         </div>
