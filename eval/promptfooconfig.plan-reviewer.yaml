@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: "Eval feature_implement_plan_reviewer.md — проверка implementation-plan.md (FT-XXX format)"
+
+prompts:
+  - file://prompts/feature_implement_plan_reviewer.md
+
+providers:
+  - id: "exec: ./providers/claude-opus.sh"
+    label: claude-opus
+  - id: "exec: ./providers/claude-sonnet.sh"
+    label: claude-sonnet
+  - id: "exec: ./providers/claude-haiku.sh"
+    label: claude-haiku
+
+tests:
+  - description: "01. Good fixture (FT-019) — допускается REVISE с замечаниями, но НЕ REJECT (фундамент плана не сломан)"
+    vars:
+      plan_doc: file://fixtures/plan-good.md
+    assert:
+      # REJECT означает «план фундаментально расходится с feature.md / scope другой» — этого быть не должно на эталонном плане.
+      # REVISE с минорными замечаниями (включая реальные находки reviewer'а) допустимо: эталон не идеален, и это нормальная подсветка.
+      - type: not-icontains
+        value: "Status: REJECT"
+
+  - description: "02. Scope creep — план вводит REQ-NEW-01 и CHK-RT-01, которых нет в feature.md"
+    vars:
+      plan_doc: file://fixtures/plan-bad-scope-creep.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил scope creep');
+          const flagged = /(scope|переопредел|REQ-NEW|REQ-RT|CHK-RT|CHK-NEW|EVID-NEW|EVID-RT|вводит новые|новый scope|должны жить в feature)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул scope creep / новые идентификаторы плана');
+          return true;
+
+  - description: "03. STEP без attribution — Implements колонка пустая для STEP-01 и STEP-02"
+    vars:
+      plan_doc: file://fixtures/plan-bad-no-attribution.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил STEP без attribution');
+          const flagged = /(implements|attribution|STEP-01|STEP-02|без ссыл|пустой|REQ-XX|canonical refs|без atribut)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул проблему с Implements / attribution');
+          return true;
+
+  - description: "04. OQ-XX без default action — TBD/обсудим позже вместо конкретики"
+    vars:
+      plan_doc: file://fixtures/plan-bad-oq-no-default.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил OQ без default');
+          const flagged = /(default|OQ-01|OQ-02|OQ-03|TBD|обсудим|escalation|не определ|конкрет)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул проблему с default action у OQ-XX');
+          return true;

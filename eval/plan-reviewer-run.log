@@ -1,0 +1,81 @@
+Cache is disabled.
+Starting evaluation eval-VAf-2026-05-01T06:45:43
+Running 12 test cases (up to 4 at a time)...
+
+[90m┌──────────────────────────────[39m[90m┬──────────────────────────────[39m[90m┬──────────────────────────────[39m[90m┬──────────────────────────────┐[39m
+[90m│[39m[1m[34m plan_doc                     [39m[22m[90m│[39m[1m[34m [claude-opus]                [39m[22m[90m│[39m[1m[34m [claude-sonnet]              [39m[22m[90m│[39m[1m[34m [claude-haiku]               [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m prompts/feature_implement_p… [39m[22m[90m│[39m[1m[34m prompts/feature_implement_p… [39m[22m[90m│[39m[1m[34m prompts/feature_implement_p… [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m # Feature                    [39m[22m[90m│[39m[1m[34m # Feature                    [39m[22m[90m│[39m[1m[34m # Feature                    [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m Implementation-Plan Reviewer [39m[22m[90m│[39m[1m[34m Implementation-Plan Reviewer [39m[22m[90m│[39m[1m[34m Implementation-Plan Reviewer [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m (FT-XXX for...               [39m[22m[90m│[39m[1m[34m (FT-XXX for...               [39m[22m[90m│[39m[1m[34m (FT-XXX for...               [39m[22m[90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/plan-good.md [90m│[39m [FAIL] # Implementation-Plan [90m│[39m [FAIL] Читаю документ и      [90m│[39m [FAIL] # Implementation-Plan [90m│[39m
+[90m│[39m                              [90m│[39m Review Report                [90m│[39m провожу ревью. Sibling       [90m│[39m Review Report                [90m│[39m
+[90m│[39m                              [90m│[39m ## Status: REVISE            [90m│[39m `feature.md` недоступен —    [90m│[39m ## Status: APPROVE           [90m│[39m
+[90m│[39m                              [90m│[39m > ⚠️ Ограничение ревью:      [90m│[39m отмечу это явно в отчёте и   [90m│[39m **0 структурных замечаний;   [90m│[39m
+[90m│[39m                              [90m│[39m sibling `feature.md` не      [90m│[39m ограничусь структурными      [90m│[39m план полностью соответствует [90m│[39m
+[90m│[39m                              [90m│[39m предоставлен в этой сессии.  [90m│[39m проверками там, где          [90m│[39m требованиям к формату.**     [90m│[39m
+[90m│[39m                              [90m│[39m Все содержательные проверки  [90m│[39m содержательная верификация   [90m│[39m ---                          [90m│[39m
+[90m│[39m                              [90m│[39m (наличие референсных         [90m│[39m требует sibling.             [90m│[39m ## Структурные находки       [90m│[39m
+[90m│[39m                              [90m│[39m `REQ-XX`/`CTR-XX`/`CHK-XX`/… [90m│[39m ---                          [90m│[39m - ✅ **Frontmatter**         [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m # Implementation-Plan Review [90m│[39m (`derived_from: feature.md`, [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m Report                       [90m│[39m `must_not_define`): поля     [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m ## Status: REVISE            [90m│[39m прису...                     [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m **Ог...                      [90m│[39m                              [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/plan-bad-sc… [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m
+[90m│[39m                              [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m
+[90m│[39m                              [90m│[39m ## Status: REJECT            [90m│[39m ## Status: REJECT            [90m│[39m ## Status: **REJECT**        [90m│[39m
+[90m│[39m                              [90m│[39m **Ограничение ревью:**       [90m│[39m > **Ограничение:** sibling   [90m│[39m План фундаментально нарушает [90m│[39m
+[90m│[39m                              [90m│[39m sibling `feature.md`         [90m│[39m `feature.md` недоступен.     [90m│[39m главное правило: вводит      [90m│[39m
+[90m│[39m                              [90m│[39m недоступен. Содержательные   [90m│[39m Содержательные проверки      [90m│[39m **новые требования и         [90m│[39m
+[90m│[39m                              [90m│[39m проверки на consistency с    [90m│[39m атрибуции                    [90m│[39m scope**, которых нет в       [90m│[39m
+[90m│[39m                              [90m│[39m canonical refs (`REQ-01`,    [90m│[39m (`REQ-XX`/`CHK-XX`/`EVID-XX` [90m│[39m canonical sibling            [90m│[39m
+[90m│[39m                              [90m│[39m `CTR-01`, `CHK-01`,          [90m│[39m существуют ли в feature.md)  [90m│[39m `feature.md`. Это попытка    [90m│[39m
+[90m│[39m                              [90m│[39m `EVID-01`, `ASM-01`)         [90m│[39m проводились по косвенным     [90m│[39m переопределить acceptance    [90m│[39m
+[90m│[39m                              [90m│[39m проведены только в части     [90m│[39m признакам — явным помет...   [90m│[39m criteria во время ex...      [90m│[39m
+[90m│[39m                              [90m│[39m sc...                        [90m│[39m                              [90m│[39m                              [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/plan-bad-no… [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m
+[90m│[39m                              [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m
+[90m│[39m                              [90m│[39m ## Status: REVISE            [90m│[39m ## Status: REVISE            [90m│[39m ## Status: REVISE            [90m│[39m
+[90m│[39m                              [90m│[39m > ⚠️ Sibling `feature.md`    [90m│[39m **Ограничение:** sibling     [90m│[39m ## Структурные находки       [90m│[39m
+[90m│[39m                              [90m│[39m недоступен в этом ревью.     [90m│[39m `feature.md` недоступен.     [90m│[39m - ⚠️ Frontmatter             [90m│[39m
+[90m│[39m                              [90m│[39m Содержательные проверки на   [90m│[39m Содержательные проверки на   [90m│[39m (`doc_kind`): значение       [90m│[39m
+[90m│[39m                              [90m│[39m scope-creep (наличие         [90m│[39m соответствие canonical refs  [90m│[39m `doc_kind: feature`          [90m│[39m
+[90m│[39m                              [90m│[39m `REQ-01`, `CTR-01`,          [90m│[39m (`REQ-XX`, `CTR-XX`,         [90m│[39m неправильно для              [90m│[39m
+[90m│[39m                              [90m│[39m `CHK-01`, `EVID-01`,         [90m│[39m `CHK-XX`, `EVID-XX`,         [90m│[39m implementation-plan; должно  [90m│[39m
+[90m│[39m                              [90m│[39m `EC-01`, `ASM-01` в          [90m│[39m `EC-XX`) проведены           [90m│[39m быть `doc_kind:              [90m│[39m
+[90m│[39m                              [90m│[39m feature.md) НЕ ПРОВЕДЕНЫ —   [90m│[39m структурно; пометка «не п... [90m│[39m implementation-plan`         [90m│[39m
+[90m│[39m                              [90m│[39m поме...                      [90m│[39m                              [90m│[39m - ⚠️ Frontmatter             [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m                              [90m│[39m (`must_no...                 [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/plan-bad-oq… [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m [PASS] # Implementation-Plan [90m│[39m
+[90m│[39m                              [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m Review Report                [90m│[39m
+[90m│[39m                              [90m│[39m ## Status: REVISE            [90m│[39m ## Status: REVISE            [90m│[39m ## Status: REVISE            [90m│[39m
+[90m│[39m                              [90m│[39m > ⚠️ Sibling `feature.md`    [90m│[39m > **Ограничение:** sibling   [90m│[39m ---                          [90m│[39m
+[90m│[39m                              [90m│[39m для FT-018 в инпуте не       [90m│[39m `feature.md` недоступен. Все [90m│[39m ## Структурные находки       [90m│[39m
+[90m│[39m                              [90m│[39m предоставлен. Содержательные [90m│[39m содержательные проверки на   [90m│[39m - ⚠️ **Frontmatter           [90m│[39m
+[90m│[39m                              [90m│[39m проверки (canonical          [90m│[39m наличие `REQ-XX`, `CTR-XX`,  [90m│[39m (`doc_kind`,                 [90m│[39m
+[90m│[39m                              [90m│[39m attribution, существование   [90m│[39m `CHK-XX`, `EVID-XX`,         [90m│[39m `must_not_define`):**        [90m│[39m
+[90m│[39m                              [90m│[39m `REQ-XX`/`CTR-XX`/`CHK-XX`/… [90m│[39m `EC-XX`, `ASM-XX` в sibling  [90m│[39m   - `doc_kind: feature`      [90m│[39m
+[90m│[39m                              [90m│[39m не выполнены — отмеч...      [90m│[39m — **не проверено**.          [90m│[39m некорректен для плана;       [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m Структурные...               [90m│[39m должно быть                  [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m                              [90m│[39m `implementation_plan` или    [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m                              [90m│[39m аналогичное.                 [90m│[39m
+[90m│[39m                              [90m│[39m                              [90m│[39m                              [90m│[39m   - `must...                 [90m│[39m
+[90m└──────────────────────────────[39m[90m┴──────────────────────────────[39m[90m┴──────────────────────────────[39m[90m┴──────────────────────────────┘[39m
+✓ Eval complete (ID: eval-VAf-2026-05-01T06:45:43)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 9 passed (75.00%)
+  ✗ 3 failed (25.00%)
+  0 errors (0%)
+Duration: 4m 21s (concurrency: 4)
+
+Writing output to plan-reviewer-results.json

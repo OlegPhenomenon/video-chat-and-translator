@@ -1,0 +1,152 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: "Eval brief_creation.md — превращение тикета в бриф (10 кейсов × 3 модели Claude)"
+
+prompts:
+  - file://prompts/brief_creation.md
+
+providers:
+  - id: "exec: ./providers/claude-opus.sh"
+    label: claude-opus
+  - id: "exec: ./providers/claude-sonnet.sh"
+    label: claude-sonnet
+  - id: "exec: ./providers/claude-haiku.sh"
+    label: claude-haiku
+
+tests:
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 1: структура (детерминированные проверки)
+  # ─────────────────────────────────────────────────
+
+  - description: "01. Простой issue — все 4 обязательные секции (h2)"
+    vars:
+      issue: "Хочу регистрацию через Google аккаунт"
+    assert:
+      - type: contains
+        value: "\n## Проблема\n"
+      - type: contains
+        value: "\n## Для кого\n"
+      - type: contains
+        value: "\n## Контекст\n"
+      - type: contains
+        value: "\n## Желаемый результат\n"
+
+  - description: "02. Issue с Title/Body — заголовок брифа на первой строке"
+    vars:
+      issue: |
+        Title: Темная тема в приложении
+        Body: Пользователи жалуются, что белый фон утомляет глаза при долгом просмотре видео вечером.
+    assert:
+      - type: regex
+        value: "^# Brief:"
+      - type: contains
+        value: "\n## Проблема\n"
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 2: запрещённые конструкции (бриф НЕ содержит решения)
+  # ─────────────────────────────────────────────────
+
+  - description: "03. Issue с UI-деталями — бриф абстрагируется от конкретной реализации UI"
+    vars:
+      issue: "Хочу кнопку 'Войти через Google' в правом верхнем углу страницы регистрации с иконкой Google."
+    assert:
+      - type: not-icontains
+        value: "правом верхнем углу"
+      - type: not-icontains
+        value: "иконк"
+      - type: contains
+        value: "\n## Проблема\n"
+
+  - description: "04. Issue с тех-деталями — бриф абстрагируется от конкретной библиотеки/API"
+    vars:
+      issue: "Реализуй Google OAuth через гем omniauth-google-oauth2, callback URL /auth/google/callback."
+    assert:
+      - type: not-icontains
+        value: "omniauth"
+      - type: not-icontains
+        value: "callback url"
+      - type: contains
+        value: "\n## Проблема\n"
+
+  - description: "05. Issue с размытыми формулировками — бриф их фильтрует"
+    vars:
+      issue: "Хочу удобную регистрацию, чтобы было быстро и при необходимости можно было быстренько войти."
+    assert:
+      - type: not-icontains
+        value: "удобн"
+      - type: not-icontains
+        value: "быстр"
+      - type: not-icontains
+        value: "при необходимости"
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 3: качество (javascript — проверка содержания секций)
+  # ─────────────────────────────────────────────────
+
+  - description: "06. Issue с метрикой — она попадает в секцию Проблема"
+    vars:
+      issue: "У нас 30% пользователей бросают регистрацию на этапе подтверждения email. Это критично для роста воронки."
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/## Проблема\n([\s\S]*?)(?=\n## |$)/);
+          if (!m) throw new Error('Секция "## Проблема" не найдена');
+          if (!/30\s?%|30 ?процент/i.test(m[1])) throw new Error('Метрика 30% не попала в секцию Проблема');
+          return true;
+
+  - description: "07. Конкретный стейкхолдер — секция 'Для кого' содержательная (>30 символов, не одно слово 'пользователи')"
+    vars:
+      issue: "От продакта Анны: B2B-клиенты просят SSO через Google для онбординга команд по 50+ человек."
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/## Для кого\n([\s\S]*?)(?=\n## |$)/);
+          if (!m) throw new Error('Секция "## Для кого" не найдена');
+          const text = m[1].trim();
+          if (text.length < 30) throw new Error('Секция слишком короткая: ' + text.length + ' симв.');
+          if (/^пользовател[ия]\.?$/i.test(text)) throw new Error('Размытое: только слово "пользователи"');
+          return true;
+
+  - description: "08. Контекст содержит маркер времени или причинности"
+    vars:
+      issue: "В Q2 запускаем B2B-направление. Без корпоративного входа через Google не сможем заключать enterprise-контракты — это блокер релиза 1 июня."
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/## Контекст\n([\s\S]*?)(?=\n## |$)/);
+          if (!m) throw new Error('Секция "## Контекст" не найдена');
+          const text = m[1];
+          if (!/(сейчас|сегодня|Q[1-4]|квартал|релиз|блокер|запуск|важн[оа]|потому что|поэтому|без этого|дедлайн|июн|критичн)/i.test(text)) {
+            throw new Error('Контекст не указывает время/причину важности');
+          }
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 4: adversarial / каверзные
+  # ─────────────────────────────────────────────────
+
+  - description: "09. Мусорный issue — бриф отмечает недостаток информации, не галлюцинирует"
+    vars:
+      issue: "Что-то не работает. Надо посмотреть."
+    assert:
+      - type: contains
+        value: "\n## Проблема\n"
+      - type: javascript
+        value: |
+          if (!/(TBD|неизвестно|уточн|недостаточно|непонятно|требует уточнения|неопределен|не указан|не хватает)/i.test(output)) {
+            throw new Error('Бриф не отметил недостаток информации — возможна галлюцинация');
+          }
+          return true;
+
+  - description: "10. Смешанный issue (метрика + решение) — метрика остаётся, тех-решение фильтруется"
+    vars:
+      issue: "Не работает регистрация: у 30% юзеров не приходит email. Нужно добавить OAuth Google как альтернативу через библиотеку omniauth-google-oauth2."
+    assert:
+      - type: contains
+        value: "30"
+      - type: not-icontains
+        value: "omniauth"
+      - type: not-icontains
+        value: "oauth"
+      - type: not-icontains
+        value: "библиотек"

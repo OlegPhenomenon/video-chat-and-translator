@@ -1,0 +1,180 @@
+---
+title: "FT-019: UI-панель субтитров справа от видео"
+doc_kind: feature
+doc_function: canonical
+purpose: "Показать пользователю субтитры в отдельной боковой панели рядом с видео, синхронизированные с текущим временем воспроизведения, с возможностью скрывать/раскрывать панель."
+derived_from:
+  - ../README.md
+  - ../../project/overview.md
+  - ../FT-018_COMPLETED/feature.md
+status: active
+delivery_status: done
+audience: humans_and_agents
+must_not_define:
+  - implementation_sequence
+---
+
+# FT-019: UI-панель субтитров справа от видео
+
+## What
+
+### Problem
+
+Сейчас на странице видео субтитры доступны только как стандартный HTML5 `<track>`-оверлей поверх плеера: строка субтитров отображается внизу видео, нельзя увидеть несколько сегментов сразу, нельзя быстро просматривать/скроллить расшифровку целиком и нельзя отключить субтитры от самого плеера, оставив их только в виде текста сбоку. Это делает контент малопригодным для быстрого просмотра, скан-чтения и образовательных сценариев (навигация по содержимому, чтение в тишине, просмотр без звука).
+
+Source: Issue [#18](https://github.com/OlegPhenomenon/video-chat-and-translator/issues/18) — «На странице видео справа от видео должна быть область с субтитрами. Также это окошко можно скрывать».
+
+Upstream context: в FT-018 уже появился статус прогресса транскрибации и сохранение результата как VTT в IndexedDB. Данная delivery-единица — следующий шаг в том же потоке: показать полученные субтитры пользователю в удобном виде.
+
+### Scope delta относительно Issue #18
+
+Буквальный текст issue требует только: (a) боковую панель субтитров, (b) возможность её скрывать. Ниже фиксируем осознанные расширения scope (и why), чтобы у ревьюера была возможность сузить фичу без переписывания `feature.md`:
+
+- `DEC-01` Synchronization (`REQ-03`) — расширение: подсвечивать активный сегмент по `video.currentTime`. Why: без синхронизации панель — просто статичный дамп текста; минимальный polish для образовательного сценария. Если решим сужать — удаляем `REQ-03`, `MET-02`, `SC-03`, `CHK-03`, `CTR-02`, `FM-03`.
+- `DEC-02` Empty state (`REQ-04`) — расширение: панель должна корректно отработать отсутствие VTT. Why: при отсутствии субтитров страница не должна рендерить пустую зону без объяснений. Если сужать — `REQ-04` можно заменить на «если субтитров нет, панель не рендерится вовсе», тогда уходят `NEG-01` и соответствующая часть `EVID-01`.
+- `DEC-03` Error state (`REQ-05`) — расширение: обработка невалидного VTT. Why: FT-017/FT-018 уже допускают, что провайдер может вернуть неожиданный ответ; без явной обработки парсер может уронить страницу. Если сужать — можно ограничиться «парсер не кидает в глобал», без отдельного UI-состояния, тогда уходит `NEG-02`.
+- `DEC-04` Responsive перекладка на узких экранах (`REQ-01`) — мягкое расширение: на узких экранах панель стакается под видео. Why: существующая страница `Show.tsx` уже работает на мобильной ширине, и отсутствие responsive-поведения создаст регрессию. Если сужать — можно зафиксировать, что фича гарантирует layout только на `sm+` и явно пометить мобильную ширину как NS.
+
+### Outcome
+
+| Metric ID | Metric | Baseline | Target | Measurement method |
+| --- | --- | --- | --- | --- |
+| `MET-01` | Наличие читаемой списком панели субтитров рядом с видео | Панели нет; текст субтитров виден только построчно как HTML5 overlay | На странице видео есть выделенная боковая панель, которая показывает субтитры списком и её можно скрыть/раскрыть | UI-проверка по `SC-01`, `SC-02` с Playwright-скриншотами |
+| `MET-02` | Синхронизация панели с воспроизведением | Нет связи между временем видео и отображением субтитров в DOM | Активный сегмент визуально выделяется по мере воспроизведения видео | UI-проверка по `SC-03` с Playwright-скриншотами |
+
+### Scope
+
+- `REQ-01` На странице видео появляется боковая панель субтитров, размещённая справа от видео на десктоп-ширинах (и перестраиваемая вниз на узких экранах), показывающая список сегментов из загруженного VTT.
+- `REQ-02` Панель имеет control для скрытия/раскрытия (toggle). При скрытии панель визуально сворачивается, но остаётся возможность раскрыть её обратно тем же control-ом без перезагрузки страницы.
+- `REQ-03` Активный сегмент (совпадающий с `video.currentTime`) визуально выделяется в панели по мере воспроизведения видео.
+- `REQ-04` Если субтитры для видео отсутствуют (VTT не загружен / не сохранён в IndexedDB), панель показывает явное пустое состояние («субтитры не загружены») и не падает.
+- `REQ-05` Если VTT повреждён/невалидный, панель показывает понятное сообщение об ошибке парсинга и не ломает остальную страницу и плеер. Существующий HTML5 `<track>`-элемент из FT-018 остаётся подключённым; его поведение не ухудшается дополнительным кодом этой фичи (браузер сам решает, отрисовывать ли cues из битого VTT — мы не обещаем, что он их покажет).
+
+### Non-Scope
+
+- `NS-01` Не делаем клик-навигацию по сегментам (seek видео на таймкод сегмента из панели) в рамках этой delivery-единицы. Это отдельная последующая фича.
+- `NS-02` Не делаем редактирование/корректировку субтитров в UI.
+- `NS-03` Не делаем поиск/фильтрацию по тексту субтитров.
+- `NS-04` Не меняем существующий контракт транскрибации и сохранения VTT из FT-017/FT-018 (источник данных остаётся прежним — IndexedDB поле `subtitles` в `StoredVideoRecord`).
+- `NS-05` Не добавляем серверные endpoints, фоновые джобы и миграции БД — панель полностью client-side.
+- `NS-06` Не добавляем автоскролл/прокрутку списка к активному сегменту. Acceptance для `REQ-03` проверяется на уровне DOM (активному сегменту выставлен маркер/класс, совпадающий с текущим временем), **видимость** активного сегмента в viewport панели для длинных transcript-ов не гарантируется в этой delivery-единице. Возможный follow-up — отдельная фича.
+- `NS-07` Не добавляем отдельный i18n-слой/библиотеку; следуем существующей конвенции страницы (русскоязычные строки как в `Show.tsx`).
+
+### Constraints / Assumptions
+
+- `ASM-01` Исходные субтитры — валидный WebVTT, сохранённый в `StoredVideoRecord.subtitles` (File), как это установлено FT-017/FT-018.
+- `ASM-02` Видео рендерится нативным HTML5 `<video>` на странице `app/frontend/pages/videos/Show.tsx` и позволяет подписаться на событие `timeupdate` через `videoRef`.
+- `CON-01` Реализация должна оставаться client-side (без серверных вызовов и миграций БД) — соответствует архитектурному принципу проекта (см. `project/overview.md`).
+- `CON-02` Стек UI: React + Inertia + Tailwind CSS; без введения новых UI-библиотек (shadcn/headlessui и т.п.) в рамках этой фичи. Toggle реализуется собственным состоянием + условным рендерингом, как это принято в проекте.
+- `CON-03` VTT-парсинг должен быть выполнен на клиенте из уже сохранённого `File`-объекта без повторного обращения к провайдеру транскрибации.
+
+## How
+
+### Solution
+
+Ввести новый feature-модуль `app/frontend/features/videos/subtitles/` с чистым VTT-парсером, типами `Segment`/`ParseResult` и presentational-компонентом `SubtitlesPanel`. На странице `Show.tsx` парсим VTT из `StoredVideoRecord.subtitles` в сегменты и передаём в `SubtitlesPanel`, который рендерится справа от видео и помечает активный сегмент на основе `videoRef.currentTime` (подписка на `timeupdate`). Отдельным toggle-контролом панель можно сворачивать/раскрывать, не разрывая подписку на время (при повторном открытии состояние соответствует текущему моменту видео). Главный trade-off: держим новую функциональность в отдельном feature-модуле (а не в глобальном `components/` и не в `transcription/`), потому что это отдельная ответственность (отображение субтитров) и пока нет второй точки потребления — кладём всё в одну feature-директорию.
+
+### Change Surface
+
+| Surface | Type | Why it changes |
+| --- | --- | --- |
+| `video_chat_and_translator/app/frontend/pages/videos/Show.tsx` | code | Добавить layout с боковой панелью субтитров, toggle-control и подписку на `timeupdate` через существующий `videoRef` |
+| `video_chat_and_translator/app/frontend/features/videos/subtitles/vtt.ts` (новый) | code | Чистая функция парсинга VTT-строки в `{ status, segments, errors }` — клиентсайд, без IO (см. `CTR-01`) |
+| `video_chat_and_translator/app/frontend/features/videos/subtitles/active-segment.ts` (новый) | code | Чистая функция выбора индекса активного сегмента по `currentTime` (см. `CTR-02`) |
+| `video_chat_and_translator/app/frontend/features/videos/subtitles/SubtitlesPanel.tsx` (новый) | code | Presentational-компонент панели: список сегментов, маркер активного, toggle, empty/error состояния |
+| `video_chat_and_translator/app/frontend/features/videos/subtitles/index.ts` (новый) | code | Barrel-экспорт `SubtitlesPanel`, парсера и типов для импорта из `Show.tsx` |
+
+Namespace `features/videos/transcription/` не трогаем — это отдельная ответственность (получение VTT от провайдера), она остаётся owner-ом существующего контракта FT-017/FT-018.
+
+Никаких изменений в `app/`, `db/`, `config/` (backend) не ожидается.
+
+### Flow
+
+1. Пользователь открывает страницу видео, у которого в `StoredVideoRecord` есть поле `subtitles` (File в формате VTT).
+2. Компонент страницы читает `subtitles` как текст, парсит в массив сегментов и передаёт в `SubtitlesPanel`.
+3. `SubtitlesPanel` рендерится справа от видео и показывает список сегментов.
+4. Пользователь включает воспроизведение; по мере изменения `video.currentTime` активный сегмент выделяется.
+5. Пользователь нажимает toggle — панель сворачивается; повторное нажатие — снова разворачивает её.
+6. Если субтитров для видео нет — панель показывает пустое состояние.
+7. Если VTT невалиден — панель показывает состояние ошибки; плеер и страница не падают, `<track>`-элемент остаётся подключённым (браузер сам решает, показывать ли cues).
+
+### Contracts
+
+| Contract ID | Input / Output | Producer / Consumer | Notes |
+| --- | --- | --- | --- |
+| `CTR-01` | Input: VTT-строка (WebVTT). Output: всегда объект одной формы `{ status: "ok" \| "partial" \| "invalid", segments: Segment[], errors: ParseError[] }`, где `Segment = { start: number (seconds), end: number (seconds), text: string }` и `ParseError = { line: number, reason: string }`. | Producer: новый парсер `vtt.ts`; Consumer: `SubtitlesPanel` и/или `Show.tsx` | Парсер — чистая функция без IO, тестируемая Vitest. Никогда не бросает исключение. `"ok"` = все cues распарсены, `errors: []`. `"partial"` = распарсена часть cues, остальные — в `errors`. `"invalid"` = пустой `segments`, есть как минимум один `ParseError` (включая «не начинается с `WEBVTT`»). Парсер обязан корректно читать **реальные варианты VTT**, которые может вернуть провайдер транскрибации: (1) необязательный BOM; (2) строка `WEBVTT` с произвольным суффиксом (`WEBVTT - Kind: captions`); (3) NOTE-блоки между cues; (4) numeric/textual cue identifiers перед таймкодами; (5) multi-line cue text; (6) cue settings в строке таймкода (`align:`, `line:`, `position:`) — settings игнорируются, сегмент остаётся валидным; (7) оба формата таймкода `HH:MM:SS.mmm` и `MM:SS.mmm`. Парсер **не обязан** поддерживать styling `STYLE`-блоки и inline-теги (`<v>`, `<c>`) — такие теги удаляются из `text`. |
+| `CTR-02` | Input: `currentTime: number`, `segments: Segment[]`; Output: индекс активного сегмента (или `null`) | Producer: `SubtitlesPanel`; Consumer: внутреннее состояние панели | Активный сегмент — первый, у которого `start <= currentTime < end`. Если `segments` пуст или `currentTime` вне всех интервалов → `null`. |
+
+### Failure Modes
+
+- `FM-01` У видео нет сохранённых субтитров (поле `subtitles` отсутствует) → панель показывает пустое состояние «субтитры не загружены» и не инициирует парсинг.
+- `FM-02` VTT невалиден (не начинается с `WEBVTT` / не парсится) → парсер возвращает результат с `status: "invalid"`, панель показывает сообщение об ошибке парсинга; плеер и страница не падают, существующий `<track>`-элемент не удаляется. Отрисовка cues нативным `<track>` в этом случае не гарантируется (зависит от браузера) и не является acceptance-критерием этой фичи.
+- `FM-03` `videoRef` ещё не смонтирован к моменту первого рендера панели → панель рендерится в неактивном состоянии (без подсветки активного сегмента) до подписки; ошибок в консоли нет.
+
+## Verify
+
+`Verify` задает canonical test case inventory для delivery-единицы: positive scenarios через `SC-*`, feature-specific negative coverage через `NEG-*`, executable checks через `CHK-*` и evidence через `EVID-*`.
+
+### Exit Criteria
+
+- `EC-01` На странице видео с сохранёнными субтитрами справа от видео отображается панель со списком сегментов, и её можно скрыть/раскрыть одним и тем же control-ом.
+- `EC-02` Во время воспроизведения видео в панели визуально выделяется сегмент, соответствующий текущему `video.currentTime`.
+- `EC-03` При отсутствии или повреждении VTT панель отображает соответствующее состояние (empty / error) и не ломает остальной UI страницы и плеер.
+
+### Traceability matrix
+
+| Requirement ID | Design refs | Acceptance refs | Checks | Evidence IDs |
+| --- | --- | --- | --- | --- |
+| `REQ-01` | `DEC-04`, `ASM-02`, `CON-02`, `CTR-01` | `EC-01`, `SC-01` | `CHK-01` | `EVID-01` |
+| `REQ-02` | `CON-02` | `EC-01`, `SC-02` | `CHK-01` | `EVID-01` |
+| `REQ-03` | `DEC-01`, `ASM-02`, `CTR-02`, `FM-03` | `EC-02`, `SC-03` | `CHK-02`, `CHK-03` | `EVID-01`, `EVID-02` |
+| `REQ-04` | `DEC-02`, `FM-01` | `EC-03`, `NEG-01` | `CHK-01` | `EVID-01` |
+| `REQ-05` | `DEC-03`, `CTR-01`, `FM-02` | `EC-03`, `NEG-02` | `CHK-01`, `CHK-02` | `EVID-01`, `EVID-02` |
+
+### Acceptance Scenarios
+
+- `SC-01` Happy path (рендер): открыть страницу видео с сохранёнными субтитрами → справа от видео появляется панель, в ней виден список сегментов текста из VTT.
+- `SC-02` Toggle: на той же странице нажать control скрытия панели → панель сворачивается; нажать снова → панель разворачивается и показывает тот же список.
+- `SC-03` Синхронизация: установить `video.currentTime` в известный таймкод внутри известного сегмента (через play или программно) → в DOM панели сегмент с этим таймкодом получает маркер/класс активного; сдвинуть `currentTime` в следующий сегмент → маркер активного переходит на следующий сегмент. Видимость активного сегмента в viewport панели не проверяется (см. `NS-06`).
+
+### Negative / Edge Cases
+
+- `NEG-01` Empty state: открыть страницу видео, у которого в IndexedDB нет поля `subtitles` → панель показывает понятное пустое состояние, страница работает.
+- `NEG-02` Invalid VTT: подсунуть в `subtitles` невалидное содержимое → панель показывает состояние ошибки парсинга, плеер и остальной UI не падают.
+
+### Checks
+
+| Check ID | Covers | How to check | Expected result | Evidence path |
+| --- | --- | --- | --- | --- |
+| `CHK-01` | `EC-01`, `EC-03`, `SC-01`, `SC-02`, `NEG-01`, `NEG-02` | Пройти сценарии `SC-01`/`SC-02` и `NEG-01`/`NEG-02` в браузере через Playwright (см. `playwright-cli` skill) и снять скриншоты состояний: панель раскрыта со списком, панель свёрнута, empty state, error state | Панель рендерится/сворачивается/раскрывается; пустое и ошибочное состояния отображаются; страница и плеер не ломаются | `artifacts/ft-019/verify/chk-01/` |
+| `CHK-02` | `CTR-01`, `CTR-02`, покрытие `REQ-03` / `REQ-05` на уровне парсера и логики активного сегмента | Vitest-тесты в `video_chat_and_translator`: (a) парсер VTT на фикстурах — валидный VTT (с BOM, NOTE, cue identifiers, multi-line text, cue settings, оба формата таймкода), частично битый VTT (`status: "partial"`), невалидный VTT (`status: "invalid"`); (b) логика выбора активного сегмента по `currentTime` (в границах, на границе, за пределами, при пустом списке) | Все unit-тесты зелёные локально (в Docker) и в CI | `artifacts/ft-019/verify/chk-02/` |
+| `CHK-03` | `EC-02`, `SC-03`, `CTR-02`, `FM-03` | Playwright-сценарий синхронизации: открыть страницу видео с сохранённым VTT, программно выставить `video.currentTime` в середину известного сегмента → сделать скриншот и ассертить, что DOM-элемент сегмента с этим таймкодом имеет маркер/класс активного; сдвинуть `currentTime` в следующий сегмент → повторить ассерцию | Маркер активного сегмента в DOM меняется согласно `currentTime`; ошибок в консоли нет | `artifacts/ft-019/verify/chk-03/` |
+
+### Test matrix
+
+| Check ID | Evidence IDs | Evidence path |
+| --- | --- | --- |
+| `CHK-01` | `EVID-01` | `artifacts/ft-019/verify/chk-01/` |
+| `CHK-02` | `EVID-02` | `artifacts/ft-019/verify/chk-02/` |
+| `CHK-03` | `EVID-03` | `artifacts/ft-019/verify/chk-03/` |
+
+### Evidence
+
+- `EVID-01` Playwright-скриншоты UI-состояний панели: `artifacts/ft-019/verify/chk-01/panel-expanded.png`, `panel-collapsed.png`, `panel-empty-state.png`, `panel-error-state.png`, assertion log `artifacts/ft-019/verify/chk-01/playwright-assertions.log`.
+- `EVID-02` Docker/Vitest/typecheck evidence: `artifacts/ft-019/verify/chk-02/vitest.log`, `artifacts/ft-019/verify/chk-02/typecheck.log`. Re-run on 2026-04-29: targeted Vitest 3 files / 12 tests passed; `npm run check` passed in Docker.
+- `EVID-03` Playwright-артефакты синхронизации: `artifacts/ft-019/verify/chk-03/active-segment-0.png`, `active-segment-1.png`, assertion log `artifacts/ft-019/verify/chk-03/playwright-assertions.log` (`consoleErrors: []`, `failed: []`).
+- `EVID-REVIEW-01` Approved by project owner in chat (2026-04-22). Persisted at `artifacts/ft-019/reviews/feature-approved.md`.
+- `EVID-PR-01` PR created for closure: [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25). Persisted at `artifacts/ft-019/reviews/pr-created.md`.
+- `EVID-CI-LOCAL-01` Local Docker parity CI passed on 2026-04-29 via `scripts/ci-app.sh`: `artifacts/ft-019/verify/chk-02/local-docker-ci.md`.
+- `EVID-CI-REMOTE-01` GitHub Actions CI for PR [#25](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/25) is tracked at `artifacts/ft-019/verify/chk-02/remote-ci.md`.
+- `EVID-AG-01` Manual/skill-driven UI evidence approval for `AG-01`: `artifacts/ft-019/reviews/ag-01-approved.md`.
+- `EVID-SIMPLIFY-01` Simplify review: `artifacts/ft-019/reviews/simplify-review.md`.
+- `EVID-UC-01` `UC-*` update decision: `artifacts/ft-019/reviews/uc-decision.md`.
+
+### Evidence contract
+
+| Evidence ID | Artifact | Producer | Path contract | Reused by checks |
+| --- | --- | --- | --- | --- |
+| `EVID-01` | Playwright-скриншоты UI-состояний панели субтитров (без sync) | verify-runner (Playwright) / human | `artifacts/ft-019/verify/chk-01/` | `CHK-01` |
+| `EVID-02` | Лог прогонки unit-тестов (Vitest) парсера VTT и логики активного сегмента | verify-runner (Docker `bin/ci`) / human | `artifacts/ft-019/verify/chk-02/` | `CHK-02` |
+| `EVID-03` | Playwright-скриншоты + assertion log синхронизации DOM-маркера активного сегмента с `video.currentTime` | verify-runner (Playwright) / human | `artifacts/ft-019/verify/chk-03/` | `CHK-03` |

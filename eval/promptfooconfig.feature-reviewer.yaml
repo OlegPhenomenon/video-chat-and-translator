@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: "Eval feature_reviewer.md — проверка feature.md (FT-XXX format)"
+
+prompts:
+  - file://prompts/feature_reviewer.md
+
+providers:
+  - id: "exec: ./providers/claude-opus.sh"
+    label: claude-opus
+  - id: "exec: ./providers/claude-sonnet.sh"
+    label: claude-sonnet
+  - id: "exec: ./providers/claude-haiku.sh"
+    label: claude-haiku
+
+tests:
+  - description: "01. Good fixture (FT-019) — допускаются минорные REVISE-замечания, но НЕ критические дефекты"
+    vars:
+      feature_doc: file://fixtures/feature-good.md
+    assert:
+      # Не REJECT (это критика scope, фундамент сломан) — допускается APPROVE / REVISE с минор-правками
+      - type: not-icontains
+        value: "Status: REJECT"
+      # Не должен находить тех же критических классов дефектов, которые есть в broken-фикстурах
+      - type: javascript
+        value: |
+          // Reviewer не должен флагать на эталонной фиче "scope creep" / orphan REQ / отсутствие baseline у MET / DEC без Why.
+          // Минорные замечания (порядок секций, мелкая лексика) — допустимы.
+          const critical = [
+            { name: 'orphan REQ (REQ-XX без появления в Traceability)', re: /(REQ-\d+).{0,80}(не.{0,20}появ|orphan|отсутству.{0,20}в.{0,30}traceability)/i },
+            { name: 'отсутствие Baseline у всех метрик', re: /(все\s+метрик|каждая\s+метрик|MET-.{0,20}ни\s+у\s+одной).{0,80}baseline/i },
+            { name: 'DEC-XX без Why ВО ВСЕХ записях', re: /(все\s+DEC|каждое\s+DEC|ни\s+у\s+одного\s+DEC).{0,80}why/i },
+          ];
+          const flagged = critical.find(c => c.re.test(output));
+          if (flagged) throw new Error('Reviewer ложно флагнул критический дефект на эталонной фиче: ' + flagged.name);
+          return true;
+
+  - description: "02. Solution leakage в Problem — reviewer должен поймать имена библиотек/файлов/UI"
+    vars:
+      feature_doc: file://fixtures/feature-bad-leakage.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил solution leakage — выдал APPROVE');
+          const flagged = /(leakage|leak|реш(е|ё)н|implementation|библиотек|axios|fetch|csrf|иконк|правом верхнем|удобн)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул признаки solution leakage');
+          return true;
+
+  - description: "03. Orphan REQ-XX — REQ-02 и REQ-03 отсутствуют в Traceability matrix"
+    vars:
+      feature_doc: file://fixtures/feature-bad-orphan-req.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил orphan REQ');
+          const flagged = /(orphan|traceability|REQ-02|REQ-03|не появ|missing|отсутству|не упомян)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул orphan / Traceability matrix');
+          return true;
+
+  - description: "04. Метрики без Baseline — Outcome не измерим"
+    vars:
+      feature_doc: file://fixtures/feature-bad-no-baseline.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил отсутствие Baseline');
+          const flagged = /(baseline|измерим|measurement|метрик|outcome|пустой|—|прочерк|не указан)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул проблему с Baseline / измеримостью Outcome');
+          return true;
+
+  - description: "05. DEC-XX без 'Why' и без narrowing path"
+    vars:
+      feature_doc: file://fixtures/feature-bad-dec-no-why.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил DEC без Why');
+          const flagged = /(DEC-01|DEC-02|why|зачем|сужать|narrowing|обоснован|нет объяснения)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул отсутствие Why / narrowing у DEC-XX');
+          return true;
