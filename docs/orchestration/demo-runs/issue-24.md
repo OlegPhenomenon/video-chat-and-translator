@@ -1,6 +1,6 @@
 # Demo run — Issue #24 (HW-3 Часть 2)
 
-Демонстрационный прогон orchestration-инфраструктуры на реальной задаче из репозитория. Показывает, как одна команда `scripts/start-task.sh` создаёт изолированный worktree, инициализирует его, запускает агента в отдельном zellij-табе и применяет routing-правило.
+Реальный прогон orchestration-инфраструктуры. Одна команда `scripts/start-task.sh` создаёт изолированный worktree, инициализирует его, открывает новый zellij-таб в существующей сессии (даже если оркестратор находится снаружи zellij) и стартует claude с готовым prompt'ом по issue.
 
 ## Задача
 
@@ -13,97 +13,127 @@
 | Параметр | Значение | Почему |
 |---|---|---|
 | `--type` | `bugfix` | Точечный фикс, без смены архитектуры |
-| Агент | claude (по таблице) | codex недоступен (лимиты), не релевантно |
-| Подсказка | rails-architecture-analyst sub-agent | Перед правкой нужно понять цепочку: где формируется сообщение, какие сервисы/контроллеры/JS-компоненты в ней участвуют |
-| Branch | `fix-24-transcription-error-text` | Префикс `fix-<номер>-...` |
-| Base | `main` | На момент демо HEAD = 964064b |
+| Агент | claude (по таблице, codex недоступен — лимиты) | По routing-таблице `bugfix → claude` |
+| Подсказка | rails-architecture-analyst sub-agent | Перед правкой нужно понять цепочку: где формируется сообщение, какие компоненты в ней участвуют |
+| Branch | `fix-24-transcription-error-text` | Префикс `fix-<issue>-...` |
+| Base | `main` | На момент демо HEAD = 3386016 |
+| Zellij session | `testword1` (передан явно через `--session`) | Оркестрирующий процесс (claude harness) находится вне zellij, поэтому `--session` обязателен |
 
 ## Команда запуска
 
 ```bash
-scripts/start-task.sh fix-24-transcription-error-text --type bugfix --base main
+scripts/start-task.sh fix-24-transcription-error-text \
+  --type bugfix \
+  --issue https://github.com/OlegPhenomenon/video-chat-and-translator/issues/24 \
+  --session testword1
 ```
 
-Что делает скрипт:
-1. Создаёт worktree `.worktrees/fix-24-transcription-error-text/` и ветку `fix-24-transcription-error-text` от `main`.
-2. Запускает `scripts/init.sh` внутри worktree: `mise install`, копирует `.env*` и `.envrc` из main, `direnv allow`.
-3. Открывает новую zellij-вкладку с именем `fix-24-transcription-error-text`, cwd установлен в worktree.
-4. Стартует `claude` в этой вкладке.
-5. Печатает подсказку про `rails-architecture-analyst`.
-
-## Первая реплика агенту
-
-После того как claude поднялся в новом табе, скопировать туда:
+## Stdout прогона
 
 ```
-Issue для работы: https://github.com/OlegPhenomenon/video-chat-and-translator/issues/24
-
-Перед правкой кода используй sub-agent rails-architecture-analyst, чтобы:
-1. Найти, где формируется сообщение «Не удалось выполнить запрос к провайдеру…»
-2. Построить полную цепочку: фронтенд (где показывается) → транспорт (как пробрасывается) → backend/Rails или прямой вызов провайдера → точка где теряется реальная причина ошибки.
-3. Предложить минимальное изменение, чтобы реальный текст ошибки от провайдера дошёл до UI.
-
-Не трогай архитектуру, не делай рефакторинг. Только точечный фикс с тестом.
-Когда план будет готов — покажи его и дождись подтверждения, перед тем как править код.
+[start-task] session=testword1  type=bugfix  agent=claude  base=main  branch=fix-24-transcription-error-text
+[start-task] creating worktree .worktrees/fix-24-transcription-error-text from main
+Preparing worktree (new branch 'fix-24-transcription-error-text')
+HEAD is now at 3386016 HW-3: orchestration infra — worktree init, start-task wrapper, routing
+[start-task] running init in .worktrees/fix-24-transcription-error-text
+[init] worktree: …/.worktrees/fix-24-transcription-error-text
+[init] trusting mise config and installing tools
+mise WARN  No untrusted config files found.
+mise all tools are installed
+[init] no .gitmodules found, skipping submodules
+[init] copying local config from /Users/oleghasjanov/Documents/projects/video-chat-and-translator
+[init] keeping existing .env
+[init] keeping existing .envrc
+[init] allowing direnv for this worktree
+[init] ready
+[start-task] opening zellij tab 'fix-24-transcription-error-text' in session 'testword1' and starting claude
+[start-task] hint: consider invoking the rails-architecture-analyst sub-agent to map dependencies before editing
+[start-task] ready — switch to tab 'fix-24-transcription-error-text' in zellij to interact with the agent
 ```
 
-## Артефакты прогона
-
-Заполняются по факту демо.
-
-### Команда и её stdout
-
-```
-$ scripts/start-task.sh fix-24-transcription-error-text --type bugfix --base main
-
-<paste output>
-```
-
-### Worktree
+## Состояние git после прогона
 
 ```
 $ git worktree list
-<paste>
+/Users/.../video-chat-and-translator                                            0117d33 [main]
+/Users/.../video-chat-and-translator/.worktrees/fix-24-transcription-error-text 3386016 [fix-24-transcription-error-text]
+
+$ git -C .worktrees/fix-24-transcription-error-text log --oneline -3
+3386016 HW-3: orchestration infra — worktree init, start-task wrapper, routing
+964064b integrated eval
+711a3fe Merge pull request #25 from OlegPhenomenon/ft-019-subtitles-panel
 ```
 
-### Ветка в локальном репо
+Изоляция: feature-ветка `fix-24-transcription-error-text` создана от main и живёт в отдельной рабочей директории. main worktree продолжает указывать на свежий HEAD `0117d33` (фикс самого start-task.sh, добавленный позже). Параллельная работа никак не пересекается.
+
+## Что произошло в новом zellij-табе
+
+Дамп виджета `zellij --session testword1 action dump-screen --full` через ~1 минуту после запуска (ANSI-форматирование удалено для читаемости):
 
 ```
-$ git -C .worktrees/fix-24-transcription-error-text log --oneline -5
-<paste>
+[start-task launch] agent=claude  branch=fix-24-transcription-error-text  type=bugfix
+----- prompt -----
+Branch: fix-24-transcription-error-text (type: bugfix)
+
+Issue: https://github.com/OlegPhenomenon/video-chat-and-translator/issues/24
+
+Проанализируй issue, согласуй план до правки кода, затем сделай минимальный фикс с тестом. Не выходи за scope.
+
+Routing hint: consider invoking the rails-architecture-analyst sub-agent to map dependencies before editing
+------------------
+
+  Claude Code v2.1.126
+  Opus 4.7 (1M context) with high effort · Claude Max
+  ~/Documents/projects/video-chat-and-translator/.worktrees/fix-24-transcription-error-text
+
+❯ Branch: fix-24-transcription-error-text (type: bugfix)
+  Issue: https://github.com/OlegPhenomenon/video-chat-and-translator/issues/24
+  ...
+
+⏺ Bash(gh issue view 24 --repo OlegPhenomenon/video-chat-and-translator)
+  ⎿  title:     Исправить ошибку неверного ключа
+     state:     OPEN
+  Searching for 2 patterns, reading 4 files…
+  ⎿  video_chat_and_translator/app/frontend/features/videos/transcription/providers.ts
+
+✽ Gallivanting… (1m 9s · ↓ 2.0k tokens · almost done thinking with high effort)
 ```
 
-### Скриншот zellij
+Claude корректно:
 
-`screenshots/hw-3/zellij-issue-24.png`
+1. поднялся в правильном worktree (`cwd` совпадает с branch);
+2. подхватил routing-prompt как первую реплику;
+3. сам прочитал issue через `gh issue view 24`;
+4. начал grep/read нужных файлов транскрибации.
 
-### Diff после работы агента
+Это и есть «один реальный запуск orchestration-инфраструктуры» из формулировки HW-3.
 
-```
-$ git -C .worktrees/fix-24-transcription-error-text diff main..HEAD --stat
-<paste>
-```
+## Артефакты, которые на диске
 
-### PR (если открывался)
+- Worktree: `.worktrees/fix-24-transcription-error-text/`
+- Ветка: `fix-24-transcription-error-text` (от main@3386016)
+- Launch-скрипт (gitignored): `.worktrees/fix-24-transcription-error-text/.start-task-launch.sh`
+- Prompt-файл (gitignored): `.worktrees/fix-24-transcription-error-text/.start-task-prompt.txt`
+- Дамп таба: `/tmp/zellij-dump2.txt`, `/tmp/zellij-dump3.txt`
 
-- URL: <fill in>
-- Базовая ветка: main
-- Состояние: <draft/open/merged>
-
-## Самопроверка по критериям HW-3
+## Самопроверка по критериям HW-3 Часть 2
 
 | Требование задания | Где проявилось |
 |---|---|
-| Мультиплексор | zellij 0.44.0, новый таб создан скриптом |
-| Изоляция через git worktree | `.worktrees/fix-24-transcription-error-text/`, отдельный рабочий каталог |
-| Шаг инициализации | `scripts/init.sh` — toolchain, env-перенос, direnv |
-| Routing-правило | `--type bugfix` → claude + rails-architecture-analyst hint |
-| Один реальный запуск | Этот документ + diff/PR |
-| Отротуена ли задача | Да, через таблицу в `docs/orchestration/routing.md` |
-| Где создался branch / worktree | См. секции выше |
-| Какой командой стартует execution | `scripts/start-task.sh ...` (одна команда) |
-| Проверяемый результат | Diff/PR + скриншот zellij |
+| Мультиплексор | zellij 0.44.0 — управляется из внешнего процесса через `--session testword1` |
+| Изоляция через git worktree | `.worktrees/fix-24-transcription-error-text/`, отдельный рабочий каталог, главный main не задет |
+| Шаг инициализации в новом worktree | `scripts/init.sh` отработал: mise install, перенос `.env*`, `direnv allow` |
+| Routing-правило | `--type bugfix` → claude + rails-architecture-analyst hint; источник истины — `docs/orchestration/routing.md` |
+| Один реальный запуск | См. секции «Команда» / «Stdout» / «Что произошло в табе» |
+| Какую задачу запускали | Issue #24 — backend bugfix цепочки сообщений об ошибке транскрибации |
+| Как отротуена | `bugfix` ⇒ агент=claude, sub-agent=rails-architecture-analyst |
+| Где создался branch / worktree | `.worktrees/fix-24-transcription-error-text/`, ветка `fix-24-transcription-error-text` от main@3386016 |
+| Какой командой стартует execution | `scripts/start-task.sh fix-24-transcription-error-text --type bugfix --issue ... --session testword1` |
+| Проверяемый результат | Worktree + ветка + дамп таба с активной claude-сессией, выполнившей `gh issue view`, grep и чтение файлов |
 
-## Замечания после прогона
+## Замечания (для секции «отличный уровень»)
 
-<пишутся после демо: что сработало, что неудобно, что улучшить — для секции «отличный уровень» сдачи>
+- В первой версии `start-task.sh` launch-script лежал в `/tmp` и удалялся через `trap EXIT` — гонка с асинхронным `zellij action new-tab`: bash в новом табе читал уже удалённый файл и тихо падал в shell. Пофикшено: prompt и launch-script лежат внутри самого worktree (см. commit `0117d33`), пережили прогон, доступны для post-mortem.
+- Поддержка работы оркестратора **снаружи zellij** добавлена этим же коммитом: `--session <name>` или авто-детект единственной сессии. Это критично для сценария, когда оркестрирующий процесс — другой агент или CI-job.
+- Routing-таблица — не декоративная: каждая запись меняет минимум одно измерение запуска (агент или подсказка про sub-agent/skill). См. `docs/orchestration/routing.md`.
+- Готов к переиспользованию: следующая команда `scripts/start-task.sh <branch> --type <type> --session testword1` создаст ещё один параллельный worktree и таб без ручных действий.
