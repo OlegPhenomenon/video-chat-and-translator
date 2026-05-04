@@ -22,12 +22,14 @@ export interface TranscribeToVttParams {
 function normalizeUnknownError(provider: TranscriptionProvider, err: unknown): TranscriptionError {
   if (err instanceof TranscriptionError) return err
   if (err instanceof TypeError) {
-    // Most common fetch error in browsers: network/CORS shows up as TypeError.
+    // Browser hides the response body for cross-origin 4xx without CORS headers,
+    // so a rejected API key surfaces here identically to a real network failure.
+    // We can't disambiguate from JS — surface the most likely cause first.
     return new TranscriptionError({
       provider,
       code: 'network',
       message:
-        'Не удалось выполнить запрос к провайдеру. Возможны проблемы сети или CORS (запрос выполняется напрямую из браузера).',
+        'Не удалось получить ответ от провайдера. Наиболее вероятная причина — неверный API key (ответ 401 заблокирован CORS и недоступен из браузера). Также возможны проблемы сети или CORS.',
     })
   }
   const message = err instanceof Error ? err.message : 'Неизвестная ошибка.'
