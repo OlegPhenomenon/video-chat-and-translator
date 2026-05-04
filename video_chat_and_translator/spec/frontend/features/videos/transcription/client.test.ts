@@ -98,6 +98,35 @@ describe('FT-017 transcription client', () => {
     ).rejects.toMatchObject({ code: 'invalid_api_key' })
   })
 
+  it('surfaces likely invalid API key when CORS hides the 401 response', async () => {
+    class XHRCorsBlocked extends MockXMLHttpRequest {
+      override send() {
+        queueMicrotask(() => {
+          this.emitUploadProgress({ lengthComputable: true, loaded: 100, total: 100 })
+          this.emitUploadLoad()
+          // Browser blocks 4xx without CORS headers → XHR fires `error`, status stays 0.
+          this.emitError()
+        })
+      }
+    }
+    vi.stubGlobal('XMLHttpRequest', XHRCorsBlocked)
+
+    try {
+      await transcribeToVtt({
+        provider: 'openai',
+        apiKey: 'bad',
+        videoFile: new File(['video'], 'video.mp4', { type: 'video/mp4' }),
+        model: 'whisper-1',
+      })
+      throw new Error('expected to reject')
+    } catch (e: unknown) {
+      expect(e).toBeInstanceOf(TranscriptionError)
+      const err = e as TranscriptionError
+      expect(err.code).toBe('network')
+      expect(err.message).toMatch(/API key/i)
+    }
+  })
+
   it('rejects non-vtt response as invalid_response', async () => {
     class XHRBadBody extends MockXMLHttpRequest {
       override send() {
