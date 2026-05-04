@@ -74,6 +74,9 @@ video_chat_and_translator/landing-screenshot.png
 
 # === Git worktrees (HW-3 orchestration) ===
 .worktrees/
+# launch artifacts dropped into worktrees by scripts/start-task.sh
+.start-task-prompt.txt
+.start-task-launch.sh
 
 # === Misc ===
 *.bak
