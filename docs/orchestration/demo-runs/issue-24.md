@@ -108,6 +108,19 @@ Claude корректно:
 
 Это и есть «один реальный запуск orchestration-инфраструктуры» из формулировки HW-3.
 
+## Результат после прогона
+
+Claude в новом табе автономно:
+
+1. прочитал issue через `gh issue view 24`;
+2. сделал grep + Read нужных файлов;
+3. поправил `client.ts:24-32` — текст сообщения теперь начинается с упоминания «вероятно неверный API key (CORS скрыл 401)»;
+4. добавил тест `surfaces likely invalid API key when CORS hides the 401 response` в `client.test.ts`;
+5. прогнал тесты через Docker (Vitest 6/6 зелёные, `npm run check` без ошибок) — соблюл проектное правило «никогда не запускать ruby/node на хосте, только Docker»;
+6. закоммитил, ребейзнул на актуальный main, запушил, открыл PR.
+
+**PR**: [#26 — fix(transcription): surface invalid API key in network-error path](https://github.com/OlegPhenomenon/video-chat-and-translator/pull/26) (коммит `a7f4c57`).
+
 ## Артефакты, которые на диске
 
 - Worktree: `.worktrees/fix-24-transcription-error-text/`
