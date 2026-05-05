@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: "Eval brief_reviewer.md — sonnet with retry (rate-limit safe)"
+
+prompts:
+  - file://prompts/brief_reviewer.md
+
+providers:
+  - id: "exec: ./providers/claude-sonnet-retry.sh"
+    label: claude-sonnet
+
+tests:
+  - description: "01. Good fixture"
+    vars:
+      brief_doc: file://fixtures/brief-good.md
+    assert:
+      - type: not-icontains
+        value: "Status: REJECT"
+
+  - description: "02. Solution leakage"
+    vars:
+      brief_doc: file://fixtures/brief-bad-leakage.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил solution leakage');
+          const flagged = /(реш(е|ё)н|реализац|библиотек|гем|devise|omniauth|код|файл|контроллер|модель|миграц|API|маршрут|route|callback|middleware)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул solution leakage');
+          return true;
+
+  - description: "03. Vague formulations"
+    vars:
+      brief_doc: file://fixtures/brief-bad-vague.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил размытые формулировки');
+          const flagged = /(размыт|двусмыслен|конкрет|измерим|быстр|удоб|легк|при необходимости|TBD|уточн)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул размытые формулировки');
+          return true;
+
+  - description: "04. Wrong structure"
+    vars:
+      brief_doc: file://fixtures/brief-bad-structure.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил неправильную структуру');
+          const flagged = /(заголовк|уровень|##|###|секци|структур|формат)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул структуру');
+          return true;
+
+  - description: "05. Garbage input"
+    vars:
+      brief_doc: file://fixtures/brief-bad-garbage.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил мусорный бриф');
+          const flagged = /(недостаточ|непонятно|уточн|TBD|неизвестно|не указан|нет данных|нет конкрет|мало информац|требует|не хватает|размыт|неопредел)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не отметил недостаток информации');
+          return true;
+
+  - description: "06. Mixed (metric + leakage)"
+    vars:
+      brief_doc: file://fixtures/brief-bad-mixed.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил leakage в смешанном брифе');
+          const flagged = /(реш(е|ё)н|реализац|библиотек|гем|GitHub Actions|workflow|\.yml|runs-on|docker compose|rspec|код|файл)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул leakage');
+          return true;

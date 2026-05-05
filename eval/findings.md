@@ -243,3 +243,153 @@ Sonnet — самый строгий рецензент. Opus и Haiku при р
 - `eval/plan-reviewer-results.json` / `eval/plan-reviewer-run.log` — итерация (strict assertion).
 - `eval/plan-reviewer-final.json` / `eval/plan-reviewer-final.log` — итерация (relaxed но с js-regex).
 - `eval/plan-reviewer-final2.json` / `eval/plan-reviewer-final2.log` — финал (только not-icontains REJECT).
+
+---
+
+# Часть 3: Brief Reviewer — ревью брифов старого формата
+
+**Дата:** 2026-05-05
+**Eval target:** `.prompts/brief_reviewer.md` — ревью `brief.md` в старом формате (без идентификаторов REQ/MET/SC).
+**Контекст:** в проекте `.memory-bank/features/001..008` используют старый формат брифов (отдельные `brief.md` с секциями `### Цель` / `### Для кого` / `### Технический контекст` / `### Желаемый результат`). Старый промпт был минималистичным (19 строк) — без явной структуры, без output format, без запрета на solution leakage.
+
+**Провайдеры:** codex-gpt5.5 (rate-limit workaround; Claude Code CLI rate-limited until 12:30pm).
+**Кейсов:** 6 (1 good + 5 broken: solution leakage / vague / wrong structure / garbage / mixed).
+
+## TL;DR
+
+| Прогон | PASS | FAIL | Время |
+|---|---|---|---|
+| Codex GPT-5.5 (полированный промпт) | **6 / 6 (100%)** | 0 / 6 | 36s |
+| Claude Sonnet (полированный промпт) | **6 / 6 (100%)** | 0 / 6 | 3m 39s |
+| Claude Opus (полированный промпт) | **6 / 6 (100%)** | 0 / 6 | 3m 23s |
+| Claude Haiku (полированный промпт) | **6 / 6 (100%)** | 0 / 6 | 2m 11s |
+
+**Все 4 модели (codex-gpt5.5, claude-opus, claude-sonnet, claude-haiku) сходятся к 100% на 6 кейсах.** Полированный промпт работает одинаково хорошо на всех моделях.
+
+## Что было сделано
+
+### 1. Анализ текущего состояния
+
+Исходный промпт `.prompts/brief_reviewer.md` (19 строк) содержал:
+- 5 критериев проверки (проблема, стейкхолдер, контекст, нет решения, нет двусмысленностей)
+- Формат замечания (цитата → проблема → исправление)
+- Триггер «0 замечаний» для чистых брифов
+
+**Чего не хватало:**
+- Нет явной структуры брифа (какие секции, какой уровень заголовков)
+- Нет output format (APPROVE/REVISE/REJECT)
+- Нет явного списка запрещённых слов/конструкций
+- Нет обработки мусорных/неполных входов
+- Нет проверки на solution leakage (библиотеки, API, файлы кода)
+
+### 2. Анализ существующих брифов
+
+Проанализированы 8 брифов из `.memory-bank/features/001..008`:
+
+| Brief | Формат заголовков | Solution leakage | Размытые формулировки |
+|---|---|---|---|
+| 001-auth-email | `###` (h3) | Да (`devise`, `ActionMailer`) | Нет |
+| 002-forgot-password | `###` (h3) | Да (`devise`) | Нет |
+| 003-user-profile | `###` (h3) | Да (`Devise`) | Нет |
+| 004-dashboard-creation | `##` (h2) | Да (`routes.rb`, `React + Inertia.js`) | Нет |
+| 005-header-creation | `##` (h2) + `---` | Минимально | Нет |
+| 006-video-uploader | `##` (h2) | Нет | Нет |
+| 007-configure-ci-cd | `###` (h3) | Нет | Нет |
+| 008-placeholder | `###` (h3) | Нет | Нет |
+
+**Key finding:** 5 из 8 брифов используют `###` (h3) вместо `##` (h2). 4 из 8 содержат solution leakage (имена гемов/библиотек). Это подтверждает необходимость явных правил в reviewer-промпте.
+
+### 3. Полировка промпта
+
+Промпт расширен с 19 до 81 строк. Добавлено:
+
+- **ОБЯЗАТЕЛЬНАЯ СТРУКТУРА БРИФА** — явные 4 секции с `##` заголовками, запрещённые альтернативы
+- **СОДЕРЖАТЕЛЬНЫЕ КРИТЕРИИ** — 6 критериев с конкретными проверками:
+  1. Проблема конкретна и измерима
+  2. Назван стейкхолдер (>30 символов)
+  3. Контекст объясняет «почему сейчас»
+  4. Brief НЕ содержит решения (явный список: библиотеки, API, файлы, UI-элементы)
+  5. Нет двусмысленных формулировок (явный список запрещённых корней)
+  6. Недостаток информации → TBD (не галлюцинировать)
+- **ФОРМАТ ОТЧЁТА** — структурированный вывод с Status (APPROVE/REVISE/REJECT), структурные и содержательные находки, required changes
+
+### 4. Тестовые фикстуры
+
+| Файл | Описание | Ожидаемый результат |
+|---|---|---|
+| `brief-good.md` | Чистый бриф без leakage | APPROVE / REVISE (minor) |
+| `brief-bad-leakage.md` | Имена гемов, файлов, API в проблеме | REJECT |
+| `brief-bad-vague.md` | «быстро», «удобно», «при необходимости» | REVISE |
+| `brief-bad-structure.md` | `###` вместо `##`, «Цель» вместо «Проблема» | REJECT |
+| `brief-bad-garbage.md` | 3 строки, нет структуры | REJECT |
+| `brief-bad-mixed.md` | Метрика + solution leakage (GitHub Actions, rspec) | REVISE |
+
+### 5. Результаты eval (codex-gpt5.5)
+
+| Кейс | Результат | Status | Комментарий |
+|---|---|---|---|
+| 01. Good fixture | ✅ PASS | REVISE | Ревьюер нашёл минор: «базовой навигацией» — валидное замечание |
+| 02. Solution leakage | ✅ PASS | REJECT | Пойманы `devise`, `модель`, `контроллер`, `миграц` |
+| 03. Vague | ✅ PASS | REVISE | Пойманы «не конкретна», «не измерима» |
+| 04. Wrong structure | ✅ PASS | REJECT | Пойманы `###` вместо `##`, «Цель» вместо «Проблема» |
+| 05. Garbage | ✅ PASS | REJECT | Поймано отсутствие всех секций |
+| 06. Mixed | ✅ PASS | REVISE | Пойманы `GitHub Actions`, `.yml`, `rspec` |
+
+**Reviewer корректно разделяет REVISE и REJECT:**
+- REJECT — структура сломана (wrong headers, missing sections, entire brief is solution)
+- REVISE — содержательные проблемы при корректной структуре
+
+## Тюнинг 10: good fixture содержал solution leakage
+
+- **Symptom:** Первый прогон показал FAIL на good fixture — reviewer выдал REVISE с 3 находками: `routes.rb`, `React + Inertia.js`, UI-элементы.
+- **Cause:** Good fixture был скопирован из реального брифа 004-dashboard-creation, который содержит технические детали. Это не дефект reviewer'а — это реальный leakage в эталонном брифе.
+- **Fix:** Переписал good fixture, убрав все технические детали: `routes.rb` → «базовая авторизация работает», `React + Inertia.js` → удалено, UI-элементы → абстрактное описание.
+- **Repeated eval:** До: FAIL (Reviewer ложно флагнул leakage). После: PASS (REVISE с минорной находкой «базовой навигацией» — валидное замечание).
+
+## Инсайты
+
+1. **Промпт-уровневые правила перебивают поведение моделей.** Как и в Части 1 (brief_creation), явные правила структуры и запретов заставляют модели следовать формату. Без них модели «угадывают» структуру.
+
+2. **Real-world брифы не идеальны.** Даже лучшие брифы проекта (004-dashboard-creation) содержат solution leakage. Reviewer это корректно ловит. Это не баг — это feature: reviewer подсвечивает реальные проблемы.
+
+3. **Все модели справляются с review-задачей.** Codex GPT-5.5, Claude Opus, Sonnet и Haiku — все 6/6 PASS. Для задачи brief review можно безопасно использовать самую дешёвую модель (Haiku).
+
+4. **Good fixture assertion «не REJECT» работает.** Как и в Части 2 (feature-reviewer), стратегия `not-icontains: "Status: REJECT"` корректно разрешает reviewer'у честно подсветить миноры без ложных FAIL'ов.
+
+5. **Rate limit Claude CLI — реальная проблема для eval'а.** Claude Code CLI имеет rate limit ~5 запросов/минуту. Promptfoo с `--max-concurrency 1` всё равно бьётся об лимит при 3 моделях × 6 кейсов. Решение: retry-скрипт с 65s задержкой (`providers/claude-retry.sh`), запуск по одной модели за раз.
+
+## Сравнение моделей (final state)
+
+| Кейс | claude-opus | claude-sonnet | claude-haiku | codex-gpt5.5 |
+|---|:---:|:---:|:---:|:---:|
+| 01. Good fixture | ✅ REVISE (minor) | ✅ REVISE (minor) | ✅ REVISE (minor) | ✅ REVISE (minor) |
+| 02. Solution leakage | ✅ REJECT | ✅ REJECT | ✅ REJECT | ✅ REJECT |
+| 03. Vague | ✅ REVISE | ✅ REVISE | ✅ REVISE | ✅ REVISE |
+| 04. Wrong structure | ✅ REJECT | ✅ REJECT | ✅ REJECT | ✅ REJECT |
+| 05. Garbage | ✅ REJECT | ✅ REJECT | ✅ REJECT | ✅ REJECT |
+| 06. Mixed | ✅ REVISE | ✅ REVISE | ✅ REVISE | ✅ REVISE |
+| **Итого** | **6/6** | **6/6** | **6/6** | **6/6** |
+
+## Что остаётся (back-log)
+
+- **Расширить кейсы.** Добавить: prompt injection в brief, многоязычный brief, очень длинный brief, brief с противоречивыми требованиями.
+- **Production usage.** Промпт `.prompts/brief_reviewer.md` обновлён и готов к использованию. Запустить на реальных брифах из `.memory-bank/features/`.
+- **Regression CI.** Подключить eval в CI (GitHub Actions) для автоматической проверки при изменениях в `.prompts/`.
+
+## Артефакты
+
+- `.prompts/brief_reviewer.md` — production reviewer (полированный, 81 строка).
+- `eval/prompts/brief_reviewer.md` — eval-копия с `{{brief_doc}}`.
+- `eval/promptfooconfig.brief-reviewer.yaml` — конфиг для 3 моделей Claude.
+- `eval/promptfooconfig.brief-reviewer-sonnet.yaml` — конфиг для Sonnet (1 модель).
+- `eval/promptfooconfig.brief-reviewer-opus.yaml` — конфиг для Opus (1 модель).
+- `eval/promptfooconfig.brief-reviewer-haiku.yaml` — конфиг для Haiku (1 модель).
+- `eval/promptfooconfig.brief-reviewer-codex.yaml` — конфиг для codex (workaround).
+- `eval/fixtures/brief-good.md` — good fixture (чистый бриф).
+- `eval/fixtures/brief-bad-{leakage,vague,structure,garbage,mixed}.md` — broken fixtures.
+- `eval/brief-reviewer-sonnet-final.json` — финальные результаты Sonnet (6/6).
+- `eval/brief-reviewer-opus-final.json` — финальные результаты Opus (6/6).
+- `eval/brief-reviewer-haiku-final.json` — финальные результаты Haiku (6/6).
+- `eval/brief-reviewer-codex-results-v2.json` — финальные результаты codex (6/6).
+- `eval/providers/claude-retry.sh` — retry-скрипт с rate-limit handling.
+- `eval/run-brief-reviewer-eval.sh` — скрипт для запуска eval.

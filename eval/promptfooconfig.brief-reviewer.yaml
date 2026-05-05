@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+description: "Eval brief_reviewer.md — ревью брифов на полноту и отсутствие решения (6 кейсов × 3 модели)"
+
+prompts:
+  - file://prompts/brief_reviewer.md
+
+providers:
+  - id: "exec: ./providers/claude-opus.sh"
+    label: claude-opus
+  - id: "exec: ./providers/claude-sonnet.sh"
+    label: claude-sonnet
+  - id: "exec: ./providers/claude-haiku.sh"
+    label: claude-haiku
+
+tests:
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 1: good fixture — допускается REVISE, но НЕ REJECT
+  # ─────────────────────────────────────────────────
+
+  - description: "01. Good fixture (dashboard brief) — допускается REVISE с минорными замечаниями, но НЕ REJECT"
+    vars:
+      brief_doc: file://fixtures/brief-good.md
+    assert:
+      - type: not-icontains
+        value: "Status: REJECT"
+      # Reviewer не должен флагать solution leakage на чистом брифе
+      - type: javascript
+        value: |
+          const leakage = /(библиотек|гем|gem|axios|fetch|devise|omniauth|callback|middleware|API|маршрут|route)/i.test(output);
+          if (leakage) throw new Error('Reviewer ложно флагнул solution leakage на чистом брифе');
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 2: solution leakage — reviewer должен поймать
+  # ─────────────────────────────────────────────────
+
+  - description: "02. Solution leakage — бриф содержит имена гемов, файлов, API. Reviewer должен поймать."
+    vars:
+      brief_doc: file://fixtures/brief-bad-leakage.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил solution leakage — выдал APPROVE');
+          const flagged = /(реш(е|ё)н|реализац|библиотек|гем|gem|devise|omniauth|код|файл|контроллер|модель|миграц|API|маршрут|route|callback|middleware|иконк|кнопк)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул признаки solution leakage');
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 3: размытые формулировки — reviewer должен поймать
+  # ─────────────────────────────────────────────────
+
+  - description: "03. Размытые формулировки — 'быстро', 'удобно', 'при необходимости'. Reviewer должен поймать."
+    vars:
+      brief_doc: file://fixtures/brief-bad-vague.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил размытые формулировки — выдал APPROVE');
+          const flagged = /(размыт|двусмыслен|неоднознач|конкрет|измерим|быстр|удоб|легк|при необходимости|TBD|уточн)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул проблему с размытыми формулировками');
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 4: неправильная структура (### вместо ##)
+  # ─────────────────────────────────────────────────
+
+  - description: "04. Неправильная структура — секции с ### вместо ##. Reviewer должен поймать."
+    vars:
+      brief_doc: file://fixtures/brief-bad-structure.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил неправильную структуру — выдал APPROVE');
+          const flagged = /(заголовк|уровень|##|###|секци|структур|формат|h2|h3)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянал проблему с заголовками/структурой');
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 5: adversarial — мусорный тикет, reviewer должен отметить недостаток информации
+  # ─────────────────────────────────────────────────
+
+  - description: "05. Мусорный бриф — нет конкретики, короткий текст. Reviewer должен отметить недостаток информации."
+    vars:
+      brief_doc: file://fixtures/brief-bad-garbage.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил мусорный бриф — выдал APPROVE');
+          const flagged = /(недостаточ|непонятно|уточн|TBD|неизвестно|не указан|нет данных|нет конкрет|мало информац|требует|не хватает|размыт|неопредел)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не отметил недостаток информации в мусорном брифе');
+          return true;
+
+  # ─────────────────────────────────────────────────
+  # УРОВЕНЬ 6: смешанный — метрика есть + есть solution leakage. Метрика остаётся, решение фильтруется.
+  # ─────────────────────────────────────────────────
+
+  - description: "06. Смешанный бриф — метрика (100% проверок) + solution leakage (GitHub Actions, rspec). Метрика остаётся, leakage фильтруется."
+    vars:
+      brief_doc: file://fixtures/brief-bad-mixed.md
+    assert:
+      - type: not-icontains
+        value: "0 замечаний"
+      - type: javascript
+        value: |
+          if (/^APPROVE/.test(output)) throw new Error('Reviewer пропустил solution leakage в смешанном брифе — выдал APPROVE');
+          // Проверяем что reviewer поймал leakage
+          const flagged = /(реш(е|ё)н|реализац|библиотек|гем|GitHub Actions|workflow|\.yml|runs-on|docker compose|rspec|код|файл)/i.test(output);
+          if (!flagged) throw new Error('Reviewer не упомянул solution leakage в смешанном брифе');
+          return true;

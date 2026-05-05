@@ -1,0 +1,40 @@
+Starting evaluation eval-Qpq-2026-05-05T09:31:46
+Running 6 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────────────────────────[39m[90m┬────────────────────────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m brief_doc                                                  [39m[22m[90m│[39m[1m[34m [claude-sonnet] prompts/brief_reviewer.md: # Brief         [39m[22m[90m│[39m
+[90m│[39m[1m[34m                                                            [39m[22m[90m│[39m[1m[34m Reviewer                                                   [39m[22m[90m│[39m
+[90m│[39m[1m[34m                                                            [39m[22m[90m│[39m[1m[34m Ты — ревьюер бизнес-брифов. Пров...                        [39m[22m[90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-good.md                              [90m│[39m [PASS] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-leakage.md                       [90m│[39m [FAIL] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-vague.md                         [90m│[39m [FAIL] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-structure.md                     [90m│[39m [FAIL] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-garbage.md                       [90m│[39m [FAIL] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m├────────────────────────────────────────────────────────────[39m[90m┼────────────────────────────────────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-mixed.md                         [90m│[39m [FAIL] You've hit your limit · resets 12:30pm              [90m│[39m
+[90m│[39m                                                            [90m│[39m (Europe/Tallinn)                                           [90m│[39m
+[90m└────────────────────────────────────────────────────────────[39m[90m┴────────────────────────────────────────────────────────────┘[39m
+✓ Eval complete (ID: eval-Qpq-2026-05-05T09:31:46)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 1 passed (16.67%)
+  ✗ 5 failed (83.33%)
+  0 errors (0%)
+Duration: 0s (concurrency: 1)
+
+Writing output to brief-reviewer-sonnet-results.json

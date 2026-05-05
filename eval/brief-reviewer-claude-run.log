@@ -1,0 +1,48 @@
+Starting evaluation eval-tHM-2026-05-05T09:30:42
+Running 18 test cases (up to 4 at a time)...
+
+[90m┌──────────────────────────────[39m[90m┬──────────────────────────────[39m[90m┬──────────────────────────────[39m[90m┬──────────────────────────────┐[39m
+[90m│[39m[1m[34m brief_doc                    [39m[22m[90m│[39m[1m[34m [claude-opus]                [39m[22m[90m│[39m[1m[34m [claude-sonnet]              [39m[22m[90m│[39m[1m[34m [claude-haiku]               [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m prompts/brief_reviewer.md: # [39m[22m[90m│[39m[1m[34m prompts/brief_reviewer.md: # [39m[22m[90m│[39m[1m[34m prompts/brief_reviewer.md: # [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m Brief Reviewer               [39m[22m[90m│[39m[1m[34m Brief Reviewer               [39m[22m[90m│[39m[1m[34m Brief Reviewer               [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m Ты — ревьюер бизнес-брифов.  [39m[22m[90m│[39m[1m[34m Ты — ревьюер бизнес-брифов.  [39m[22m[90m│[39m[1m[34m Ты — ревьюер бизнес-брифов.  [39m[22m[90m│[39m
+[90m│[39m[1m[34m                              [39m[22m[90m│[39m[1m[34m Пров...                      [39m[22m[90m│[39m[1m[34m Пров...                      [39m[22m[90m│[39m[1m[34m Пров...                      [39m[22m[90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-good.… [90m│[39m [PASS] You've hit your limit [90m│[39m [PASS] You've hit your limit [90m│[39m [PASS] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-l… [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-v… [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-s… [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-g… [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m├──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────[39m[90m┼──────────────────────────────┤[39m
+[90m│[39m file://fixtures/brief-bad-m… [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m [FAIL] You've hit your limit [90m│[39m
+[90m│[39m                              [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m · resets 12:30pm             [90m│[39m
+[90m│[39m                              [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m (Europe/Tallinn)             [90m│[39m
+[90m└──────────────────────────────[39m[90m┴──────────────────────────────[39m[90m┴──────────────────────────────[39m[90m┴──────────────────────────────┘[39m
+✓ Eval complete (ID: eval-tHM-2026-05-05T09:30:42)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 3 passed (16.67%)
+  ✗ 15 failed (83.33%)
+  0 errors (0%)
+Duration: 0s (concurrency: 4)
+
+Writing output to brief-reviewer-claude-results.json
