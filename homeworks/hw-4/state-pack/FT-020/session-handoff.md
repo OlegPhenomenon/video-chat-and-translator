@@ -1,55 +1,38 @@
 # session-handoff: FT-020
 
-status: paused
+status: closed
 last_run: FT-020-20260505-1058
-updated: 2026-05-05T11:50:00+03:00
-last_green_commit: 793e26b on branch `FT-020-ai-chat`
+updated: 2026-05-05T12:30:00+03:00
+last_green_commit: 749ca66
+pr: https://github.com/OlegPhenomenon/video-chat-and-translator/pull/27
 
-## What is done
+## Outcome
 
-- stage 1 brief-loop: `APPROVE: 0 замечаний, brief готов к spec-loop.`
-- stage 2 spec-loop: `APPROVE: feature=0, plan=0, scope-инвариант PASS`
-- stage 3 implement: `DONE: код в commit 793e26b`
-- stage 4 check: `DONE: lint+typecheck+unit (47/47), evidence в artifacts/ft-020/verify/chk-02,04,05/`
+Большой цикл HW-4 пройден полностью на реальной задаче (issue #19). Финальный статус — **DONE**.
 
-## How to resume
+| Stage | Status |
+|---|---|
+| 1 brief-loop | ✅ APPROVE iter 2 |
+| 2 spec-loop | ✅ APPROVE iter 1 |
+| 3 implement | ✅ commit 793e26b |
+| 4 check | ✅ Vitest 47/47, typecheck OK |
+| **STOP/RESUME** | ✅ commit 3b3fbe0 |
+| 5 smoke | ✅ rubocop 56/56, rspec 68/68 (1 pending), Vite build OK |
+| 6 verify | ✅ EC-01..EC-05 PASS at unit/component (UI Playwright deferred per AG-01) |
+| 7 fix-loop | ✅ skipped (verify clean) |
+| 8 close | ✅ PR #27 created |
 
-Открыть worktree и продолжить с stage 5:
+## Next steps (post-merge)
 
-```bash
-cd .worktrees/FT-020-ai-chat
-homeworks/hw-4/scripts/run-feature.sh \
-  --feature-id FT-020 \
-  --issue https://github.com/OlegPhenomenon/video-chat-and-translator/issues/19 \
-  --from-stage 5
-```
+- Human review PR #27
+- После merge — cleanup ветки и worktree
+- При желании добавить `Gemini`/`OpenRouter`/`DeepSeek`/`Qwen` адаптеры — отдельный delivery-юнит, scope сохранён в `feature.md` `## Non-Scope > NS-01`
 
-Runner прочтёт `state-pack/FT-020/active-context.md` и пойдёт со stage 5 (smoke).
+## Where everything lives
 
-## What to read first on resume
-
-1. `homeworks/hw-4/state-pack/FT-020/active-context.md` — текущее состояние, `last_completed_stage=4`, `next_action=resume from-stage 5`
-2. `homeworks/hw-4/state-pack/FT-020/plan.md` — какие STEP-XX из implementation-plan уже сделаны (✅) и какие pending (⏳)
-3. `.memory-bank/features/FT-020/feature.md` — canonical scope, особенно `## Verify` (EC-XX, CHK-XX, EVID-XX), которые проверяет stage 6
-4. `.memory-bank/features/FT-020/implementation-plan.md` — секция `## Approval Gates` (`AG-01`) и `## Stop Conditions` для stage 5-7
-
-## Where evidence lives
-
-- unit/typecheck (`CHK-02`, `CHK-04`, `CHK-05`): `artifacts/ft-020/verify/chk-02,04,05/`
-- UI/Playwright (`CHK-01`, `CHK-03`, `CHK-06`): `artifacts/ft-020/verify/chk-01,03,06/` — будет заполнено на stage 5-6
-- review: `artifacts/ft-020/reviews/` — пусто, заполнится на stage 8
-
-## Why this stop
-
-Это **обязательный stop/resume** для HW-4 (минимум один в большом цикле). Граница выбрана между «локальный verify зелёный» (stage 4) и «UI evidence на стенде» (stage 5+) — чтобы между сессиями реально менялся контекст: первая сессия — pure-логика и unit-тесты, вторая — UI/E2E на поднятом приложении.
-
-## Resume checklist
-
-- [ ] открыть worktree `.worktrees/FT-020-ai-chat`
-- [ ] прочесть этот файл + active-context.md
-- [ ] поднять стек: `docker compose -f docker/docker-compose.yml up`
-- [ ] запустить `run-feature.sh --from-stage 5` ИЛИ выполнить stage 5-8 inline (в зависимости от наличия zellij)
-- [ ] на stage 5: scripts/test-ci.sh + smoke evidence
-- [ ] на stage 6: пройти EC-01..EC-05, evidence в `artifacts/ft-020/verify/chk-01,03,06/`
-- [ ] на stage 7: только если EC не закрыт, добавить fix STEP-XX в план и пройти 4-6 ещё раз
-- [ ] на stage 8: rebase на main, `gh pr create`, обновить `EVID-PR-01`, финальный handoff `status: closed`
+- spec-pack: `.memory-bank/features/FT-020/{brief,feature,implementation-plan}.md`
+- code: `app/frontend/features/videos/chat/`, `pages/videos/Show.tsx`
+- tests: `spec/frontend/features/videos/chat/`
+- evidence: `artifacts/ft-020/verify/chk-{01..06}/`, `artifacts/ft-020/reviews/pr-created.md`
+- HW-4 trace + report: `homeworks/hw-4/runs/FT-020-20260505-1058/{trace,report}.md`
+- state-pack (этот файл + active-context.md + plan.md): `homeworks/hw-4/state-pack/FT-020/`
