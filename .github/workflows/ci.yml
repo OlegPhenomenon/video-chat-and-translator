@@ -37,10 +37,10 @@ jobs:
           sudo apt-get install -y shellcheck shfmt
 
       - name: Check shell formatting
-        run: shfmt -d scripts/*.sh
+        run: shfmt -d scripts/*.sh homeworks/hw-4/scripts/*.sh
 
       - name: Lint shell scripts
-        run: shellcheck scripts/*.sh
+        run: shellcheck scripts/*.sh homeworks/hw-4/scripts/*.sh
 
   smoke-bootstrap:
     name: Smoke (${{ matrix.os }})

@@ -78,5 +78,10 @@ video_chat_and_translator/landing-screenshot.png
 .start-task-prompt.txt
 .start-task-launch.sh
 
+# === HW-4 transient runner artefacts (keep trace.md / report.md) ===
+homeworks/hw-4/runs/**/.launch-*.sh
+homeworks/hw-4/runs/**/.wrapper-*.sh
+homeworks/hw-4/runs/**/.verdict-*.txt
+
 # === Misc ===
 *.bak
