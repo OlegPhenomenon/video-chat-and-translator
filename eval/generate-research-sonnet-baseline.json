@@ -1,0 +1,728 @@
+{
+  "evalId": "eval-RBE-2026-05-05T10:17:37",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-05-05T10:17:37.230Z",
+    "prompts": [
+      {
+        "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n{{brief_doc}}\n\nКонтекст проекта (что уже реализовано):\n\n{{project_context}}\n",
+        "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+        "id": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "provider": "claude-sonnet",
+        "metrics": {
+          "score": 6,
+          "testPassCount": 6,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 12,
+          "assertFailCount": 0,
+          "totalLatencyMs": 790519,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 6,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 1."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 2."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 3."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 4."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 5."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 6."
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "## 7."
+              }
+            }
+          ]
+        },
+        "id": "ab9f8ba3-8592-4289-991d-aec972560e0a",
+        "latencyMs": 314235,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Система сброса пароля\n\n## Проблема\n\nЗарегистрированный пользователь, забывший пароль, полностью заблокирован — нет возможности восстановить доступ к аккаунту. Это критично: пользователь теряет все свои данные и настройки.\n\n## Для кого\n\nДля зарегистрированных пользователей с подтверждённым email, которые забыли пароль и не могут войти в систему.\n\n## Контекст\n\nСистема авторизации уже реализована через Devise с подтверждением email. Пользователи начали регистрироваться. Отсутствие сброса пароля — блокер для нормального пользования сервисом: при утере пароля единственный путь — создать новый аккаунт.\n\n## Желаемый результат\n\nЗарегистрированный пользователь с подтверждённым email может самостоятельно сбросить пароль через email-ссылку. Для неподтверждённых пользователей сброс пароля недоступен.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Теперь у меня полная картина. Пишу Research-документ.\n\n---\n\n# Research: Система сброса пароля\n\n## 1. Анализ текущего состояния\n\n**Итоговый вывод: система сброса пароля уже полностью реализована.** Brief описывает проблему, которая решена на уровне кода. Ниже — детальный аудит каждого компонента.\n\n| Компонент | Статус | Файл |\n|---|---|---|\n| Devise-модуль `:recoverable` | ✅ Подключён | `app/models/user.rb` |\n| Маршруты (`/users/password/new`, POST, GET/edit, PATCH) | ✅ Есть (через `devise_for`) | `config/routes.rb` |\n| Контроллер `Users::PasswordsController` (new/create/edit/update) | ✅ Полностью кастомизирован под Inertia | `app/controllers/users/passwords_controller.rb` |\n| React-страница `ForgotPassword` | ✅ TypeScript + `useForm` + spinner + inline-ошибки | `app/frontend/pages/auth/ForgotPassword.tsx` |\n| React-страница `ResetPassword` | ✅ `token_state: valid/invalid` + скрытый токен в форме | `app/frontend/pages/auth/ResetPassword.tsx` |\n| HTML email-шаблон | ✅ Кастомизирован, все тексты через i18n | `app/views/devise/mailer/reset_password_instructions.html.erb` |\n| Plain-text email-шаблон (`.text.erb`) | ❌ Отсутствует | — |\n| Ссылка «Забыл пароль?» на странице логина | ✅ `forgot_password_url` передаётся из `SessionsController` | `app/frontend/pages/auth/Login.tsx` строка 105 |\n| Локализация RU (ForgotPassword + ResetPassword + письмо) | ✅ Все ключи заполнены | `config/locales/ru.yml` |\n| Локализация EN | ❌ Только заглушка (`hello: \"Hello world\"`) | `config/locales/en.yml` |\n| Anti-enumeration (одинаковый flash для любого email) | ✅ Реализован вручную в `create` | `app/controllers/users/passwords_controller.rb:23–25` |\n| `reset_password_within = 6.hours` | ✅ | `config/initializers/devise.rb` |\n| Email-доставка async (Sidekiq + `deliver_later`) | ✅ Через `send_devise_notification` | `app/models/user.rb` |\n| Email в development (`letter_opener_web`) | ✅ `delivery_method: :letter_opener_web` | `config/environments/development.rb:43` |\n| SMTP-конфигурация в production | ❌ Закомментирована, `host: \"example.com\"` | `config/environments/production.rb:60–69` |\n| RSpec request specs (сброс через email) | ✅ 14 сценариев | `spec/requests/users/passwords_spec.rb` |\n| RSpec request specs (смена в профиле) | ✅ 6 сценариев | `spec/requests/users/profile/passwords_spec.rb` |\n\n**Что покрыто тестами**: `GET /new`, `POST /create` (confirmed, unconfirmed, non-existent, invalid format, anti-enumeration flash), `GET /edit` (valid/expired/invalid token), `PATCH /update` (success, too short, mismatching, expired, retry after validation error).\n\n---\n\n## 2. Анализ альтернатив\n\nПоскольку система уже реализована, альтернативы рассматриваются только для единственного незакрытого пункта — **конфигурации email в production**.\n\n### 2.1 Доставка email в production\n\n| | **Вариант A: Внешний SMTP-сервис (SendGrid / Postmark / Mailgun)** | **Вариант B: Self-hosted SMTP (Postfix в Docker)** | **Вариант C: AWS SES через SMTP** |\n|---|---|---|---|\n| **Плюсы** | Высокая доставляемость, DKIM/SPF из коробки, bounces/complaints обрабатываются сервисом, бесплатный tier (Postmark 100/день, SendGrid 100/день) | Полный контроль, нет внешних зависимостей | Дёшево при масштабе ($0.10 за 1000 писем), высокая доставляемость, AWS-экосистема |\n| **Минусы** | Внешняя зависимость, API-ключи в credentials | Высокий risk попасть в спам, нужна настройка SPF/DKIM/PTR-записей, поддержка | Нужен AWS-аккаунт, сложнее настройка для малого объёма |\n| **Рекомендация** | ✅ **Этот** — минимальные усилия, максимальная доставляемость | ❌ — риск спама неприемлем для транзакционных писем | Подходит при росте, сейчас избыточно |\n\n**Рекомендация**: Postmark или SendGrid. Оба работают как SMTP-relay — изменения только в `config/environments/production.rb` и Rails credentials. Не требуют изменений в коде контроллеров или модели.\n\n### 2.2 Добавить plain-text email шаблон\n\n| | **Вариант A: Добавить `.text.erb`** | **Вариант B: Оставить только HTML** |\n|---|---|---|\n| **Плюсы** | RFC-совместимость (multipart/alternative), корректное отображение в клиентах без HTML | Меньше файлов для поддержки |\n| **Минусы** | Нужно поддерживать синхронизацию двух шаблонов | Некоторые email-клиенты и антиспам-фильтры предпочитают multipart |\n| **Рекомендация** | ✅ **Этот** — 10 строк кода, снижает риск попадания в спам | ❌ |\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### 3.1 Production SMTP не настроен\n`config/environments/production.rb` содержит закомментированный блок SMTP и placeholder `host: \"example.com\"`. При деплое без настройки:\n- Email не отправляются (Rails по умолчанию молчит при `raise_delivery_errors = false`)\n- Ссылки в письмах будут вести на `example.com` вместо реального домена\n\n### 3.2 Sidekiq как единая точка отказа для email\n`send_devise_notification` использует `deliver_later` → письма уходят через Sidekiq. Если Sidekiq-воркер не запущен или упал:\n- Пользователь получает flash «письмо отправлено» (anti-enumeration), но email не приходит\n- Нет retry-уведомления для пользователя\n\n### 3.3 Токен истекает через 6 часов\nЕсли пользователь откроет письмо после 6 часов — увидит страницу «токен недействителен» и должен запросить новое письмо. UX корректен (`token_state: \"invalid\"` + ссылка на повторный запрос реализована), но пользователь может не понять, почему ссылка не работает, если в письме нет явного указания срока.\n\n### 3.4 Отсутствие rate limiting на `/users/password` (POST)\nНет ограничения на количество запросов сброса пароля. Теоретически можно заспамить confirmed-пользователя письмами о сбросе.\n\n### 3.5 Нет Inertia-пропа с флешем при редиректе\nПосле успешного `create` контроллер делает `redirect_to new_user_password_path, notice:`. Но нет проверки, что `Notice`-компонент отображается на странице ForgotPassword (нужно убедиться, что `AppLayout` или `AuthLayout` рендерит flash через Toast-компонент).\n\n---\n\n## 4. Обоснованный дизайн решения\n\nСистема уже реализована. Ниже — описание существующей архитектуры и два дополнения, необходимых для production-ready состояния.\n\n### 4.1 Существующий поток\n\n```\n[Login.tsx] → \"Забыл пароль?\" → GET /users/password/new\n                                        ↓\n                              ForgotPassword.tsx\n                                        ↓ POST /users/password\n                              Users::PasswordsController#create\n                            ├── invalid email format → render ForgotPassword с errors\n                            └── valid format → user.send_reset_password_instructions (если confirmed)\n                                             → redirect /users/password/new + flash notice\n                                                        ↓ (письмо через Sidekiq)\n                                              [Email] reset_password_instructions.html.erb\n                                                        ↓ ссылка с raw token\n                                              GET /users/password/edit?reset_password_token=TOKEN\n                                                        ↓\n                                              Users::PasswordsController#edit\n                              ├── token invalid/expired → ResetPassword.tsx (token_state: \"invalid\")\n                              └── token valid → ResetPassword.tsx (token_state: \"valid\", token в форме)\n                                                        ↓ PATCH /users/password\n                                              Users::PasswordsController#update\n                              ├── invalid → render ResetPassword с errors (токен сохраняется)\n                              └── success → redirect /users/sign_in + flash notice\n```\n\n### 4.2 Дополнение 1: Production SMTP (`config/environments/production.rb`)\n\n```ruby\n# config/environments/production.rb\nconfig.action_mailer.default_url_options = { host: ENV.fetch(\"APP_HOST\", \"yourdomain.com\") }\nconfig.action_mailer.delivery_method = :smtp\nconfig.action_mailer.perform_deliveries = true\nconfig.action_mailer.raise_delivery_errors = true\nconfig.action_mailer.smtp_settings = {\n  user_name: Rails.application.credentials.dig(:smtp, :user_name),\n  password:  Rails.application.credentials.dig(:smtp, :password),\n  address:   Rails.application.credentials.dig(:smtp, :address),\n  port:      587,\n  authentication: :plain,\n  enable_starttls_auto: true\n}\n```\n\nCredentials добавить через `rails credentials:edit`:\n```yaml\nsmtp:\n  address: smtp.postmarkapp.com\n  user_name: <POSTMARK_TOKEN>\n  password: <POSTMARK_TOKEN>\n```\n\n### 4.3 Дополнение 2: Plain-text email шаблон\n\nНовый файл: `app/views/devise/mailer/reset_password_instructions.text.erb`\n\n```erb\n<%= I18n.t(\"devise.mailer.reset_password_instructions.greeting\", name: @resource.email) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.message\") %>\n\n<%= edit_user_password_url(reset_password_token: @token) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.ignore_message\") %>\n<%= I18n.t(\"devise.mailer.reset_password_instructions.expiry_notice\") %>\n```\n\n### 4.4 Ключи локализации уже существуют\n\nВсе ключи в `config/locales/ru.yml` присутствуют. Новый шаблон `.text.erb` использует те же ключи — дублирования нет.\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| Production SMTP не настроен → письма не доходят | Высокая (сейчас) | Настроить credentials + ENV `APP_HOST` перед деплоем; добавить smoke-test в CI |\n| Sidekiq упал → письмо не отправлено, пользователь не знает | Средняя | Sidekiq retry (по умолчанию 25 попыток); мониторинг Sidekiq в production; Dead Job Queue алерты |\n| `host: \"example.com\"` в письме → ссылка ведёт не туда | Высокая (сейчас) | `ENV.fetch(\"APP_HOST\")` в `default_url_options` |\n| Rate limit отсутствует → спам confirmed-пользователю письмами | Низкая (нет публичного интереса пока) | Добавить `rack-attack` правило на `POST /users/password` (≤5 запросов с IP за 10 мин) |\n| Токен истёк → пользователь не понимает почему | Низкая | В письме уже есть `expiry_notice` («действительна 6 часов»); UX на странице `invalid` с кнопкой «запросить снова» — реализован |\n| Email в спаме | Средняя | Использовать Postmark/SendGrid (SPF/DKIM из коробки); plain-text шаблон |\n\n---\n\n## 6. Тестовая стратегия\n\n### 6.1 Существующее покрытие (RSpec request specs)\n\nФайл `spec/requests/users/passwords_spec.rb` покрывает **14 сценариев**:\n\n| Группа | Сценарии |\n|---|---|\n| `GET /users/password/new` | Успешный рендер страницы |\n| `POST /users/password` | Confirmed user → mail enqueued; Unconfirmed → no mail; Non-existent → no mail; Invalid format → validation error; Anti-enumeration flash идентичен |\n| `GET /users/password/edit` | Valid token; Expired token; Invalid token |\n| `PATCH /users/password` | Success + redirect + password changed; Too short; Mismatching; Expired token; Retry after failed validation (токен не сгорает) |\n| `GET /users/sign_in` | Включает `forgot_password_url` в props |\n\n### 6.2 Что добавить\n\n**Тест для plain-text шаблона** (после его добавления):\n```ruby\n# spec/mailers/devise/mailer_spec.rb\nit \"sends multipart email (html + text)\" do\n  mail = Devise::Mailer.reset_password_instructions(user, token)\n  expect(mail.content_type).to start_with(\"multipart/alternative\")\n  expect(mail.parts.map(&:content_type)).to include(match(\"text/plain\"), match(\"text/html\"))\nend\n```\n\n**Smoke-test для production SMTP** (вне RSpec, вручную при деплое):\n```bash\ndocker compose exec web rails runner \\\n  \"DeviseMailer.reset_password_instructions(User.first, 'test-token').deliver_now\"\n```\n\n**Rate limiting тест** (если будет добавлен `rack-attack`):\n```ruby\nit \"blocks after 5 requests from same IP\" do\n  6.times { post \"/users/password\", params: { user: { email: \"x@x.com\" } } }\n  expect(response.status).to eq(429)\nend\n```\n\n### 6.3 Инструменты\n\n| Цель | Инструмент | Статус |\n|---|---|---|\n| Request specs | RSpec + FactoryBot | ✅ Уже используется |\n| Проверка отправки email | `have_enqueued_mail` (ActiveJob::TestHelper) | ✅ Уже используется |\n| Mailer specs | RSpec mailer type | Нужно добавить для text-шаблона |\n| Интеграционный тест email | `letter_opener_web` в dev | ✅ Настроен |\n\n---\n\n## 7. Итоговая рекомендация\n\n**Система сброса пароля полностью реализована** на уровне кода и покрыта тестами. Все компоненты из Brief присутствуют: Devise `:recoverable`, кастомный контроллер с anti-enumeration, React-страницы `ForgotPassword` и `ResetPassword`, email-шаблон, i18n, ссылка со страницы логина.\n\n**Что делаем:**\n1. Настроить production SMTP в `config/environments/production.rb` + `rails credentials:edit` (Postmark или SendGrid) — **блокер деплоя**\n2. Заменить `host: \"example.com\"` на `ENV.fetch(\"APP_HOST\")` в `config/environments/production.rb`\n3. Добавить `app/views/devise/mailer/reset_password_instructions.text.erb` (10 строк) — улучшает доставляемость\n4. Добавить mailer spec для проверки multipart формата\n\n**Что не делаем сейчас:**\n- Rate limiting (`rack-attack`) — риск низкий на текущем этапе, добавить при необходимости\n- Локализация EN — приложение работает только на RU\n\n**Гемы/библиотеки:** никаких новых не требуется. Postmark/SendGrid подключаются через стандартный SMTP, `letter_opener_web` уже в Gemfile для development."
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "01. Simple brief — все 7 обязательных секций присутствуют",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-simple.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "## 1."
+            },
+            {
+              "type": "contains",
+              "value": "## 2."
+            },
+            {
+              "type": "contains",
+              "value": "## 3."
+            },
+            {
+              "type": "contains",
+              "value": "## 4."
+            },
+            {
+              "type": "contains",
+              "value": "## 5."
+            },
+            {
+              "type": "contains",
+              "value": "## 6."
+            },
+            {
+              "type": "contains",
+              "value": "## 7."
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = output.match(/## 2[\\s\\S]*?(?=\\n## 3|$)/);\nif (!m) throw new Error('Секция \"## 2. Анализ альтернатив\" не найдена');\nconst text = m[0];\nconst hasVariants = /(вариант|variant|подход|option|в[аa]риант\\s*[A-Za-zА-Яа-я0-9])/gi.test(text);\nif (!hasVariants) throw new Error('Нет явных вариантов (A, B, C или Вариант 1, 2)');\nconst hasPros = /(плюс|pro|преимуществ)/i.test(text);\nconst hasCons = /(минус|con|недостат)/i.test(text);\nif (!hasPros || !hasCons) throw new Error('Нет Плюсов/Минусов у альтернатив');\nreturn true;\n"
+              }
+            }
+          ]
+        },
+        "id": "13ea8d93-6a52-4d27-bc55-4c142e067af2",
+        "latencyMs": 1,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Система сброса пароля\n\n## Проблема\n\nЗарегистрированный пользователь, забывший пароль, полностью заблокирован — нет возможности восстановить доступ к аккаунту. Это критично: пользователь теряет все свои данные и настройки.\n\n## Для кого\n\nДля зарегистрированных пользователей с подтверждённым email, которые забыли пароль и не могут войти в систему.\n\n## Контекст\n\nСистема авторизации уже реализована через Devise с подтверждением email. Пользователи начали регистрироваться. Отсутствие сброса пароля — блокер для нормального пользования сервисом: при утере пароля единственный путь — создать новый аккаунт.\n\n## Желаемый результат\n\nЗарегистрированный пользователь с подтверждённым email может самостоятельно сбросить пароль через email-ссылку. Для неподтверждённых пользователей сброс пароля недоступен.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Теперь у меня полная картина. Пишу Research-документ.\n\n---\n\n# Research: Система сброса пароля\n\n## 1. Анализ текущего состояния\n\n**Итоговый вывод: система сброса пароля уже полностью реализована.** Brief описывает проблему, которая решена на уровне кода. Ниже — детальный аудит каждого компонента.\n\n| Компонент | Статус | Файл |\n|---|---|---|\n| Devise-модуль `:recoverable` | ✅ Подключён | `app/models/user.rb` |\n| Маршруты (`/users/password/new`, POST, GET/edit, PATCH) | ✅ Есть (через `devise_for`) | `config/routes.rb` |\n| Контроллер `Users::PasswordsController` (new/create/edit/update) | ✅ Полностью кастомизирован под Inertia | `app/controllers/users/passwords_controller.rb` |\n| React-страница `ForgotPassword` | ✅ TypeScript + `useForm` + spinner + inline-ошибки | `app/frontend/pages/auth/ForgotPassword.tsx` |\n| React-страница `ResetPassword` | ✅ `token_state: valid/invalid` + скрытый токен в форме | `app/frontend/pages/auth/ResetPassword.tsx` |\n| HTML email-шаблон | ✅ Кастомизирован, все тексты через i18n | `app/views/devise/mailer/reset_password_instructions.html.erb` |\n| Plain-text email-шаблон (`.text.erb`) | ❌ Отсутствует | — |\n| Ссылка «Забыл пароль?» на странице логина | ✅ `forgot_password_url` передаётся из `SessionsController` | `app/frontend/pages/auth/Login.tsx` строка 105 |\n| Локализация RU (ForgotPassword + ResetPassword + письмо) | ✅ Все ключи заполнены | `config/locales/ru.yml` |\n| Локализация EN | ❌ Только заглушка (`hello: \"Hello world\"`) | `config/locales/en.yml` |\n| Anti-enumeration (одинаковый flash для любого email) | ✅ Реализован вручную в `create` | `app/controllers/users/passwords_controller.rb:23–25` |\n| `reset_password_within = 6.hours` | ✅ | `config/initializers/devise.rb` |\n| Email-доставка async (Sidekiq + `deliver_later`) | ✅ Через `send_devise_notification` | `app/models/user.rb` |\n| Email в development (`letter_opener_web`) | ✅ `delivery_method: :letter_opener_web` | `config/environments/development.rb:43` |\n| SMTP-конфигурация в production | ❌ Закомментирована, `host: \"example.com\"` | `config/environments/production.rb:60–69` |\n| RSpec request specs (сброс через email) | ✅ 14 сценариев | `spec/requests/users/passwords_spec.rb` |\n| RSpec request specs (смена в профиле) | ✅ 6 сценариев | `spec/requests/users/profile/passwords_spec.rb` |\n\n**Что покрыто тестами**: `GET /new`, `POST /create` (confirmed, unconfirmed, non-existent, invalid format, anti-enumeration flash), `GET /edit` (valid/expired/invalid token), `PATCH /update` (success, too short, mismatching, expired, retry after validation error).\n\n---\n\n## 2. Анализ альтернатив\n\nПоскольку система уже реализована, альтернативы рассматриваются только для единственного незакрытого пункта — **конфигурации email в production**.\n\n### 2.1 Доставка email в production\n\n| | **Вариант A: Внешний SMTP-сервис (SendGrid / Postmark / Mailgun)** | **Вариант B: Self-hosted SMTP (Postfix в Docker)** | **Вариант C: AWS SES через SMTP** |\n|---|---|---|---|\n| **Плюсы** | Высокая доставляемость, DKIM/SPF из коробки, bounces/complaints обрабатываются сервисом, бесплатный tier (Postmark 100/день, SendGrid 100/день) | Полный контроль, нет внешних зависимостей | Дёшево при масштабе ($0.10 за 1000 писем), высокая доставляемость, AWS-экосистема |\n| **Минусы** | Внешняя зависимость, API-ключи в credentials | Высокий risk попасть в спам, нужна настройка SPF/DKIM/PTR-записей, поддержка | Нужен AWS-аккаунт, сложнее настройка для малого объёма |\n| **Рекомендация** | ✅ **Этот** — минимальные усилия, максимальная доставляемость | ❌ — риск спама неприемлем для транзакционных писем | Подходит при росте, сейчас избыточно |\n\n**Рекомендация**: Postmark или SendGrid. Оба работают как SMTP-relay — изменения только в `config/environments/production.rb` и Rails credentials. Не требуют изменений в коде контроллеров или модели.\n\n### 2.2 Добавить plain-text email шаблон\n\n| | **Вариант A: Добавить `.text.erb`** | **Вариант B: Оставить только HTML** |\n|---|---|---|\n| **Плюсы** | RFC-совместимость (multipart/alternative), корректное отображение в клиентах без HTML | Меньше файлов для поддержки |\n| **Минусы** | Нужно поддерживать синхронизацию двух шаблонов | Некоторые email-клиенты и антиспам-фильтры предпочитают multipart |\n| **Рекомендация** | ✅ **Этот** — 10 строк кода, снижает риск попадания в спам | ❌ |\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### 3.1 Production SMTP не настроен\n`config/environments/production.rb` содержит закомментированный блок SMTP и placeholder `host: \"example.com\"`. При деплое без настройки:\n- Email не отправляются (Rails по умолчанию молчит при `raise_delivery_errors = false`)\n- Ссылки в письмах будут вести на `example.com` вместо реального домена\n\n### 3.2 Sidekiq как единая точка отказа для email\n`send_devise_notification` использует `deliver_later` → письма уходят через Sidekiq. Если Sidekiq-воркер не запущен или упал:\n- Пользователь получает flash «письмо отправлено» (anti-enumeration), но email не приходит\n- Нет retry-уведомления для пользователя\n\n### 3.3 Токен истекает через 6 часов\nЕсли пользователь откроет письмо после 6 часов — увидит страницу «токен недействителен» и должен запросить новое письмо. UX корректен (`token_state: \"invalid\"` + ссылка на повторный запрос реализована), но пользователь может не понять, почему ссылка не работает, если в письме нет явного указания срока.\n\n### 3.4 Отсутствие rate limiting на `/users/password` (POST)\nНет ограничения на количество запросов сброса пароля. Теоретически можно заспамить confirmed-пользователя письмами о сбросе.\n\n### 3.5 Нет Inertia-пропа с флешем при редиректе\nПосле успешного `create` контроллер делает `redirect_to new_user_password_path, notice:`. Но нет проверки, что `Notice`-компонент отображается на странице ForgotPassword (нужно убедиться, что `AppLayout` или `AuthLayout` рендерит flash через Toast-компонент).\n\n---\n\n## 4. Обоснованный дизайн решения\n\nСистема уже реализована. Ниже — описание существующей архитектуры и два дополнения, необходимых для production-ready состояния.\n\n### 4.1 Существующий поток\n\n```\n[Login.tsx] → \"Забыл пароль?\" → GET /users/password/new\n                                        ↓\n                              ForgotPassword.tsx\n                                        ↓ POST /users/password\n                              Users::PasswordsController#create\n                            ├── invalid email format → render ForgotPassword с errors\n                            └── valid format → user.send_reset_password_instructions (если confirmed)\n                                             → redirect /users/password/new + flash notice\n                                                        ↓ (письмо через Sidekiq)\n                                              [Email] reset_password_instructions.html.erb\n                                                        ↓ ссылка с raw token\n                                              GET /users/password/edit?reset_password_token=TOKEN\n                                                        ↓\n                                              Users::PasswordsController#edit\n                              ├── token invalid/expired → ResetPassword.tsx (token_state: \"invalid\")\n                              └── token valid → ResetPassword.tsx (token_state: \"valid\", token в форме)\n                                                        ↓ PATCH /users/password\n                                              Users::PasswordsController#update\n                              ├── invalid → render ResetPassword с errors (токен сохраняется)\n                              └── success → redirect /users/sign_in + flash notice\n```\n\n### 4.2 Дополнение 1: Production SMTP (`config/environments/production.rb`)\n\n```ruby\n# config/environments/production.rb\nconfig.action_mailer.default_url_options = { host: ENV.fetch(\"APP_HOST\", \"yourdomain.com\") }\nconfig.action_mailer.delivery_method = :smtp\nconfig.action_mailer.perform_deliveries = true\nconfig.action_mailer.raise_delivery_errors = true\nconfig.action_mailer.smtp_settings = {\n  user_name: Rails.application.credentials.dig(:smtp, :user_name),\n  password:  Rails.application.credentials.dig(:smtp, :password),\n  address:   Rails.application.credentials.dig(:smtp, :address),\n  port:      587,\n  authentication: :plain,\n  enable_starttls_auto: true\n}\n```\n\nCredentials добавить через `rails credentials:edit`:\n```yaml\nsmtp:\n  address: smtp.postmarkapp.com\n  user_name: <POSTMARK_TOKEN>\n  password: <POSTMARK_TOKEN>\n```\n\n### 4.3 Дополнение 2: Plain-text email шаблон\n\nНовый файл: `app/views/devise/mailer/reset_password_instructions.text.erb`\n\n```erb\n<%= I18n.t(\"devise.mailer.reset_password_instructions.greeting\", name: @resource.email) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.message\") %>\n\n<%= edit_user_password_url(reset_password_token: @token) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.ignore_message\") %>\n<%= I18n.t(\"devise.mailer.reset_password_instructions.expiry_notice\") %>\n```\n\n### 4.4 Ключи локализации уже существуют\n\nВсе ключи в `config/locales/ru.yml` присутствуют. Новый шаблон `.text.erb` использует те же ключи — дублирования нет.\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| Production SMTP не настроен → письма не доходят | Высокая (сейчас) | Настроить credentials + ENV `APP_HOST` перед деплоем; добавить smoke-test в CI |\n| Sidekiq упал → письмо не отправлено, пользователь не знает | Средняя | Sidekiq retry (по умолчанию 25 попыток); мониторинг Sidekiq в production; Dead Job Queue алерты |\n| `host: \"example.com\"` в письме → ссылка ведёт не туда | Высокая (сейчас) | `ENV.fetch(\"APP_HOST\")` в `default_url_options` |\n| Rate limit отсутствует → спам confirmed-пользователю письмами | Низкая (нет публичного интереса пока) | Добавить `rack-attack` правило на `POST /users/password` (≤5 запросов с IP за 10 мин) |\n| Токен истёк → пользователь не понимает почему | Низкая | В письме уже есть `expiry_notice` («действительна 6 часов»); UX на странице `invalid` с кнопкой «запросить снова» — реализован |\n| Email в спаме | Средняя | Использовать Postmark/SendGrid (SPF/DKIM из коробки); plain-text шаблон |\n\n---\n\n## 6. Тестовая стратегия\n\n### 6.1 Существующее покрытие (RSpec request specs)\n\nФайл `spec/requests/users/passwords_spec.rb` покрывает **14 сценариев**:\n\n| Группа | Сценарии |\n|---|---|\n| `GET /users/password/new` | Успешный рендер страницы |\n| `POST /users/password` | Confirmed user → mail enqueued; Unconfirmed → no mail; Non-existent → no mail; Invalid format → validation error; Anti-enumeration flash идентичен |\n| `GET /users/password/edit` | Valid token; Expired token; Invalid token |\n| `PATCH /users/password` | Success + redirect + password changed; Too short; Mismatching; Expired token; Retry after failed validation (токен не сгорает) |\n| `GET /users/sign_in` | Включает `forgot_password_url` в props |\n\n### 6.2 Что добавить\n\n**Тест для plain-text шаблона** (после его добавления):\n```ruby\n# spec/mailers/devise/mailer_spec.rb\nit \"sends multipart email (html + text)\" do\n  mail = Devise::Mailer.reset_password_instructions(user, token)\n  expect(mail.content_type).to start_with(\"multipart/alternative\")\n  expect(mail.parts.map(&:content_type)).to include(match(\"text/plain\"), match(\"text/html\"))\nend\n```\n\n**Smoke-test для production SMTP** (вне RSpec, вручную при деплое):\n```bash\ndocker compose exec web rails runner \\\n  \"DeviseMailer.reset_password_instructions(User.first, 'test-token').deliver_now\"\n```\n\n**Rate limiting тест** (если будет добавлен `rack-attack`):\n```ruby\nit \"blocks after 5 requests from same IP\" do\n  6.times { post \"/users/password\", params: { user: { email: \"x@x.com\" } } }\n  expect(response.status).to eq(429)\nend\n```\n\n### 6.3 Инструменты\n\n| Цель | Инструмент | Статус |\n|---|---|---|\n| Request specs | RSpec + FactoryBot | ✅ Уже используется |\n| Проверка отправки email | `have_enqueued_mail` (ActiveJob::TestHelper) | ✅ Уже используется |\n| Mailer specs | RSpec mailer type | Нужно добавить для text-шаблона |\n| Интеграционный тест email | `letter_opener_web` в dev | ✅ Настроен |\n\n---\n\n## 7. Итоговая рекомендация\n\n**Система сброса пароля полностью реализована** на уровне кода и покрыта тестами. Все компоненты из Brief присутствуют: Devise `:recoverable`, кастомный контроллер с anti-enumeration, React-страницы `ForgotPassword` и `ResetPassword`, email-шаблон, i18n, ссылка со страницы логина.\n\n**Что делаем:**\n1. Настроить production SMTP в `config/environments/production.rb` + `rails credentials:edit` (Postmark или SendGrid) — **блокер деплоя**\n2. Заменить `host: \"example.com\"` на `ENV.fetch(\"APP_HOST\")` в `config/environments/production.rb`\n3. Добавить `app/views/devise/mailer/reset_password_instructions.text.erb` (10 строк) — улучшает доставляемость\n4. Добавить mailer spec для проверки multipart формата\n\n**Что не делаем сейчас:**\n- Rate limiting (`rack-attack`) — риск низкий на текущем этапе, добавить при необходимости\n- Локализация EN — приложение работает только на RU\n\n**Гемы/библиотеки:** никаких новых не требуется. Postmark/SendGrid подключаются через стандартный SMTP, `letter_opener_web` уже в Gemfile для development.",
+          "cached": true
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "02. Simple brief — альтернативы содержат ≥2 варианта с Плюсы/Минусы",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-simple.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = output.match(/## 2[\\s\\S]*?(?=\\n## 3|$)/);\nif (!m) throw new Error('Секция \"## 2. Анализ альтернатив\" не найдена');\nconst text = m[0];\nconst hasVariants = /(вариант|variant|подход|option|в[аa]риант\\s*[A-Za-zА-Яа-я0-9])/gi.test(text);\nif (!hasVariants) throw new Error('Нет явных вариантов (A, B, C или Вариант 1, 2)');\nconst hasPros = /(плюс|pro|преимуществ)/i.test(text);\nconst hasCons = /(минус|con|недостат)/i.test(text);\nif (!hasPros || !hasCons) throw new Error('Нет Плюсов/Минусов у альтернатив');\nreturn true;\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "const hasRec = /(рекоменду|recommended|выбран|chosen|итог|вывод|выбор)/i.test(output);\nif (!hasRec) throw new Error('Нет явной рекомендации');\nreturn true;\n"
+              }
+            }
+          ]
+        },
+        "id": "283ed037-dcfa-4188-9328-63980f111b27",
+        "latencyMs": 1,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Система сброса пароля\n\n## Проблема\n\nЗарегистрированный пользователь, забывший пароль, полностью заблокирован — нет возможности восстановить доступ к аккаунту. Это критично: пользователь теряет все свои данные и настройки.\n\n## Для кого\n\nДля зарегистрированных пользователей с подтверждённым email, которые забыли пароль и не могут войти в систему.\n\n## Контекст\n\nСистема авторизации уже реализована через Devise с подтверждением email. Пользователи начали регистрироваться. Отсутствие сброса пароля — блокер для нормального пользования сервисом: при утере пароля единственный путь — создать новый аккаунт.\n\n## Желаемый результат\n\nЗарегистрированный пользователь с подтверждённым email может самостоятельно сбросить пароль через email-ссылку. Для неподтверждённых пользователей сброс пароля недоступен.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Теперь у меня полная картина. Пишу Research-документ.\n\n---\n\n# Research: Система сброса пароля\n\n## 1. Анализ текущего состояния\n\n**Итоговый вывод: система сброса пароля уже полностью реализована.** Brief описывает проблему, которая решена на уровне кода. Ниже — детальный аудит каждого компонента.\n\n| Компонент | Статус | Файл |\n|---|---|---|\n| Devise-модуль `:recoverable` | ✅ Подключён | `app/models/user.rb` |\n| Маршруты (`/users/password/new`, POST, GET/edit, PATCH) | ✅ Есть (через `devise_for`) | `config/routes.rb` |\n| Контроллер `Users::PasswordsController` (new/create/edit/update) | ✅ Полностью кастомизирован под Inertia | `app/controllers/users/passwords_controller.rb` |\n| React-страница `ForgotPassword` | ✅ TypeScript + `useForm` + spinner + inline-ошибки | `app/frontend/pages/auth/ForgotPassword.tsx` |\n| React-страница `ResetPassword` | ✅ `token_state: valid/invalid` + скрытый токен в форме | `app/frontend/pages/auth/ResetPassword.tsx` |\n| HTML email-шаблон | ✅ Кастомизирован, все тексты через i18n | `app/views/devise/mailer/reset_password_instructions.html.erb` |\n| Plain-text email-шаблон (`.text.erb`) | ❌ Отсутствует | — |\n| Ссылка «Забыл пароль?» на странице логина | ✅ `forgot_password_url` передаётся из `SessionsController` | `app/frontend/pages/auth/Login.tsx` строка 105 |\n| Локализация RU (ForgotPassword + ResetPassword + письмо) | ✅ Все ключи заполнены | `config/locales/ru.yml` |\n| Локализация EN | ❌ Только заглушка (`hello: \"Hello world\"`) | `config/locales/en.yml` |\n| Anti-enumeration (одинаковый flash для любого email) | ✅ Реализован вручную в `create` | `app/controllers/users/passwords_controller.rb:23–25` |\n| `reset_password_within = 6.hours` | ✅ | `config/initializers/devise.rb` |\n| Email-доставка async (Sidekiq + `deliver_later`) | ✅ Через `send_devise_notification` | `app/models/user.rb` |\n| Email в development (`letter_opener_web`) | ✅ `delivery_method: :letter_opener_web` | `config/environments/development.rb:43` |\n| SMTP-конфигурация в production | ❌ Закомментирована, `host: \"example.com\"` | `config/environments/production.rb:60–69` |\n| RSpec request specs (сброс через email) | ✅ 14 сценариев | `spec/requests/users/passwords_spec.rb` |\n| RSpec request specs (смена в профиле) | ✅ 6 сценариев | `spec/requests/users/profile/passwords_spec.rb` |\n\n**Что покрыто тестами**: `GET /new`, `POST /create` (confirmed, unconfirmed, non-existent, invalid format, anti-enumeration flash), `GET /edit` (valid/expired/invalid token), `PATCH /update` (success, too short, mismatching, expired, retry after validation error).\n\n---\n\n## 2. Анализ альтернатив\n\nПоскольку система уже реализована, альтернативы рассматриваются только для единственного незакрытого пункта — **конфигурации email в production**.\n\n### 2.1 Доставка email в production\n\n| | **Вариант A: Внешний SMTP-сервис (SendGrid / Postmark / Mailgun)** | **Вариант B: Self-hosted SMTP (Postfix в Docker)** | **Вариант C: AWS SES через SMTP** |\n|---|---|---|---|\n| **Плюсы** | Высокая доставляемость, DKIM/SPF из коробки, bounces/complaints обрабатываются сервисом, бесплатный tier (Postmark 100/день, SendGrid 100/день) | Полный контроль, нет внешних зависимостей | Дёшево при масштабе ($0.10 за 1000 писем), высокая доставляемость, AWS-экосистема |\n| **Минусы** | Внешняя зависимость, API-ключи в credentials | Высокий risk попасть в спам, нужна настройка SPF/DKIM/PTR-записей, поддержка | Нужен AWS-аккаунт, сложнее настройка для малого объёма |\n| **Рекомендация** | ✅ **Этот** — минимальные усилия, максимальная доставляемость | ❌ — риск спама неприемлем для транзакционных писем | Подходит при росте, сейчас избыточно |\n\n**Рекомендация**: Postmark или SendGrid. Оба работают как SMTP-relay — изменения только в `config/environments/production.rb` и Rails credentials. Не требуют изменений в коде контроллеров или модели.\n\n### 2.2 Добавить plain-text email шаблон\n\n| | **Вариант A: Добавить `.text.erb`** | **Вариант B: Оставить только HTML** |\n|---|---|---|\n| **Плюсы** | RFC-совместимость (multipart/alternative), корректное отображение в клиентах без HTML | Меньше файлов для поддержки |\n| **Минусы** | Нужно поддерживать синхронизацию двух шаблонов | Некоторые email-клиенты и антиспам-фильтры предпочитают multipart |\n| **Рекомендация** | ✅ **Этот** — 10 строк кода, снижает риск попадания в спам | ❌ |\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### 3.1 Production SMTP не настроен\n`config/environments/production.rb` содержит закомментированный блок SMTP и placeholder `host: \"example.com\"`. При деплое без настройки:\n- Email не отправляются (Rails по умолчанию молчит при `raise_delivery_errors = false`)\n- Ссылки в письмах будут вести на `example.com` вместо реального домена\n\n### 3.2 Sidekiq как единая точка отказа для email\n`send_devise_notification` использует `deliver_later` → письма уходят через Sidekiq. Если Sidekiq-воркер не запущен или упал:\n- Пользователь получает flash «письмо отправлено» (anti-enumeration), но email не приходит\n- Нет retry-уведомления для пользователя\n\n### 3.3 Токен истекает через 6 часов\nЕсли пользователь откроет письмо после 6 часов — увидит страницу «токен недействителен» и должен запросить новое письмо. UX корректен (`token_state: \"invalid\"` + ссылка на повторный запрос реализована), но пользователь может не понять, почему ссылка не работает, если в письме нет явного указания срока.\n\n### 3.4 Отсутствие rate limiting на `/users/password` (POST)\nНет ограничения на количество запросов сброса пароля. Теоретически можно заспамить confirmed-пользователя письмами о сбросе.\n\n### 3.5 Нет Inertia-пропа с флешем при редиректе\nПосле успешного `create` контроллер делает `redirect_to new_user_password_path, notice:`. Но нет проверки, что `Notice`-компонент отображается на странице ForgotPassword (нужно убедиться, что `AppLayout` или `AuthLayout` рендерит flash через Toast-компонент).\n\n---\n\n## 4. Обоснованный дизайн решения\n\nСистема уже реализована. Ниже — описание существующей архитектуры и два дополнения, необходимых для production-ready состояния.\n\n### 4.1 Существующий поток\n\n```\n[Login.tsx] → \"Забыл пароль?\" → GET /users/password/new\n                                        ↓\n                              ForgotPassword.tsx\n                                        ↓ POST /users/password\n                              Users::PasswordsController#create\n                            ├── invalid email format → render ForgotPassword с errors\n                            └── valid format → user.send_reset_password_instructions (если confirmed)\n                                             → redirect /users/password/new + flash notice\n                                                        ↓ (письмо через Sidekiq)\n                                              [Email] reset_password_instructions.html.erb\n                                                        ↓ ссылка с raw token\n                                              GET /users/password/edit?reset_password_token=TOKEN\n                                                        ↓\n                                              Users::PasswordsController#edit\n                              ├── token invalid/expired → ResetPassword.tsx (token_state: \"invalid\")\n                              └── token valid → ResetPassword.tsx (token_state: \"valid\", token в форме)\n                                                        ↓ PATCH /users/password\n                                              Users::PasswordsController#update\n                              ├── invalid → render ResetPassword с errors (токен сохраняется)\n                              └── success → redirect /users/sign_in + flash notice\n```\n\n### 4.2 Дополнение 1: Production SMTP (`config/environments/production.rb`)\n\n```ruby\n# config/environments/production.rb\nconfig.action_mailer.default_url_options = { host: ENV.fetch(\"APP_HOST\", \"yourdomain.com\") }\nconfig.action_mailer.delivery_method = :smtp\nconfig.action_mailer.perform_deliveries = true\nconfig.action_mailer.raise_delivery_errors = true\nconfig.action_mailer.smtp_settings = {\n  user_name: Rails.application.credentials.dig(:smtp, :user_name),\n  password:  Rails.application.credentials.dig(:smtp, :password),\n  address:   Rails.application.credentials.dig(:smtp, :address),\n  port:      587,\n  authentication: :plain,\n  enable_starttls_auto: true\n}\n```\n\nCredentials добавить через `rails credentials:edit`:\n```yaml\nsmtp:\n  address: smtp.postmarkapp.com\n  user_name: <POSTMARK_TOKEN>\n  password: <POSTMARK_TOKEN>\n```\n\n### 4.3 Дополнение 2: Plain-text email шаблон\n\nНовый файл: `app/views/devise/mailer/reset_password_instructions.text.erb`\n\n```erb\n<%= I18n.t(\"devise.mailer.reset_password_instructions.greeting\", name: @resource.email) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.message\") %>\n\n<%= edit_user_password_url(reset_password_token: @token) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.ignore_message\") %>\n<%= I18n.t(\"devise.mailer.reset_password_instructions.expiry_notice\") %>\n```\n\n### 4.4 Ключи локализации уже существуют\n\nВсе ключи в `config/locales/ru.yml` присутствуют. Новый шаблон `.text.erb` использует те же ключи — дублирования нет.\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| Production SMTP не настроен → письма не доходят | Высокая (сейчас) | Настроить credentials + ENV `APP_HOST` перед деплоем; добавить smoke-test в CI |\n| Sidekiq упал → письмо не отправлено, пользователь не знает | Средняя | Sidekiq retry (по умолчанию 25 попыток); мониторинг Sidekiq в production; Dead Job Queue алерты |\n| `host: \"example.com\"` в письме → ссылка ведёт не туда | Высокая (сейчас) | `ENV.fetch(\"APP_HOST\")` в `default_url_options` |\n| Rate limit отсутствует → спам confirmed-пользователю письмами | Низкая (нет публичного интереса пока) | Добавить `rack-attack` правило на `POST /users/password` (≤5 запросов с IP за 10 мин) |\n| Токен истёк → пользователь не понимает почему | Низкая | В письме уже есть `expiry_notice` («действительна 6 часов»); UX на странице `invalid` с кнопкой «запросить снова» — реализован |\n| Email в спаме | Средняя | Использовать Postmark/SendGrid (SPF/DKIM из коробки); plain-text шаблон |\n\n---\n\n## 6. Тестовая стратегия\n\n### 6.1 Существующее покрытие (RSpec request specs)\n\nФайл `spec/requests/users/passwords_spec.rb` покрывает **14 сценариев**:\n\n| Группа | Сценарии |\n|---|---|\n| `GET /users/password/new` | Успешный рендер страницы |\n| `POST /users/password` | Confirmed user → mail enqueued; Unconfirmed → no mail; Non-existent → no mail; Invalid format → validation error; Anti-enumeration flash идентичен |\n| `GET /users/password/edit` | Valid token; Expired token; Invalid token |\n| `PATCH /users/password` | Success + redirect + password changed; Too short; Mismatching; Expired token; Retry after failed validation (токен не сгорает) |\n| `GET /users/sign_in` | Включает `forgot_password_url` в props |\n\n### 6.2 Что добавить\n\n**Тест для plain-text шаблона** (после его добавления):\n```ruby\n# spec/mailers/devise/mailer_spec.rb\nit \"sends multipart email (html + text)\" do\n  mail = Devise::Mailer.reset_password_instructions(user, token)\n  expect(mail.content_type).to start_with(\"multipart/alternative\")\n  expect(mail.parts.map(&:content_type)).to include(match(\"text/plain\"), match(\"text/html\"))\nend\n```\n\n**Smoke-test для production SMTP** (вне RSpec, вручную при деплое):\n```bash\ndocker compose exec web rails runner \\\n  \"DeviseMailer.reset_password_instructions(User.first, 'test-token').deliver_now\"\n```\n\n**Rate limiting тест** (если будет добавлен `rack-attack`):\n```ruby\nit \"blocks after 5 requests from same IP\" do\n  6.times { post \"/users/password\", params: { user: { email: \"x@x.com\" } } }\n  expect(response.status).to eq(429)\nend\n```\n\n### 6.3 Инструменты\n\n| Цель | Инструмент | Статус |\n|---|---|---|\n| Request specs | RSpec + FactoryBot | ✅ Уже используется |\n| Проверка отправки email | `have_enqueued_mail` (ActiveJob::TestHelper) | ✅ Уже используется |\n| Mailer specs | RSpec mailer type | Нужно добавить для text-шаблона |\n| Интеграционный тест email | `letter_opener_web` в dev | ✅ Настроен |\n\n---\n\n## 7. Итоговая рекомендация\n\n**Система сброса пароля полностью реализована** на уровне кода и покрыта тестами. Все компоненты из Brief присутствуют: Devise `:recoverable`, кастомный контроллер с anti-enumeration, React-страницы `ForgotPassword` и `ResetPassword`, email-шаблон, i18n, ссылка со страницы логина.\n\n**Что делаем:**\n1. Настроить production SMTP в `config/environments/production.rb` + `rails credentials:edit` (Postmark или SendGrid) — **блокер деплоя**\n2. Заменить `host: \"example.com\"` на `ENV.fetch(\"APP_HOST\")` в `config/environments/production.rb`\n3. Добавить `app/views/devise/mailer/reset_password_instructions.text.erb` (10 строк) — улучшает доставляемость\n4. Добавить mailer spec для проверки multipart формата\n\n**Что не делаем сейчас:**\n- Rate limiting (`rack-attack`) — риск низкий на текущем этапе, добавить при необходимости\n- Локализация EN — приложение работает только на RU\n\n**Гемы/библиотеки:** никаких новых не требуется. Postmark/SendGrid подключаются через стандартный SMTP, `letter_opener_web` уже в Gemfile для development.",
+          "cached": true
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "03. Simple brief — есть явная рекомендация с обоснованием",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-simple.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const hasRec = /(рекоменду|recommended|выбран|chosen|итог|вывод|выбор)/i.test(output);\nif (!hasRec) throw new Error('Нет явной рекомендации');\nreturn true;\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "const hasFiles = /app\\/(controllers|models|frontend|views)\\//i.test(output);\nconst hasRoutes = /(GET|POST|PATCH|PUT|DELETE)\\s+\\//i.test(output);\nconst hasGems = /(devise|sidekiq|redis|rspec|inertia|tailwind)/i.test(output);\nif (!hasFiles && !hasRoutes) throw new Error('Нет конкретных файлов или маршрутов в дизайне');\nreturn true;\n"
+              }
+            }
+          ]
+        },
+        "id": "1a6aaa36-aa6e-4acb-ab15-e83c3642498a",
+        "latencyMs": 1,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Система сброса пароля\n\n## Проблема\n\nЗарегистрированный пользователь, забывший пароль, полностью заблокирован — нет возможности восстановить доступ к аккаунту. Это критично: пользователь теряет все свои данные и настройки.\n\n## Для кого\n\nДля зарегистрированных пользователей с подтверждённым email, которые забыли пароль и не могут войти в систему.\n\n## Контекст\n\nСистема авторизации уже реализована через Devise с подтверждением email. Пользователи начали регистрироваться. Отсутствие сброса пароля — блокер для нормального пользования сервисом: при утере пароля единственный путь — создать новый аккаунт.\n\n## Желаемый результат\n\nЗарегистрированный пользователь с подтверждённым email может самостоятельно сбросить пароль через email-ссылку. Для неподтверждённых пользователей сброс пароля недоступен.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Теперь у меня полная картина. Пишу Research-документ.\n\n---\n\n# Research: Система сброса пароля\n\n## 1. Анализ текущего состояния\n\n**Итоговый вывод: система сброса пароля уже полностью реализована.** Brief описывает проблему, которая решена на уровне кода. Ниже — детальный аудит каждого компонента.\n\n| Компонент | Статус | Файл |\n|---|---|---|\n| Devise-модуль `:recoverable` | ✅ Подключён | `app/models/user.rb` |\n| Маршруты (`/users/password/new`, POST, GET/edit, PATCH) | ✅ Есть (через `devise_for`) | `config/routes.rb` |\n| Контроллер `Users::PasswordsController` (new/create/edit/update) | ✅ Полностью кастомизирован под Inertia | `app/controllers/users/passwords_controller.rb` |\n| React-страница `ForgotPassword` | ✅ TypeScript + `useForm` + spinner + inline-ошибки | `app/frontend/pages/auth/ForgotPassword.tsx` |\n| React-страница `ResetPassword` | ✅ `token_state: valid/invalid` + скрытый токен в форме | `app/frontend/pages/auth/ResetPassword.tsx` |\n| HTML email-шаблон | ✅ Кастомизирован, все тексты через i18n | `app/views/devise/mailer/reset_password_instructions.html.erb` |\n| Plain-text email-шаблон (`.text.erb`) | ❌ Отсутствует | — |\n| Ссылка «Забыл пароль?» на странице логина | ✅ `forgot_password_url` передаётся из `SessionsController` | `app/frontend/pages/auth/Login.tsx` строка 105 |\n| Локализация RU (ForgotPassword + ResetPassword + письмо) | ✅ Все ключи заполнены | `config/locales/ru.yml` |\n| Локализация EN | ❌ Только заглушка (`hello: \"Hello world\"`) | `config/locales/en.yml` |\n| Anti-enumeration (одинаковый flash для любого email) | ✅ Реализован вручную в `create` | `app/controllers/users/passwords_controller.rb:23–25` |\n| `reset_password_within = 6.hours` | ✅ | `config/initializers/devise.rb` |\n| Email-доставка async (Sidekiq + `deliver_later`) | ✅ Через `send_devise_notification` | `app/models/user.rb` |\n| Email в development (`letter_opener_web`) | ✅ `delivery_method: :letter_opener_web` | `config/environments/development.rb:43` |\n| SMTP-конфигурация в production | ❌ Закомментирована, `host: \"example.com\"` | `config/environments/production.rb:60–69` |\n| RSpec request specs (сброс через email) | ✅ 14 сценариев | `spec/requests/users/passwords_spec.rb` |\n| RSpec request specs (смена в профиле) | ✅ 6 сценариев | `spec/requests/users/profile/passwords_spec.rb` |\n\n**Что покрыто тестами**: `GET /new`, `POST /create` (confirmed, unconfirmed, non-existent, invalid format, anti-enumeration flash), `GET /edit` (valid/expired/invalid token), `PATCH /update` (success, too short, mismatching, expired, retry after validation error).\n\n---\n\n## 2. Анализ альтернатив\n\nПоскольку система уже реализована, альтернативы рассматриваются только для единственного незакрытого пункта — **конфигурации email в production**.\n\n### 2.1 Доставка email в production\n\n| | **Вариант A: Внешний SMTP-сервис (SendGrid / Postmark / Mailgun)** | **Вариант B: Self-hosted SMTP (Postfix в Docker)** | **Вариант C: AWS SES через SMTP** |\n|---|---|---|---|\n| **Плюсы** | Высокая доставляемость, DKIM/SPF из коробки, bounces/complaints обрабатываются сервисом, бесплатный tier (Postmark 100/день, SendGrid 100/день) | Полный контроль, нет внешних зависимостей | Дёшево при масштабе ($0.10 за 1000 писем), высокая доставляемость, AWS-экосистема |\n| **Минусы** | Внешняя зависимость, API-ключи в credentials | Высокий risk попасть в спам, нужна настройка SPF/DKIM/PTR-записей, поддержка | Нужен AWS-аккаунт, сложнее настройка для малого объёма |\n| **Рекомендация** | ✅ **Этот** — минимальные усилия, максимальная доставляемость | ❌ — риск спама неприемлем для транзакционных писем | Подходит при росте, сейчас избыточно |\n\n**Рекомендация**: Postmark или SendGrid. Оба работают как SMTP-relay — изменения только в `config/environments/production.rb` и Rails credentials. Не требуют изменений в коде контроллеров или модели.\n\n### 2.2 Добавить plain-text email шаблон\n\n| | **Вариант A: Добавить `.text.erb`** | **Вариант B: Оставить только HTML** |\n|---|---|---|\n| **Плюсы** | RFC-совместимость (multipart/alternative), корректное отображение в клиентах без HTML | Меньше файлов для поддержки |\n| **Минусы** | Нужно поддерживать синхронизацию двух шаблонов | Некоторые email-клиенты и антиспам-фильтры предпочитают multipart |\n| **Рекомендация** | ✅ **Этот** — 10 строк кода, снижает риск попадания в спам | ❌ |\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### 3.1 Production SMTP не настроен\n`config/environments/production.rb` содержит закомментированный блок SMTP и placeholder `host: \"example.com\"`. При деплое без настройки:\n- Email не отправляются (Rails по умолчанию молчит при `raise_delivery_errors = false`)\n- Ссылки в письмах будут вести на `example.com` вместо реального домена\n\n### 3.2 Sidekiq как единая точка отказа для email\n`send_devise_notification` использует `deliver_later` → письма уходят через Sidekiq. Если Sidekiq-воркер не запущен или упал:\n- Пользователь получает flash «письмо отправлено» (anti-enumeration), но email не приходит\n- Нет retry-уведомления для пользователя\n\n### 3.3 Токен истекает через 6 часов\nЕсли пользователь откроет письмо после 6 часов — увидит страницу «токен недействителен» и должен запросить новое письмо. UX корректен (`token_state: \"invalid\"` + ссылка на повторный запрос реализована), но пользователь может не понять, почему ссылка не работает, если в письме нет явного указания срока.\n\n### 3.4 Отсутствие rate limiting на `/users/password` (POST)\nНет ограничения на количество запросов сброса пароля. Теоретически можно заспамить confirmed-пользователя письмами о сбросе.\n\n### 3.5 Нет Inertia-пропа с флешем при редиректе\nПосле успешного `create` контроллер делает `redirect_to new_user_password_path, notice:`. Но нет проверки, что `Notice`-компонент отображается на странице ForgotPassword (нужно убедиться, что `AppLayout` или `AuthLayout` рендерит flash через Toast-компонент).\n\n---\n\n## 4. Обоснованный дизайн решения\n\nСистема уже реализована. Ниже — описание существующей архитектуры и два дополнения, необходимых для production-ready состояния.\n\n### 4.1 Существующий поток\n\n```\n[Login.tsx] → \"Забыл пароль?\" → GET /users/password/new\n                                        ↓\n                              ForgotPassword.tsx\n                                        ↓ POST /users/password\n                              Users::PasswordsController#create\n                            ├── invalid email format → render ForgotPassword с errors\n                            └── valid format → user.send_reset_password_instructions (если confirmed)\n                                             → redirect /users/password/new + flash notice\n                                                        ↓ (письмо через Sidekiq)\n                                              [Email] reset_password_instructions.html.erb\n                                                        ↓ ссылка с raw token\n                                              GET /users/password/edit?reset_password_token=TOKEN\n                                                        ↓\n                                              Users::PasswordsController#edit\n                              ├── token invalid/expired → ResetPassword.tsx (token_state: \"invalid\")\n                              └── token valid → ResetPassword.tsx (token_state: \"valid\", token в форме)\n                                                        ↓ PATCH /users/password\n                                              Users::PasswordsController#update\n                              ├── invalid → render ResetPassword с errors (токен сохраняется)\n                              └── success → redirect /users/sign_in + flash notice\n```\n\n### 4.2 Дополнение 1: Production SMTP (`config/environments/production.rb`)\n\n```ruby\n# config/environments/production.rb\nconfig.action_mailer.default_url_options = { host: ENV.fetch(\"APP_HOST\", \"yourdomain.com\") }\nconfig.action_mailer.delivery_method = :smtp\nconfig.action_mailer.perform_deliveries = true\nconfig.action_mailer.raise_delivery_errors = true\nconfig.action_mailer.smtp_settings = {\n  user_name: Rails.application.credentials.dig(:smtp, :user_name),\n  password:  Rails.application.credentials.dig(:smtp, :password),\n  address:   Rails.application.credentials.dig(:smtp, :address),\n  port:      587,\n  authentication: :plain,\n  enable_starttls_auto: true\n}\n```\n\nCredentials добавить через `rails credentials:edit`:\n```yaml\nsmtp:\n  address: smtp.postmarkapp.com\n  user_name: <POSTMARK_TOKEN>\n  password: <POSTMARK_TOKEN>\n```\n\n### 4.3 Дополнение 2: Plain-text email шаблон\n\nНовый файл: `app/views/devise/mailer/reset_password_instructions.text.erb`\n\n```erb\n<%= I18n.t(\"devise.mailer.reset_password_instructions.greeting\", name: @resource.email) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.message\") %>\n\n<%= edit_user_password_url(reset_password_token: @token) %>\n\n<%= I18n.t(\"devise.mailer.reset_password_instructions.ignore_message\") %>\n<%= I18n.t(\"devise.mailer.reset_password_instructions.expiry_notice\") %>\n```\n\n### 4.4 Ключи локализации уже существуют\n\nВсе ключи в `config/locales/ru.yml` присутствуют. Новый шаблон `.text.erb` использует те же ключи — дублирования нет.\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| Production SMTP не настроен → письма не доходят | Высокая (сейчас) | Настроить credentials + ENV `APP_HOST` перед деплоем; добавить smoke-test в CI |\n| Sidekiq упал → письмо не отправлено, пользователь не знает | Средняя | Sidekiq retry (по умолчанию 25 попыток); мониторинг Sidekiq в production; Dead Job Queue алерты |\n| `host: \"example.com\"` в письме → ссылка ведёт не туда | Высокая (сейчас) | `ENV.fetch(\"APP_HOST\")` в `default_url_options` |\n| Rate limit отсутствует → спам confirmed-пользователю письмами | Низкая (нет публичного интереса пока) | Добавить `rack-attack` правило на `POST /users/password` (≤5 запросов с IP за 10 мин) |\n| Токен истёк → пользователь не понимает почему | Низкая | В письме уже есть `expiry_notice` («действительна 6 часов»); UX на странице `invalid` с кнопкой «запросить снова» — реализован |\n| Email в спаме | Средняя | Использовать Postmark/SendGrid (SPF/DKIM из коробки); plain-text шаблон |\n\n---\n\n## 6. Тестовая стратегия\n\n### 6.1 Существующее покрытие (RSpec request specs)\n\nФайл `spec/requests/users/passwords_spec.rb` покрывает **14 сценариев**:\n\n| Группа | Сценарии |\n|---|---|\n| `GET /users/password/new` | Успешный рендер страницы |\n| `POST /users/password` | Confirmed user → mail enqueued; Unconfirmed → no mail; Non-existent → no mail; Invalid format → validation error; Anti-enumeration flash идентичен |\n| `GET /users/password/edit` | Valid token; Expired token; Invalid token |\n| `PATCH /users/password` | Success + redirect + password changed; Too short; Mismatching; Expired token; Retry after failed validation (токен не сгорает) |\n| `GET /users/sign_in` | Включает `forgot_password_url` в props |\n\n### 6.2 Что добавить\n\n**Тест для plain-text шаблона** (после его добавления):\n```ruby\n# spec/mailers/devise/mailer_spec.rb\nit \"sends multipart email (html + text)\" do\n  mail = Devise::Mailer.reset_password_instructions(user, token)\n  expect(mail.content_type).to start_with(\"multipart/alternative\")\n  expect(mail.parts.map(&:content_type)).to include(match(\"text/plain\"), match(\"text/html\"))\nend\n```\n\n**Smoke-test для production SMTP** (вне RSpec, вручную при деплое):\n```bash\ndocker compose exec web rails runner \\\n  \"DeviseMailer.reset_password_instructions(User.first, 'test-token').deliver_now\"\n```\n\n**Rate limiting тест** (если будет добавлен `rack-attack`):\n```ruby\nit \"blocks after 5 requests from same IP\" do\n  6.times { post \"/users/password\", params: { user: { email: \"x@x.com\" } } }\n  expect(response.status).to eq(429)\nend\n```\n\n### 6.3 Инструменты\n\n| Цель | Инструмент | Статус |\n|---|---|---|\n| Request specs | RSpec + FactoryBot | ✅ Уже используется |\n| Проверка отправки email | `have_enqueued_mail` (ActiveJob::TestHelper) | ✅ Уже используется |\n| Mailer specs | RSpec mailer type | Нужно добавить для text-шаблона |\n| Интеграционный тест email | `letter_opener_web` в dev | ✅ Настроен |\n\n---\n\n## 7. Итоговая рекомендация\n\n**Система сброса пароля полностью реализована** на уровне кода и покрыта тестами. Все компоненты из Brief присутствуют: Devise `:recoverable`, кастомный контроллер с anti-enumeration, React-страницы `ForgotPassword` и `ResetPassword`, email-шаблон, i18n, ссылка со страницы логина.\n\n**Что делаем:**\n1. Настроить production SMTP в `config/environments/production.rb` + `rails credentials:edit` (Postmark или SendGrid) — **блокер деплоя**\n2. Заменить `host: \"example.com\"` на `ENV.fetch(\"APP_HOST\")` в `config/environments/production.rb`\n3. Добавить `app/views/devise/mailer/reset_password_instructions.text.erb` (10 строк) — улучшает доставляемость\n4. Добавить mailer spec для проверки multipart формата\n\n**Что не делаем сейчас:**\n- Rate limiting (`rack-attack`) — риск низкий на текущем этапе, добавить при необходимости\n- Локализация EN — приложение работает только на RU\n\n**Гемы/библиотеки:** никаких новых не требуется. Postmark/SendGrid подключаются через стандартный SMTP, `letter_opener_web` уже в Gemfile для development.",
+          "cached": true
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "04. Simple brief — дизайн содержит конкретные файлы/маршруты/компоненты",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-simple.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const hasFiles = /app\\/(controllers|models|frontend|views)\\//i.test(output);\nconst hasRoutes = /(GET|POST|PATCH|PUT|DELETE)\\s+\\//i.test(output);\nconst hasGems = /(devise|sidekiq|redis|rspec|inertia|tailwind)/i.test(output);\nif (!hasFiles && !hasRoutes) throw new Error('Нет конкретных файлов или маршрутов в дизайне');\nreturn true;\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "const m = output.match(/## 3[\\s\\S]*?(?=\\n## 4|$)/);\nif (!m) throw new Error('Секция \"## 3. Анализ узких мест и рисков\" не найдена');\nconst text = m[0];\n// Проверяем что риски конкретные (упоминают технологии, лимиты, сценарии)\nconst concrete = /(quota|IndexedDB|localStorage|base64|память|memory|blob|File|размер|size|лимит|limit|ошибка|error|fallback)/i.test(text);\nif (!concrete) throw new Error('Риски слишком общие — нет конкретных технологий/сценариев');\nreturn true;\n"
+              }
+            }
+          ]
+        },
+        "id": "1bc338af-b3db-41b3-ad5d-59137c90a6e8",
+        "latencyMs": 301554,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Загрузка видео и доступ к ранее загруженным видео\n\n## Проблема\n\nВ приложении отсутствует точка входа в ключевой пользовательский сценарий: авторизованный пользователь не может загрузить ни одного видео для дальнейшей работы с сервисом. 100% авторизованных пользователей не имеют интерфейса для загрузки видеофайла. Пока этот сценарий отсутствует, продукт не даёт пользователю начать основную работу с видео.\n\n## Для кого\n\nАвторизованные пользователи, которые хотят загрузить своё видео в приложение как первый шаг перед дальнейшей работой с ним.\n\n## Контекст\n\nВ проекте уже есть базовая инфраструктура: аутентификация, профиль, дашборд и навигация. Однако основной сценарий продукта, связанный с пользовательским видео, ещё не представлен в интерфейсе. Это важно сейчас, потому что без возможности загрузить видео пользовательский контур остаётся подготовительным.\n\n## Желаемый результат\n\nАвторизованный пользователь может загрузить видеофайл, после чего загруженное видео остаётся доступным в том же браузере на том же устройстве после перезагрузки страницы. Пользователь видит все ранее загруженные видео и может открыть любое из них для воспроизведения.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Анализ завершён. Пишу Research документ.\n\n---\n\n# Research: Загрузка видео и доступ к ранее загруженным видео\n\n## 1. Анализ текущего состояния\n\n### Ключевое открытие\n\nВопреки формулировке Brief («пользователь не может загрузить ни одного видео»), **клиентская реализация уже существует** в кодовой базе. Вся фича реализована через IndexedDB без участия сервера.\n\n### Что уже есть\n\n| Что | Файл | Детали |\n|---|---|---|\n| IndexedDB storage layer | `app/frontend/features/videos/storage.ts` | `saveVideo()`, `listVideos()`, `findVideo()`, `setSubtitles()`, `StorageError` с кодами |\n| Страница списка + загрузки | `app/frontend/pages/videos/Index.tsx` | `<input type=\"file\" accept=\"video/*\">`, сохранение через `saveVideo()`, список с датой/размером |\n| Страница просмотра | `app/frontend/pages/videos/Show.tsx` | `findVideo(id)` + `URL.createObjectURL()`, `<video>`, субтитры, транскрипция, чат |\n| Маршруты | `config/routes.rb` | `resources :videos, only: [:index, :show]` |\n| Контроллер | `app/controllers/videos_controller.rb` | `#index` → `videos/Index`, `#show` → `videos/Show` с `props: { id: params[:id] }` |\n| Навигация | `app/frontend/components/Header.tsx` | Ссылка «Видео» → `/videos` |\n| Dashboard | `app/frontend/pages/Dashboard.tsx` | Карточка «Видеотека» → `/videos` |\n| Аутентификация | `app/controllers/application_controller.rb` | `before_action :authenticate_user!` глобально |\n\n### Чего нет (серверная сторона)\n\n| Чего нет | Следствие |\n|---|---|\n| Модели `Video` | Видео не привязаны к аккаунту в БД |\n| Миграций для `videos` / Active Storage таблиц | Нет серверного хранилища |\n| `VideosController#create`, `#destroy` | Сервер не принимает файлы |\n| Active Storage config (`storage.yml`) | Не сконфигурирован |\n| Ключей `ru.yml` для раздела `videos` | Тексты UI хардкодом в TSX |\n| `aws-sdk-s3` / `google-cloud-storage` в Gemfile | Cloud-хранилище не настроено |\n\n### Диагноз\n\nПользователь **технически может** загрузить видео прямо сейчас: зайти на `/videos`, выбрать файл, смотреть. После перезагрузки страницы видео **остаётся** в IndexedDB. Проблема Brief описывает либо состояние до появления этого кода, либо речь идёт о нефункциональных пробелах (ошибки, edge cases, отсутствие i18n, не протестировано).\n\n---\n\n## 2. Анализ альтернатив\n\n### Вариант A: Полностью клиентский (IndexedDB) — текущий подход\n\n**Как работает:** Файл остаётся в браузере. Rails только рендерит Inertia-страницы и аутентифицирует. Видео по UUID хранится в IndexedDB object store `videos`.\n\n| | |\n|---|---|\n| **Плюсы** | Уже реализован. Нулевые затраты на хранилище. Нет latency при загрузке (всё локально). Не нужны Active Storage, S3, миграции. Работает без сети после первой загрузки. |\n| **Минусы** | Видео привязаны к браузеру, не к аккаунту. Потеря при очистке данных браузера / смене браузера. Квота: Chrome ~80% свободного диска, Firefox ~50%, Safari жёстче. Нет защиты от потери данных. Нельзя поделиться видео по ссылке между устройствами. |\n\n### Вариант B: Серверное хранение (Active Storage + PostgreSQL + cloud)\n\n**Как работает:** Файлы загружаются на сервер через `POST /videos`. Active Storage хранит blob на S3/GCS. Модель `Video belongs_to :user`. Список видео отдаётся через props в Inertia.\n\n| | |\n|---|---|\n| **Плюсы** | Видео привязаны к аккаунту, доступны с любого устройства. Надёжное хранение. Возможность обработки на сервере (Sidekiq: транскрибация, конвертация). Аналитика. |\n| **Минусы** | Требует: `Video` модель + миграция, Active Storage таблицы (3 миграции), `aws-sdk-s3` в Gemfile, `storage.yml`, `VideosController#create`, прогресс загрузки на фронте. Стоимость хранилища. Latency при загрузке и воспроизведении. Минимум 2-3 дня работы. |\n\n### Вариант C: Гибридный (IndexedDB + серверный манифест)\n\n**Как работает:** Файлы в IndexedDB, но метаданные (id, name, size, createdAt) синхронизируются с сервером. Позволяет видеть «список» с другого устройства, но файл всё равно нужно скачать.\n\n| | |\n|---|---|\n| **Плюсы** | Меньше объём серверной работы, чем Вариант B. Устойчивее к очистке браузера (манифест на сервере). |\n| **Минусы** | Усложняет архитектуру без явной ценности: файл всё равно доступен только в браузере где загружен. Противоречит YAGNI. |\n\n### Рекомендация\n\n**Вариант A** — единственный обоснованный выбор для данного Brief.\n\nОбоснование: Brief явно ограничивает требования фразой «в том же браузере на том же устройстве после перезагрузки страницы». IndexedDB технически удовлетворяет этому требованию. Клиентская реализация **уже существует**. Вариант B решает проблему, которую Brief не ставит (кросс-устройственный доступ), и требует в 5-10 раз больше работы. Задача текущего этапа — завершить и hardened-сделать клиентскую реализацию.\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### Квота IndexedDB\n\nБраузеры выделяют квоту на origin динамически:\n- Chrome/Edge: до 80% свободного места на диске\n- Firefox: до 50% свободного места\n- Safari: начинает с 1 ГБ, расширяется по запросу\n\nДля видеофайлов (типичный размер 100 МБ – 2 ГБ) это реальный edge case. `StorageError` с кодом `quota_exceeded` уже обрабатывается в `storage.ts`, но `Index.tsx` должен показывать понятное сообщение пользователю.\n\n### Производительность при большом количестве видео\n\n`listVideos()` возвращает все записи целиком включая поле `file: File`. При десятках видео по 1+ ГБ это не проблема (File — lazy), но нужно убедиться, что список не материализует файлы в память.\n\n### Потеря данных\n\nПользователи могут случайно очистить данные сайта в браузере — все видео исчезнут без предупреждения. Нет механизма резервного копирования.\n\n### Безопасность\n\n`authenticate_user!` глобально в `ApplicationController` закрывает `/videos` и `/videos/:id` от неавторизованных. Это корректно. Но один пользователь может открыть `/videos/UUID-другого-пользователя` — сервер вернёт страницу (так как контроллер не проверяет принадлежность), а React скажет «видео не найдено» (оно в чужом IndexedDB). Это не security issue (файл недоступен), но UX неоднозначен.\n\n### UUID collision\n\n`crypto.randomUUID()` — стандарт, коллизии практически исключены. Не риск.\n\n---\n\n## 4. Обоснованный дизайн решения\n\n### Архитектура (подтверждение текущей)\n\n```\nBrowser                              Rails Server\n──────────────────────────────────   ──────────────────────────\n[User] → file input                  GET /videos\n         ↓                           → VideosController#index\n    saveVideo(file)                  → render inertia 'videos/Index'\n         ↓\n    IndexedDB                        GET /videos/:id\n    {id, name, size, file, ...}      → VideosController#show\n         ↓                           → render inertia 'videos/Show'\n    listVideos() → Index.tsx           props: { id: params[:id] }\n         ↓\n    findVideo(id) → Show.tsx\n         ↓\n    URL.createObjectURL → <video>\n```\n\nСервер не хранит файлы. Rails — stateless Inertia-рендерер + аутентификация.\n\n### Существующие файлы (не нужно создавать заново)\n\n| Файл | Статус | Что потенциально нужно доделать |\n|---|---|---|\n| `app/frontend/features/videos/storage.ts` | Готов | Проверить обработку `quota_exceeded` в вызывающем коде |\n| `app/frontend/pages/videos/Index.tsx` | Готов | Добавить понятное сообщение при `quota_exceeded`; добавить лимит на тип/размер файла в UI |\n| `app/frontend/pages/videos/Show.tsx` | Готов | Обработка `null` из `findVideo()` (видео не найдено) |\n| `app/controllers/videos_controller.rb` | Готов | Не требует изменений |\n| `config/routes.rb` | Готов | `resources :videos, only: [:index, :show]` достаточно |\n\n### Что нужно добавить\n\n**1. i18n для videos** — `config/locales/ru.yml`:\n\n```yaml\nru:\n  videos:\n    index:\n      title: \"Видеотека\"\n      upload_label: \"Загрузить видео\"\n      empty_state: \"Вы ещё не загружали видео\"\n      open_link: \"Смотреть\"\n      size_label: \"Размер\"\n      date_label: \"Добавлено\"\n    show:\n      not_found: \"Видео не найдено\"\n      not_found_hint: \"Возможно, данные браузера были очищены\"\n    errors:\n      unsupported_browser: \"Ваш браузер не поддерживает хранение видео\"\n      quota_exceeded: \"Недостаточно места в браузере. Удалите старые видео.\"\n      invalid_format: \"Выберите файл в формате видео\"\n```\n\n**2. Проброс i18n в React** — через `inertia_share` в `ApplicationController` добавить нужные строки или использовать react-i18n с JSON-файлом.\n\n**3. Обработка quota_exceeded в `Index.tsx`**:\n```tsx\n// В обработчике onFileChange:\n} catch (err) {\n  if (err instanceof StorageError && err.code === 'quota_exceeded') {\n    setError(t('videos.errors.quota_exceeded'))\n  }\n}\n```\n\n**4. Обработка not found в `Show.tsx`**:\n```tsx\n// Если findVideo(id) возвращает null:\nif (!video) {\n  return <NotFoundState message={t('videos.show.not_found')} hint={t('videos.show.not_found_hint')} />\n}\n```\n\n### Потоки пользователя\n\n**Загрузка видео:**\n```\n/videos → клик \"Загрузить видео\" → file picker\n→ валидация (video/* && size check)\n→ saveVideo(file) → IndexedDB\n→ redirect /videos/:uuid → Show.tsx → playback\n```\n\n**Список видео:**\n```\n/videos → listVideos() из IndexedDB\n→ отрисовка карточек с именем, размером, датой\n→ клик \"Смотреть\" → /videos/:uuid\n```\n\n**Перезагрузка страницы:**\n```\n/videos/:uuid → Show.tsx → findVideo(id) → IndexedDB\n→ видео найдено (IndexedDB персистентен) → playback\n```\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| `quota_exceeded` при загрузке большого файла (>1 ГБ) | Средняя | В `Index.tsx` показывать размер файла и предупреждение. Ловить `StorageError.quota_exceeded`, показывать `videos.errors.quota_exceeded`. |\n| Пользователь очищает данные браузера → потеря всех видео | Низкая (не по сценарию) | Предупреждение в UI: «Видео хранятся только в этом браузере». |\n| Safari: квота 1 ГБ по умолчанию, не расширяется без явного запроса | Средняя | Предупреждение при `quota_exceeded` с текстом про Safari. |\n| `IndexedDB.open()` блокирован в private mode (Safari) | Низкая | `StorageError.unsupported` уже обрабатывается. Показывать `videos.errors.unsupported_browser`. |\n| Невалидный UUID в URL (`/videos/not-a-uuid`) | Низкая | `findVideo()` вернёт `undefined`, Show покажет not-found state. |\n| Видео не воспроизводится: неподдерживаемый кодек | Средняя | `<video>` браузера сам покажет ошибку. Можно добавить `onError` обработчик с понятным сообщением. |\n\n---\n\n## 6. Тестовая стратегия\n\n### Backend (RSpec)\n\nФайлы: `spec/requests/videos_spec.rb`\n\n```ruby\n# Доступ к /videos требует авторизации\ndescribe 'GET /videos' do\n  context 'when not authenticated' do\n    it 'redirects to login' do\n      get videos_path\n      expect(response).to redirect_to(new_user_session_path)\n    end\n  end\n\n  context 'when authenticated' do\n    it 'renders videos/Index inertia page' do\n      sign_in user\n      get videos_path\n      expect(response).to have_http_status(:ok)\n      expect(inertia.component).to eq('videos/Index')\n    end\n  end\nend\n\ndescribe 'GET /videos/:id' do\n  context 'when authenticated' do\n    it 'renders videos/Show with id prop' do\n      sign_in user\n      get video_path('some-uuid')\n      expect(inertia.props[:id]).to eq('some-uuid')\n    end\n  end\nend\n```\n\nИнструмент: `inertia_rails` предоставляет тест-хелперы через `inertia_rails-rspec`.\n\n### Frontend (Vitest)\n\nVitest не упомянут в Brief/контексте, но Vite 8 поставляется с ним.\n\nФайлы: `app/frontend/features/videos/storage.test.ts`\n\n```typescript\n// Мок IndexedDB: fake-indexeddb\nimport { saveVideo, listVideos, findVideo } from './storage'\n\ntest('saveVideo persists file and returns record', async () => {\n  const file = new File(['data'], 'test.mp4', { type: 'video/mp4' })\n  const record = await saveVideo(file)\n  expect(record.id).toBeDefined()\n  expect(record.name).toBe('test.mp4')\n})\n\ntest('listVideos returns saved videos sorted by date', async () => {\n  // ...\n})\n\ntest('findVideo returns null for unknown id', async () => {\n  const result = await findVideo('nonexistent-id')\n  expect(result).toBeNull()\n})\n```\n\nЗависимость для мока IndexedDB: [`fake-indexeddb`](https://github.com/dumbmatter/fakeIndexedDB) — лёгкий in-memory мок, не требует браузера.\n\n### E2E (Playwright)\n\nОпционально. Playwright уже упомянут в SuperClaude-конфиге. Сценарий:\n\n```typescript\ntest('upload and view video', async ({ page }) => {\n  await page.goto('/videos')\n  const [fileChooser] = await Promise.all([\n    page.waitForEvent('filechooser'),\n    page.click('[data-testid=\"upload-button\"]')\n  ])\n  await fileChooser.setFiles('fixtures/sample.mp4')\n  await expect(page).toHaveURL(/\\/videos\\/[0-9a-f-]+/)\n  await page.reload()\n  await expect(page.locator('video')).toBeVisible()\n})\n```\n\n---\n\n## 7. Итоговая рекомендация\n\n### Что делаем\n\nКлиентская реализация (IndexedDB) уже существует и **полностью закрывает требования Brief**: загрузка, список, воспроизведение, персистентность в том же браузере после перезагрузки. Задача — завершить и укрепить реализацию:\n\n1. **Добавить i18n** (`ru.yml`) для всех текстов раздела `videos`\n2. **Добавить обработку `quota_exceeded`** в `Index.tsx` с понятным UI-сообщением\n3. **Добавить not-found state** в `Show.tsx` для несуществующих UUID\n4. **Написать RSpec-тесты** для `GET /videos` и `GET /videos/:id` (аутентификация, inertia props)\n5. **Написать unit-тесты** для `storage.ts` через `fake-indexeddb`\n\n### Чего не делаем\n\n- **Не добавляем серверное хранение видео** — Brief не требует кросс-устройственного доступа; Active Storage + S3 + Video модель + миграции выходят за рамки задачи\n- **Не добавляем upload progress через XMLHttpRequest** — загрузка в IndexedDB не требует HTTP\n- **Не добавляем CarrierWave / Shrine** — нет серверной загрузки файлов\n\n### Гемы и библиотеки\n\n| Компонент | Решение | Обоснование |\n|---|---|---|\n| Серверное хранение | Не нужно | Brief ограничен «тем же браузером» |\n| Клиентское хранение | IndexedDB (уже есть) | Встроен в браузер, `storage.ts` готов |\n| Frontend тесты | `fake-indexeddb` (npm) | Лёгкий мок для Vitest без браузера |\n| Backend тесты | RSpec + `inertia_rails-rspec` | Уже в проекте |\n| i18n | `ru.yml` (уже есть) | Просто добавить ключи `videos.*` |"
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "05. Complex brief — риски содержат конкретные сценарии, не общие слова",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-complex.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "const m = output.match(/## 3[\\s\\S]*?(?=\\n## 4|$)/);\nif (!m) throw new Error('Секция \"## 3. Анализ узких мест и рисков\" не найдена');\nconst text = m[0];\n// Проверяем что риски конкретные (упоминают технологии, лимиты, сценарии)\nconst concrete = /(quota|IndexedDB|localStorage|base64|память|memory|blob|File|размер|size|лимит|limit|ошибка|error|fallback)/i.test(text);\nif (!concrete) throw new Error('Риски слишком общие — нет конкретных технологий/сценариев');\nreturn true;\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-complex.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "// При мусорном brief research должен либо отметить недостаток инфо,\n// либо заполнить TBD, либо запросить уточнения.\n// НЕ должен галлюцинировать сложную архитектуру без основания.\nconst hasTBD = /TBD/i.test(output);\nconst hasNote = /(недостаточ|уточн|требует|не хватает|нет данных|не указан|неопредел|sparse|limited information)/i.test(output);\nconst isShort = output.length < 3000; // Если мусорный brief — research не должен быть на 500 строк\nif (!hasTBD && !hasNote && !isShort) throw new Error('Research не отметил недостаток информации в мусорном brief — возможна галлюцинация');\nreturn true;\n"
+              }
+            }
+          ]
+        },
+        "id": "e0b01676-8dda-4957-acd4-2e0a6f2b9798",
+        "latencyMs": 174727,
+        "namedScores": {},
+        "prompt": {
+          "raw": "# Generate Research\n\nПроблема из Brief понятна. Решение неочевидно. Проведи исследование и подготовь обоснованный дизайн решения для следующего этапа (Spec).\n\n## ОБЯЗАТЕЛЬНАЯ СТРУКТУРА RESEARCH\n\nДокумент ДОЛЖЕН содержать эти секции в этом порядке:\n\n1. `## 1. Анализ текущего состояния` — таблица «Что уже есть» / «Чего нет» в проекте. Конкретные файлы, гемы, маршруты. Не общие слова.\n2. `## 2. Анализ альтернатив` — для каждого решения ≥2 варианта с Плюсы/Минусы. Один вариант — рекомендация с обоснованием.\n3. `## 3. Анализ узких мест и рисков` — что может сломаться, quota, edge cases, зависимости.\n4. `## 4. Обоснованный дизайн решения` — архитектура, потоки, модель данных. Конкретные файлы/маршруты/компоненты.\n5. `## 5. Риски и митигации` — таблица Риск/Вероятность/Митигация.\n6. `## 6. Тестовая стратегия` — какие тесты нужны, какие инструменты.\n7. `## 7. Итоговая рекомендация` — краткое резюме: что делаем, чего не делаем, какие гемы/библиотеки.\n\n## ПРАВИЛА КАЧЕСТВА\n\n1. **Конкретика, не общие слова.** Каждый пункт должен ссылаться на конкретный файл, гем, маршрут, API или компонент. «Нужно добавить контроллер» — плохо. «Добавить `Users::ProfileController#show` в `app/controllers/users/profile_controller.rb`» — хорошо.\n\n2. **Альтернативы обоснованы.** Для каждого варианта: Плюсы, Минусы, **Рекомендация** с объяснением «почему именно этот». Не просто «вариант A — лучше».\n\n3. **Риски конкретны.** Не «могут быть проблемы», а конкретный сценарий + митигация. Привязка к ограничениям проекта (Docker, client-side, IndexedDB quota и т.п.).\n\n4. **Дизайн решает проблему из Brief.** Секция 4 должна явно показывать, как предложенная архитектура закрывает каждый пункт Brief'а.\n\n5. **Тестовая стратегия привязана к проекту.** Учитывать существующий стек (RSpec для backend, Vitest для frontend если есть). Если нужны новые инструменты — обосновать.\n\n6. **Нет выдуманных зависимостей.** Если Brief упоминает конкретный гем/библиотеку — используй. Если не упоминает — рекомендуй最小ный набор, обосновывая выбор.\n\n7. **Источники.** Если ссылаешься на внешнюю документацию (MDN, гемы, API) — дай ссылку.\n\n## ФОРМАТ\n\n- Markdown\n- Таблицы для структурированных данных (альтернативы, риски, текущее состояние)\n- Код-блоки для примеров маршрутов, сигнатур, моделей данных\n- Заголовок: `# Research: <название из Brief>`\n\n## INPUT\n\nBrief:\n\n# Brief: Добавить темную тему\n\n## Проблема\n\nПользователи жалуются.\n\n## Для кого\n\nПользователи.\n\n## Контекст\n\nЗадача актуальна.\n\n## Желаемый результат\n\nТемная тема.\n\nКонтекст проекта (что уже реализовано):\n\n# Контекст проекта\n\n## Стек\n- Rails 8.1.3, Vite 8, React 19, Inertia.js 3, Tailwind CSS 4\n- PostgreSQL 17, Redis, Sidekiq\n- Docker (web + db + redis + sidekiq)\n- RSpec для backend тестов\n\n## Что уже реализовано\n\n| Фича | Статус | Ключевые файлы |\n|---|---|---|\n| Авторизация (Devise confirmable) | DONE | `app/models/user.rb`, `app/controllers/users/sessions_controller.rb`, `app/controllers/users/registrations_controller.rb` |\n| Сброс пароля (Devise recoverable) | DONE | `app/controllers/users/passwords_controller.rb` |\n| Профиль пользователя | DONE | `app/controllers/users/profile_controller.rb`, `app/controllers/users/profile/emails_controller.rb`, `app/controllers/users/profile/passwords_controller.rb` |\n| Dashboard | DONE | `app/controllers/pages/dashboard_controller.rb`, `app/frontend/pages/Dashboard.tsx` |\n| Header/навигация | DONE | `app/frontend/components/Header.tsx` |\n| Toast-уведомления | DONE | `app/frontend/components/Toast.tsx` |\n| i18n (русская локализация) | DONE | `config/locales/ru.yml` |\n\n## Архитектурные правила\n- Контроллеры только CRUD (без бизнес-логики в контроллерах)\n- Фронтенд: React + Inertia.js + TypeScript + Tailwind CSS\n- Файлы в `app/frontend/pages/` для Inertia-страниц\n- Background jobs через Sidekiq\n- Все тексты через i18n (`config/locales/ru.yml`)\n\n## База данных\n- Таблица `users` с полями: email, encrypted_password, confirmed_at, confirmation_token, unconfirmed_email\n- Нет таблиц для видео, файлов и т.п.\n",
+          "label": "prompts/generate_research.md: # Generate Research\n\nПроблема из Brief понятна. Ре...",
+          "config": {}
+        },
+        "promptId": "608d93f195e889f7b8b571665b01a05da328dd1ce6f8e2e60a442e665eb4778c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "exec: ./providers/claude-sonnet-retry.sh",
+          "label": "claude-sonnet"
+        },
+        "response": {
+          "output": "Теперь у меня достаточно данных. Генерирую research-документ.\n\n---\n\n# Research: Добавить тёмную тему\n\n## 1. Анализ текущего состояния\n\n### Что уже есть\n\n| Категория | Что есть | Файл |\n|---|---|---|\n| CSS-фреймворк | Tailwind CSS v4 через `@tailwindcss/vite` плагин | `vite.config.ts` |\n| CSS entry point | `@import 'tailwindcss'` + typography/forms плагины | `app/frontend/entrypoints/application.css` |\n| Корневой layout | `AppLayout.tsx` — оборачивает все страницы | `app/frontend/layouts/AppLayout.tsx` |\n| Auth layout | `AuthLayout.tsx` — логин/регистрация/сброс пароля | `app/frontend/pages/auth/AuthLayout.tsx` |\n| Header | Навигация с bg-white / text-gray-600 / indigo | `app/frontend/components/Header.tsx` |\n| Backend-модель | `users` таблица (email, encrypted_password, confirmed_at…) | `app/models/user.rb`, `db/schema.rb` |\n\n### Чего нет\n\n| Что отсутствует | Следствие |\n|---|---|\n| `darkMode` конфигурация в Tailwind | классы `dark:*` не активируются |\n| React Context/Provider для темы | нет глобального состояния темы |\n| Колонка `theme_preference` в `users` | нет хранения выбора между сессиями |\n| `dark:` variants в компонентах | Header, Dashboard, AppLayout, Auth-страницы — light-only |\n| Кнопка переключения темы в UI | пользователь не может сменить тему |\n| CSS custom properties для цветов | нет token-подхода, цвета жёстко зашиты в классах |\n\n**Вывод:** инфраструктура тёмной темы отсутствует полностью. Это greenfield.\n\n---\n\n## 2. Анализ альтернатив\n\n### Решение A: Конфигурация Tailwind (стратегия активации `dark:`)\n\n#### A1 — Media-query (`prefers-color-scheme`)\n\n```css\n/* application.css — ничего не добавлять, это дефолт в Tailwind v4 */\n@import 'tailwindcss';\n```\n\n**Плюсы:** работает без JS, автоматически следует системным настройкам, нулевая сложность  \n**Минусы:** пользователь не может переключить тему вручную, никакой персистентности выбора, противоречит ожиданиям (кнопка «тема» стала стандартом UX)\n\n#### A2 — Class-based (`.dark` на `<html>`) ✅ Рекомендация\n\n```css\n/* application.css */\n@import 'tailwindcss';\n@custom-variant dark (&:where(.dark, .dark *));\n```\n\n**Плюсы:** пользователь управляет темой вручную, легко сочетается с сохранением в localStorage/DB, промышленный стандарт (Tailwind docs рекомендуют), позволяет учесть системные предпочтения как дефолт  \n**Минусы:** требует JS для переключения, нужен ThemeProvider\n\n**Рекомендация:** A2 — class-based. Это стандартный подход в Tailwind v4, единственный дающий ручное переключение. Реализуется одной строкой в CSS.\n\n---\n\n### Решение B: Хранение выбора пользователя\n\n#### B1 — `localStorage` (client-side only)\n\n```ts\n// Хранение: localStorage.setItem('theme', 'dark')\n// Чтение при инициализации: в inertia.tsx или AppLayout.tsx\n```\n\n**Плюсы:** нет миграций БД, работает мгновенно, не требует backend-изменений, работает для неавторизованных пользователей  \n**Минусы:** выбор не переносится между устройствами, сбрасывается при очистке браузера\n\n#### B2 — Колонка `users.theme_preference` в БД ✅ Рекомендация\n\n```ruby\n# db/migrate/YYYYMMDDHHMMSS_add_theme_preference_to_users.rb\nadd_column :users, :theme_preference, :string, default: 'system', null: false\n```\n\n**Плюсы:** выбор сохраняется между устройствами, доступен через `current_user` на сервере, передаётся в Inertia shared props, соответствует архитектурным правилам проекта  \n**Минусы:** требует миграции и изменения профиля\n\n**Рекомендация:** B2 — DB. Проект уже имеет авторизацию и профиль пользователя (`app/controllers/users/profile_controller.rb`). Сохранение в БД — единственный способ обеспечить синхронизацию между устройствами. При этом для инициализации до первой загрузки страницы используется `localStorage` как кэш.\n\n---\n\n### Решение C: Точка управления темой в UI\n\n#### C1 — Только кнопка в Header\n\n**Плюсы:** быстрый доступ, UX-стандарт  \n**Минусы:** нет сохранения на уровне настроек профиля\n\n#### C2 — Только страница профиля\n\n**Плюсы:** централизованно  \n**Минусы:** скрыто от пользователя, нет быстрого доступа\n\n#### C3 — Кнопка в Header + select в Profile ✅ Рекомендация\n\n**Плюсы:** мгновенное переключение через Header, постоянная настройка через профиль, стандарт (GitHub, Linear, Notion)  \n**Минусы:** небольшое дублирование — оба триггера вызывают одно действие\n\n**Рекомендация:** C3. Кнопка в Header вызывает мутацию (PATCH на профиль), которая обновляет и БД, и локальное состояние.\n\n---\n\n## 3. Анализ узких мест и рисков\n\n### FOUC (Flash of Unstyled Content)\n\n**Сценарий:** пользователь открывает страницу, браузер загружает React, только потом применяется тёмная тема — мелькает белый фон.  \n**Причина:** Inertia.js + React — полностью клиентский рендеринг, тема применяется в `useEffect`, то есть после первой отрисовки.  \n**Митигация:** добавить inline-скрипт в `<head>` (Rails layout `application.html.erb`), который до загрузки React читает `localStorage` и ставит класс `.dark` на `<html>`.\n\n### Flash on navigation\n\n**Сценарий:** Inertia SPA-навигация переинициализирует компонент — тема может моргать.  \n**Митигация:** хранить класс на `document.documentElement` (глобально), не удалять при размонтировании компонента.\n\n### Tailwind v4 — изменённый API\n\n**Сценарий:** в Tailwind v4 нет `tailwind.config.js` и `darkMode: 'class'`, используется `@custom-variant dark`.  \n**Митигация:** использовать документацию Tailwind v4 ([https://tailwindcss.com/docs/dark-mode](https://tailwindcss.com/docs/dark-mode)), проверить вывод `bundle exec vite build` после изменения CSS.\n\n### Объём работ по компонентам\n\n**Сценарий:** ~15+ компонентов/страниц используют light-only классы (`bg-white`, `bg-gray-50`, `text-gray-900` и т.д.), все требуют `dark:` variants.  \n**Митигация:** начать с `AppLayout.tsx` и `Header.tsx` — они охватывают все авторизованные страницы. Auth-страницы через `AuthLayout.tsx`.\n\n---\n\n## 4. Обоснованный дизайн решения\n\n### Как решение закрывает Brief\n\n| Проблема из Brief | Решение |\n|---|---|\n| Пользователи жалуются | Ручной переключатель в Header, системный дефолт |\n| Тёмная тема | class-based Tailwind dark mode на всех страницах |\n| Сохранение выбора | `users.theme_preference` + localStorage как кэш |\n\n### Архитектура\n\n```\n[Browser]\n  └─ <html class=\"dark\"> ← inline script в application.html.erb (анти-FOUC)\n       └─ AppLayout.tsx (ThemeProvider)\n            ├─ Header.tsx (кнопка переключения → PATCH /users/profile)\n            └─ {children} (все страницы с dark: variants)\n\n[Rails]\n  ├─ users.theme_preference (колонка: 'light' | 'dark' | 'system')\n  ├─ ApplicationController → shared Inertia props (current_user.theme_preference)\n  └─ Users::ProfileController#update (уже существует, расширяем permitted params)\n```\n\n### Поток данных\n\n```\n1. Первая загрузка:\n   inline script читает localStorage → ставит .dark на <html>\n   Rails передаёт theme_preference через Inertia shared props\n   React ThemeProvider синхронизирует состояние\n\n2. Переключение темы:\n   Клик кнопки в Header\n   → ThemeProvider.toggle()\n   → document.documentElement.classList.toggle('dark')\n   → localStorage.setItem('theme', value)\n   → PATCH /users/profile { theme_preference: value } (фоновый запрос)\n\n3. Следующая сессия:\n   inline script: localStorage → мгновенное применение класса\n   Inertia shared props: подтверждение от сервера\n```\n\n### Файлы, которые нужно создать/изменить\n\n| Файл | Действие | Что делать |\n|---|---|---|\n| `app/frontend/entrypoints/application.css` | изменить | добавить `@custom-variant dark (&:where(.dark, .dark *));` |\n| `app/views/layouts/application.html.erb` | изменить | добавить inline-скрипт анти-FOUC в `<head>` |\n| `app/frontend/layouts/AppLayout.tsx` | изменить | добавить ThemeProvider + применение `dark:bg-gray-900` |\n| `app/frontend/components/Header.tsx` | изменить | добавить кнопку переключения + `dark:` variants |\n| `app/frontend/components/ThemeProvider.tsx` | создать | React Context + хук `useTheme()` |\n| `app/frontend/pages/Dashboard.tsx` | изменить | добавить `dark:` variants |\n| `app/frontend/pages/profile/Show.tsx` | изменить | добавить select выбора темы + `dark:` variants |\n| `app/frontend/pages/auth/AuthLayout.tsx` | изменить | добавить `dark:` variants |\n| `app/frontend/components/Toast.tsx` | изменить | добавить `dark:` variants |\n| `db/migrate/*_add_theme_preference_to_users.rb` | создать | `add_column :users, :theme_preference, :string, default: 'system', null: false` |\n| `app/models/user.rb` | изменить | добавить `validates :theme_preference, inclusion: { in: %w[light dark system] }` |\n| `app/controllers/users/profile_controller.rb` | изменить | добавить `theme_preference` в permitted params |\n| `app/controllers/application_controller.rb` | изменить | добавить `theme_preference` в Inertia shared props |\n| `config/locales/ru.yml` | изменить | добавить ключи для названий тем |\n\n### Ключевые сигнатуры\n\n```ruby\n# db/migrate/..._add_theme_preference_to_users.rb\nadd_column :users, :theme_preference, :string, default: 'system', null: false\nadd_check_constraint :users, \"theme_preference IN ('light', 'dark', 'system')\", \n  name: 'check_users_theme_preference'\n```\n\n```tsx\n// app/frontend/components/ThemeProvider.tsx\ninterface ThemeContextValue {\n  theme: 'light' | 'dark' | 'system'\n  resolvedTheme: 'light' | 'dark'\n  setTheme: (theme: 'light' | 'dark' | 'system') => void\n}\n```\n\n```tsx\n// AppLayout.tsx — применение класса\n<div className=\"min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100\">\n```\n\n### Inline anti-FOUC скрипт (в `<head>`)\n\n```html\n<script>\n  (function() {\n    var stored = localStorage.getItem('theme');\n    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;\n    if (stored === 'dark' || (!stored && prefersDark)) {\n      document.documentElement.classList.add('dark');\n    }\n  })();\n</script>\n```\n\n---\n\n## 5. Риски и митигации\n\n| Риск | Вероятность | Митигация |\n|---|---|---|\n| FOUC при первой загрузке | Высокая | Inline-скрипт в `<head>` до любых CSS |\n| Tailwind v4 синтаксис `@custom-variant` изменится | Низкая | Проверять [changelog](https://github.com/tailwindlabs/tailwindcss/blob/next/CHANGELOG.md) при обновлении |\n| Пропущенный компонент без dark: variants | Средняя | QA-проверка всех страниц в тёмном режиме + Chrome DevTools dark mode emulation |\n| Race condition: localStorage vs Inertia props | Низкая | ThemeProvider синхронизирует оба источника при mount, отдаёт приоритет серверному значению |\n| Миграция ломает seed/тесты | Низкая | `default: 'system'` — backward-compatible, существующие записи получают дефолт |\n| Несоответствие цветов (WCAG) в тёмном режиме | Средняя | Использовать `dark:text-gray-100` для текста, не `dark:text-gray-500` — проверять contrast ratio |\n\n---\n\n## 6. Тестовая стратегия\n\n### Backend (RSpec)\n\n```ruby\n# spec/models/user_spec.rb\ndescribe 'theme_preference' do\n  it 'defaults to system' do\n    expect(build(:user).theme_preference).to eq('system')\n  end\n\n  it 'validates inclusion' do\n    expect(build(:user, theme_preference: 'invalid')).not_to be_valid\n  end\nend\n\n# spec/requests/users/profile_spec.rb\ndescribe 'PATCH /users/profile' do\n  it 'updates theme_preference' do\n    patch users_profile_path, params: { user: { theme_preference: 'dark' } }\n    expect(current_user.reload.theme_preference).to eq('dark')\n  end\n\n  it 'rejects invalid theme' do\n    patch users_profile_path, params: { user: { theme_preference: 'rainbow' } }\n    expect(response).to have_http_status(:unprocessable_entity)\n  end\nend\n```\n\n### Frontend (ручное тестирование + DevTools)\n\nАвтотесты для React ThemeProvider нецелесообразны без Vitest (в проекте не установлен) — ручная QA матрица:\n\n| Сценарий | Ожидаемое поведение |\n|---|---|\n| Системная тема dark, preference = system | тёмная тема |\n| Preference = light при системной dark | светлая тема |\n| Переключение → обновление страницы | тема сохраняется |\n| Вход с другого браузера | тема из БД применяется |\n| Неавторизованный пользователь | тема из localStorage |\n| Страницы: Dashboard, Profile, Login, Register | нет белых вспышек |\n\n**Инструменты:**\n- Chrome DevTools → Rendering → Emulate CSS prefers-color-scheme: dark\n- Chrome DevTools → Application → Local Storage — проверка ключа `theme`\n\n---\n\n## 7. Итоговая рекомендация\n\n**Что делаем:**\n- Tailwind v4 class-based dark mode через `@custom-variant dark` в `application.css`\n- `users.theme_preference` колонка (значения: `light | dark | system`, дефолт `system`)\n- `ThemeProvider.tsx` — React Context, хранит тему, применяет класс на `document.documentElement`\n- Inline anti-FOUC скрипт в `application.html.erb`\n- Кнопка переключения в `Header.tsx` + select в `profile/Show.tsx`\n- `dark:` variants во всех существующих компонентах (AppLayout, Header, Dashboard, Auth-страницы, Toast)\n\n**Чего не делаем:**\n- Не вводим сторонние библиотеки (`next-themes` и аналоги — Rails-проект без Next.js)\n- Не делаем отдельную таблицу `user_preferences` — преждевременная абстракция для одной настройки\n- Не используем CSS custom properties для color tokens — Tailwind `dark:` variants достаточны для текущего масштаба\n- Не добавляем Vitest — проект без него, ручное QA по матрице покрывает сценарии\n\n**Гемы/библиотеки:**\n- Ничего нового. Tailwind v4, React 19, Inertia.js 3 уже установлены и покрывают все потребности."
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "06. Sparse brief — research отмечает недостаток информации или заполняет TBD",
+          "vars": {
+            "brief_doc": "file://fixtures/research-brief-sparse.md",
+            "project_context": "file://fixtures/research-project-context.md"
+          },
+          "assert": [
+            {
+              "type": "javascript",
+              "value": "// При мусорном brief research должен либо отметить недостаток инфо,\n// либо заполнить TBD, либо запросить уточнения.\n// НЕ должен галлюцинировать сложную архитектуру без основания.\nconst hasTBD = /TBD/i.test(output);\nconst hasNote = /(недостаточ|уточн|требует|не хватает|нет данных|не указан|неопредел|sparse|limited information)/i.test(output);\nconst isShort = output.length < 3000; // Если мусорный brief — research не должен быть на 500 строк\nif (!hasTBD && !hasNote && !isShort) throw new Error('Research не отметил недостаток информации в мусорном brief — возможна галлюцинация');\nreturn true;\n"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-sparse.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 6,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 6,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 790599,
+      "evaluationDurationMs": 790599
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Eval generate_research.md — генерация research.md из brief (3 кейса × 3 модели)",
+    "prompts": [
+      "file:///Users/oleghasjanov/Documents/projects/video-chat-and-translator/eval/prompts/generate_research.md"
+    ],
+    "providers": [
+      {
+        "id": "exec: ./providers/claude-sonnet-retry.sh",
+        "label": "claude-sonnet"
+      }
+    ],
+    "tests": [
+      {
+        "description": "01. Simple brief — все 7 обязательных секций присутствуют",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "## 1."
+          },
+          {
+            "type": "contains",
+            "value": "## 2."
+          },
+          {
+            "type": "contains",
+            "value": "## 3."
+          },
+          {
+            "type": "contains",
+            "value": "## 4."
+          },
+          {
+            "type": "contains",
+            "value": "## 5."
+          },
+          {
+            "type": "contains",
+            "value": "## 6."
+          },
+          {
+            "type": "contains",
+            "value": "## 7."
+          }
+        ]
+      },
+      {
+        "description": "02. Simple brief — альтернативы содержат ≥2 варианта с Плюсы/Минусы",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = output.match(/## 2[\\s\\S]*?(?=\\n## 3|$)/);\nif (!m) throw new Error('Секция \"## 2. Анализ альтернатив\" не найдена');\nconst text = m[0];\nconst hasVariants = /(вариант|variant|подход|option|в[аa]риант\\s*[A-Za-zА-Яа-я0-9])/gi.test(text);\nif (!hasVariants) throw new Error('Нет явных вариантов (A, B, C или Вариант 1, 2)');\nconst hasPros = /(плюс|pro|преимуществ)/i.test(text);\nconst hasCons = /(минус|con|недостат)/i.test(text);\nif (!hasPros || !hasCons) throw new Error('Нет Плюсов/Минусов у альтернатив');\nreturn true;\n"
+          }
+        ]
+      },
+      {
+        "description": "03. Simple brief — есть явная рекомендация с обоснованием",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const hasRec = /(рекоменду|recommended|выбран|chosen|итог|вывод|выбор)/i.test(output);\nif (!hasRec) throw new Error('Нет явной рекомендации');\nreturn true;\n"
+          }
+        ]
+      },
+      {
+        "description": "04. Simple brief — дизайн содержит конкретные файлы/маршруты/компоненты",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-simple.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const hasFiles = /app\\/(controllers|models|frontend|views)\\//i.test(output);\nconst hasRoutes = /(GET|POST|PATCH|PUT|DELETE)\\s+\\//i.test(output);\nconst hasGems = /(devise|sidekiq|redis|rspec|inertia|tailwind)/i.test(output);\nif (!hasFiles && !hasRoutes) throw new Error('Нет конкретных файлов или маршрутов в дизайне');\nreturn true;\n"
+          }
+        ]
+      },
+      {
+        "description": "05. Complex brief — риски содержат конкретные сценарии, не общие слова",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-complex.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "const m = output.match(/## 3[\\s\\S]*?(?=\\n## 4|$)/);\nif (!m) throw new Error('Секция \"## 3. Анализ узких мест и рисков\" не найдена');\nconst text = m[0];\n// Проверяем что риски конкретные (упоминают технологии, лимиты, сценарии)\nconst concrete = /(quota|IndexedDB|localStorage|base64|память|memory|blob|File|размер|size|лимит|limit|ошибка|error|fallback)/i.test(text);\nif (!concrete) throw new Error('Риски слишком общие — нет конкретных технологий/сценариев');\nreturn true;\n"
+          }
+        ]
+      },
+      {
+        "description": "06. Sparse brief — research отмечает недостаток информации или заполняет TBD",
+        "vars": {
+          "brief_doc": "file://fixtures/research-brief-sparse.md",
+          "project_context": "file://fixtures/research-project-context.md"
+        },
+        "assert": [
+          {
+            "type": "javascript",
+            "value": "// При мусорном brief research должен либо отметить недостаток инфо,\n// либо заполнить TBD, либо запросить уточнения.\n// НЕ должен галлюцинировать сложную архитектуру без основания.\nconst hasTBD = /TBD/i.test(output);\nconst hasNote = /(недостаточ|уточн|требует|не хватает|нет данных|не указан|неопредел|sparse|limited information)/i.test(output);\nconst isShort = output.length < 3000; // Если мусорный brief — research не должен быть на 500 строк\nif (!hasTBD && !hasNote && !isShort) throw new Error('Research не отметил недостаток информации в мусорном brief — возможна галлюцинация');\nreturn true;\n"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "outputPath": [
+      "generate-research-sonnet-baseline.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.9",
+    "nodeVersion": "v25.8.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-05-05T10:30:48.108Z",
+    "evaluationCreatedAt": "2026-05-05T10:17:37.230Z"
+  }
+}
