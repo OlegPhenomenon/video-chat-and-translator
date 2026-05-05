@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { StorageError, StoredVideoRecord, findVideo, setSubtitles } from '@/features/videos/storage'
 import { getActiveSegmentIndex, parseVtt, SubtitlesPanel, type Segment } from '@/features/videos/subtitles'
+import { ChatPanel } from '@/features/videos/chat'
 import {
   isTranscriptionError,
   providerDefaultModel,
@@ -614,7 +615,7 @@ export default function VideosShow() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start xl:flex-row">
                 <div className="min-w-0 flex-1">
                   <video
                     ref={videoRef}
@@ -642,6 +643,8 @@ export default function VideosShow() {
                   segments={parsedSubtitles.status === 'ready' ? parsedSubtitles.segments : []}
                   status={parsedSubtitles.status}
                 />
+
+                <ChatPanel videoId={id} subtitlesFile={state.record.subtitles ?? null} />
               </div>
             </div>
           )}

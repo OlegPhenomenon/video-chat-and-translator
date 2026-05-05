@@ -14,7 +14,6 @@
 #     --issue <url-or-path> \
 #     [--from-stage <N>] \
 #     [--session <name>] \
-#     [--max-fix-iters 3] \
 #     [--auto-approve-spec]
 #
 # Stages:
@@ -45,7 +44,6 @@ Usage: homeworks/hw-4/scripts/run-feature.sh \
          --issue <url-or-path> \
          [--from-stage <N>] \
          [--session <name>] \
-         [--max-fix-iters 3] \
          [--auto-approve-spec]
 
 Stages: 1=brief, 2=spec, 3=implement, 4=check, 5=smoke, 6=verify, 7=fix, 8=close.
@@ -57,7 +55,6 @@ feature_id=""
 issue=""
 from_stage=""
 session_override=""
-max_fix_iters=3
 auto_approve_spec=0
 
 while [[ $# -gt 0 ]]; do
@@ -76,10 +73,6 @@ while [[ $# -gt 0 ]]; do
 		;;
 	--session)
 		session_override="$2"
-		shift 2
-		;;
-	--max-fix-iters)
-		max_fix_iters="$2"
 		shift 2
 		;;
 	--auto-approve-spec)
@@ -234,6 +227,7 @@ latest_small_loop_verdict() {
 	local kind="$1" slug="$2"
 	# run-loop.sh names runs as <kind>-<slug>-<ts>; pick newest.
 	local dir
+	# shellcheck disable=SC2012  # ls -t for mtime sort is the simplest readable choice here
 	dir="$(ls -td "$hw4_root/runs/${kind}-${slug}-"* 2>/dev/null | head -n 1 || true)"
 	[[ -z "$dir" ]] && return 1
 	# Read STATUS line from report.md
@@ -341,7 +335,6 @@ for stage in 1 2 3 4 5 6 7 8; do
 		log "running brief-loop on $brief_file"
 		set +e
 		run_small_loop brief "$brief_file"
-		rl_status=$?
 		set -e
 		v_status="$(latest_small_loop_verdict brief "$(basename "$brief_file" | tr '/. ' '-' | tr -cd 'A-Za-z0-9-_' | head -c 40)")"
 		case "$v_status" in

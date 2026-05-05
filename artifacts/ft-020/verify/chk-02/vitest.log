@@ -1,0 +1,23 @@
+ Container video-chat-and-translator-redis-1  Running
+ Container video-chat-and-translator-db-1  Running
+
+> test
+> vitest run --run spec/frontend/features/videos/chat/
+
+
+ RUN  v3.2.4 /app
+
+ ✓ spec/frontend/features/videos/chat/storage.test.ts (4 tests) 5ms
+ ✓ spec/frontend/features/videos/chat/client.test.ts (17 tests) 32ms
+ ✓ spec/frontend/features/videos/chat/context.test.ts (6 tests) 38ms
+
+ Test Files  3 passed (3)
+      Tests  27 passed (27)
+   Start at  08:13:54
+   Duration  2.63s (transform 833ms, setup 0ms, collect 1.90s, tests 76ms, environment 3.07s, prepare 1.10s)
+
+npm notice
+npm notice New major version of npm available! 10.9.4 -> 11.13.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+npm notice To update run: npm install -g npm@11.13.0
+npm notice

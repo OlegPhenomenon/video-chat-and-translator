@@ -1,0 +1,11 @@
+ Container video-chat-and-translator-db-1  Running
+ Container video-chat-and-translator-redis-1  Running
+
+> check
+> tsc -p tsconfig.app.json && tsc -p tsconfig.node.json
+
+npm notice
+npm notice New major version of npm available! 10.9.4 -> 11.13.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+npm notice To update run: npm install -g npm@11.13.0
+npm notice

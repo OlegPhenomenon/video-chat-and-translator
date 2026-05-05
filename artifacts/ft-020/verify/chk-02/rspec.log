@@ -1,0 +1,13 @@
+ Container video-chat-and-translator-redis-1  Running
+ Container video-chat-and-translator-db-1  Running
+*...................................................................
+
+Pending: (Failures listed here are expected and do not affect your suite's status)
+
+  1) User add some examples to (or delete) /app/spec/models/user_spec.rb
+     # Not yet implemented
+     # ./spec/models/user_spec.rb:4
+
+Finished in 47.95 seconds (files took 22.4 seconds to load)
+68 examples, 0 failures, 1 pending
+
