@@ -2,27 +2,48 @@
 
 feature_id: FT-020
 issue: https://github.com/OlegPhenomenon/video-chat-and-translator/issues/19
-current_stage: 3
-last_completed_stage: 2
-last_action_at: 2026-05-05T11:33:00+03:00
-status: running
-next_action: реализовать `features/videos/chat/` (router + 3 адаптера + context + storage + ChatPanel) и интегрировать в Show.tsx по `implementation-plan.md` STEP-01..STEP-07
+current_stage: 5
+last_completed_stage: 4
+last_action_at: 2026-05-05T11:50:00+03:00
+status: paused
+next_action: resume from-stage 5 (smoke / safe deploy + verify EC-XX + close PR)
 run_id: FT-020-20260505-1058
 branch: FT-020-ai-chat
 worktree: .worktrees/FT-020-ai-chat
+last_green_commit: 793e26b
 
 ## Stages done
 
-- stage 1 (brief-loop): brief.md APPROVE на 2-й итерации (пересборка из тела issue)
-- stage 2 (spec-loop): feature.md + implementation-plan.md APPROVE на первой итерации, scope creep отсутствует (41 ID плана, все из 66 canonical в feature.md)
+- stage 1 (brief-loop): brief.md APPROVE на 2-й итерации
+- stage 2 (spec-loop): feature.md + plan APPROVE, scope creep отсутствует
+- stage 3 (implement): commit 793e26b — `features/videos/chat/` (router + 3 адаптера + storage + context + ChatPanel) + интеграция в `pages/videos/Show.tsx`
+- stage 4 (check):
+  - Vitest полный suite в Docker — 47/47 passed (включая chat/* 27 тестов)
+  - typecheck `npm run check` — 0 ошибок
+  - evidence: `artifacts/ft-020/verify/chk-02/{vitest,typecheck,full-vitest}.log`, `chk-04/vitest.log`, `chk-05/vitest.log`
 
-## Stage 3 — current
+## STOP/RESUME marker
 
-implementation-plan.md last_completed STEP: 0 (PR-first)
-next STEP: STEP-01 — заморозить shared types (`types.ts`, `errors.ts`)
-WS order: WS-1 (router+адаптеры) → WS-2 (context) → WS-3 (storage) → WS-4 (ChatPanel + Show.tsx)
-parallelizable per PAR-01..PAR-04 в плане
+**Эта запись фиксирует обязательный stop большого цикла HW-4** (граница stage 4 → stage 5).
+Состояние сохранено атомарно. Следующий заход:
 
-## Pending state for resume
+```bash
+cd .worktrees/FT-020-ai-chat
+homeworks/hw-4/scripts/run-feature.sh \
+  --feature-id FT-020 \
+  --issue https://github.com/OlegPhenomenon/video-chat-and-translator/issues/19 \
+  --from-stage 5
+```
 
-если прервёмся в середине STEP-X — обновить эту секцию: какой STEP в работе, какие файлы изменены, какой коммит последний green
+Runner прочитает эту секцию и продолжит с stage 5 без пересказа.
+
+## Stage 5 — pending
+
+план STEP-09 (Playwright evidence для CHK-01/03/06). Pre-condition: app поднят через
+`docker compose -f docker/docker-compose.yml up`. Manual gap (`AG-01`) уже approve'нут в плане.
+
+## Stage 6-8 — pending
+
+- 6 verify: пройти EC-01..EC-05 на стенде, evidence в `artifacts/ft-020/verify/chk-01,03,06/`
+- 7 fix-loop: только если verify нашёл проблемы
+- 8 close: PR через `gh pr create` со ссылками на feature.md / plan / evidence
