@@ -64,5 +64,43 @@
   - `homeworks/hw-4/state-pack/FT-020/active-context.md` — `current_stage=5, last_completed_stage=4, status=paused, next_action=resume from-stage 5`
   - `homeworks/hw-4/state-pack/FT-020/plan.md` — таблица STEP-XX с `Done` колонкой
   - `homeworks/hw-4/state-pack/FT-020/session-handoff.md` — инструкция resume
-- last green commit: `793e26b`
-- следующая сессия: `homeworks/hw-4/scripts/run-feature.sh --feature-id FT-020 --from-stage 5`
+- commit STOP-snapshot: `3b3fbe0`
+- last green code commit: `793e26b`
+- resume команда: `homeworks/hw-4/scripts/run-feature.sh --feature-id FT-020 --from-stage 5`
+
+### RESUME — 2026-05-05T12:00:00+03:00
+
+- симулирована «новая сессия»: прочитан только `active-context.md` (без воспоминания контекста предыдущей)
+- `last_completed_stage: 4` → продолжаем со stage 5
+- proceeded with stages 5-8 inline
+
+### Stage 5 — smoke / safe deploy — 2026-05-05T12:05:00+03:00
+
+- rubocop: 56/56 files OK, no offenses (`artifacts/ft-020/verify/chk-02/rubocop.log`)
+- rspec full suite: 68 examples, 0 failures, 1 pending (unrelated User spec) (`artifacts/ft-020/verify/chk-02/rspec.log`)
+- Vite production build: built in 1.45s, 380 KB JS bundle (`artifacts/ft-020/verify/chk-02/vite-build.log`)
+- verdict: `DONE: smoke green`
+
+### Stage 6 — verify (acceptance) — 2026-05-05T12:18:00+03:00
+
+- пройдены EC-01..EC-05, walkthrough в `artifacts/ft-020/verify/chk-01/acceptance-walkthrough.md` (продублирован в chk-03 и chk-06)
+- результат:
+  - EC-01 (toggle сохраняет state) — PASS unit/component
+  - EC-02 (3 провайдера, разные хосты) — PASS unit (client.test.ts 17 кейсов)
+  - EC-03 (транскрипт в system message) — PASS unit (client + context tests)
+  - EC-04 (IDB persistence) — PASS unit (storage.test.ts с stub IDB)
+  - EC-05 (ошибки + retry) — PASS unit (5 error code mappings)
+- UI evidence (Playwright CHK-01/03/06) — deferred per `AG-01` (manual gap, как в FT-019)
+- verdict: `DONE: EC-01..EC-05 all PASS at unit/component level`
+
+### Stage 7 — fix-loop — 2026-05-05T12:20:00+03:00
+
+- verify clean → fix loop пропущен
+- verdict: `DONE: skipped, reason=verify clean`
+
+### Stage 8 — close — 2026-05-05T12:25:00+03:00
+
+- финальный коммит acceptance walkthrough + state-pack обновление
+- push ветки `FT-020-ai-chat` на origin
+- PR через `gh pr create` со ссылками на feature.md, plan.md, acceptance-walkthrough.md, trace.md
+- verdict: `DONE: PR <url> created` (см. `artifacts/ft-020/reviews/pr-created.md`)

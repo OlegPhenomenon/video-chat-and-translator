@@ -1,0 +1,23 @@
+ Container video-chat-and-translator-db-1  Running
+ Container video-chat-and-translator-redis-1  Running
+vite v8.0.3 building client environment for production...
+[2Ktransforming...✓ 562 modules transformed.
+rendering chunks...
+computing gzip size...
+public/vite-dev/assets/react-D1O1WqmP.svg          0.41 kB │ gzip:   0.26 kB
+public/vite-dev/.vite/manifest-assets.json         0.42 kB │ gzip:   0.17 kB
+public/vite-dev/assets/inertia-BBwuM70o.svg        0.59 kB │ gzip:   0.35 kB
+public/vite-dev/.vite/manifest.json                1.16 kB │ gzip:   0.32 kB
+public/vite-dev/assets/vite_ruby-BkLf4vgQ.svg      1.62 kB │ gzip:   0.71 kB
+public/vite-dev/assets/rails-CaIcUWwI.svg          8.83 kB │ gzip:   3.85 kB
+public/vite-dev/assets/inertia-CAxN9LE_.css        2.23 kB │ gzip:   0.96 kB
+public/vite-dev/assets/application-CO4nNE2W.css   30.74 kB │ gzip:   6.56 kB
+public/vite-dev/assets/application-DQXq7vvp.js     0.13 kB │ gzip:   0.13 kB
+public/vite-dev/assets/inertia-CpKKDwxS.js       380.51 kB │ gzip: 114.12 kB
+
+✓ built in 1.45s
+npm notice
+npm notice New major version of npm available! 10.9.4 -> 11.13.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+npm notice To update run: npm install -g npm@11.13.0
+npm notice
