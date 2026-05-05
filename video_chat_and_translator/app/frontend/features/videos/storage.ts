@@ -3,8 +3,11 @@
 // Videos are NOT synced across devices or shared via the server.
 
 const DB_NAME = 'video_library'
-const DB_VERSION = 1
+// v2 (FT-020): adds `chat_messages` store. The upgrade callback is additive —
+// existing `videos` records survive intact (ER-02 mitigation).
+const DB_VERSION = 2
 const STORE_NAME = 'videos'
+export const CHAT_STORE_NAME = 'chat_messages'
 
 export type StorageErrorCode = 'unsupported' | 'quota_exceeded' | 'unknown'
 
@@ -29,7 +32,7 @@ export interface StoredVideoRecord {
   subtitles?: File
 }
 
-function openDB(): Promise<IDBDatabase> {
+export function openDB(): Promise<IDBDatabase> {
   if (!window.indexedDB) {
     return Promise.reject(new StorageError('IndexedDB is not supported in this browser.', 'unsupported'))
   }
@@ -42,11 +45,18 @@ function openDB(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: 'id' })
       }
+      if (!db.objectStoreNames.contains(CHAT_STORE_NAME)) {
+        db.createObjectStore(CHAT_STORE_NAME, { keyPath: 'videoId' })
+      }
     }
 
     request.onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result)
     request.onerror = () => reject(normalizeError(request.error))
   })
+}
+
+export function normalizeStorageError(error: DOMException | null | unknown): StorageError {
+  return normalizeError(error)
 }
 
 function normalizeError(error: DOMException | null | unknown): StorageError {

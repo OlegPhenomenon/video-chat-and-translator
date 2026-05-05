@@ -1,0 +1,31 @@
+ Container video-chat-and-translator-redis-1  Running
+ Container video-chat-and-translator-db-1  Running
+
+> test
+> vitest run --run
+
+
+ RUN  v3.2.4 /app
+
+ ✓ spec/frontend/features/videos/subtitles/vtt.test.ts (3 tests) 4ms
+ ✓ spec/frontend/features/videos/transcription/client.test.ts (6 tests) 7ms
+ ✓ spec/frontend/features/videos/chat/storage.test.ts (4 tests) 6ms
+ ✓ spec/frontend/features/videos/chat/client.test.ts (17 tests) 19ms
+ ✓ spec/frontend/features/videos/chat/context.test.ts (6 tests) 23ms
+ ✓ spec/frontend/pages/auth/Register.test.tsx (2 tests) 894ms
+   ✓ Register > renders the success placeholder instead of the form  357ms
+   ✓ Register > renders the registration form when success flag is false  535ms
+ ✓ spec/frontend/features/videos/subtitles/active-segment.test.ts (3 tests) 2ms
+ ✓ spec/frontend/pages/videos/Show.test.tsx (6 tests) 1383ms
+   ✓ VideosShow subtitles > shows download + toggle after successful .vtt upload  979ms
+
+ Test Files  8 passed (8)
+      Tests  47 passed (47)
+   Start at  09:33:17
+   Duration  3.46s (transform 1.67s, setup 0ms, collect 3.94s, tests 2.34s, environment 6.62s, prepare 1.20s)
+
+npm notice
+npm notice New major version of npm available! 10.9.4 -> 11.13.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.13.0
+npm notice To update run: npm install -g npm@11.13.0
+npm notice
